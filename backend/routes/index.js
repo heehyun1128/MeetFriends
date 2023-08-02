@@ -3,6 +3,13 @@ const express = require('express');
 const router = express.Router();
 
 // backend/routes/index.js
+
+const apiRouter = require('./api');
+// All the URLs of the routes in the api router will be prefixed with /api
+router.use('/api', apiRouter);
+
+
+// backend/routes/index.js
 // ...
 // Add a XSRF-TOKEN cookie
 router.get("/api/csrf/restore", (req, res) => {
