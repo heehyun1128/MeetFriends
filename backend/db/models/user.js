@@ -24,6 +24,28 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
+      firstName:{
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate:{
+          isCapitalized(firstName){
+            if(firstName[0].toUpperCase() !== firstName[0]){
+              throw new Error("Firstname must be capitalized.")
+            }
+          }
+        }
+      },
+      lastName:{
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate:{
+          isCapitalized(lastName){
+            if(lastName[0].toUpperCase() !== lastName[0]){
+              throw new Error("Lastname must be capitalized.")
+            }
+          }
+        }
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
