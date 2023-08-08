@@ -4,7 +4,8 @@ const { requireAuth } = require("../../utils/auth")
 
 const { Group, GroupImage, Membership, User, Venue, sequelize } = require('../../db/models');
 
-const { Op } = require('sequelize')
+const { Op } = require('sequelize');
+const e = require('express');
 
 const router = express.Router();
 
@@ -229,36 +230,21 @@ router.put("/:id", requireAuth, async (req, res, next) => {
   try {
     // check to see if id is provided and matched
     const { name, about, type, private, city, state } = req.body
-    console.log(private)
+    // console.log(private)
     // find group by Id after id is provided and matched
     const groupToUpdate = await Group.findByPk(req.params.id)
     // find group memberships
     if (groupToUpdate) {
-      const groupMemberships = await groupToUpdate.getMemberships()
-      for (let i = 0; i < groupMemberships.length; i++) {
-        let groupMembership = groupMemberships[i].toJSON()
+     
         // authorization
-        if (groupToUpdate.organizerId === req.user.id || groupMembership.userId === req.user.id) {
-
-          if (name) {
+        if (groupToUpdate.organizerId === req.user.id) {
             groupToUpdate.name = name
-          }
-          if (about) {
             groupToUpdate.about = about
-          }
-          if (type) {
             groupToUpdate.type = type
-          }
-          if (private !== undefined) {
             groupToUpdate.private = private
-            
-          }
-          if (city) {
             groupToUpdate.city = city
-          }
-          if (state) {
             groupToUpdate.state = state
-          }
+
           await groupToUpdate.save()
           return res.json(groupToUpdate)
         } else {
@@ -268,7 +254,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
             message: "Forbidden",
           })
         }
-      }
+      
     } else {
       next({
         status: 404,
@@ -282,6 +268,33 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 })
 
 
+// Delete a Group-Deletes an existing group.
 
+// Require Authentication: true
+// Require proper authorization: Group must belong to the current user
+router.delete("/:id", requireAuth, async (req, res, next) => {
+  const groupToDel = await Group.findByPk(req.params.id)
+  if(groupToDel){
+    if (groupToDel.organizerId === req.user.id) {
+      await groupToDel.destroy()
+      res.status(200).json({
+        message: "Successfully deleted"
+      })
+    }else{
+      next({
+        status: 403,
+        title: "403 Forbidden",
+        message: "Forbidden",
+      })
+    }
+
+  }else{
+    next({
+      status: 404,
+      title: "404 Not Found",
+      message: `Group ${req.params.id} couldn't be found`
+    })
+  }
+})
 
 module.exports = router;

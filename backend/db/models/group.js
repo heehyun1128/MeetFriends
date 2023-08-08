@@ -76,7 +76,7 @@ module.exports = (sequelize, DataTypes) => {
         isBoolean:{
           msg: "Private must be a boolean"
         },
-        len:[4,5],
+        
         notEmpty: {
           msg: "Private must be a boolean"
         }
