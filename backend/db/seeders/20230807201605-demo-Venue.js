@@ -31,7 +31,7 @@ module.exports = {
         
       }
       
-    ])
+    ], { validate: true })
   },
 
   async down(queryInterface, Sequelize) {

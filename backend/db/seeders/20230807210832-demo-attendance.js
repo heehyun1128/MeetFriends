@@ -16,7 +16,7 @@ module.exports = {
         userId:2,
         status:"attending"
       }
-    ])
+    ], { validate: true })
   },
 
   async down (queryInterface, Sequelize) {

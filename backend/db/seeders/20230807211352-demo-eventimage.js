@@ -26,7 +26,7 @@ module.exports = {
         url: "event 2 image url",
         preview: true
       },
-    ])
+    ], { validate: true })
   },
 
   async down(queryInterface, Sequelize) {

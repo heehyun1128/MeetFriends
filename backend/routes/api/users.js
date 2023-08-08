@@ -7,7 +7,7 @@ const { User } = require('../../db/models');
 
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
-
+const { Op } = require('sequelize')
 
 const router = express.Router();
 
@@ -36,26 +36,61 @@ const validateSignup = [
 router.post(
   '/',
   validateSignup,
-  async (req, res) => {
+  async (req, res,next) => {
     const { email, password, username, firstName, lastName } = req.body;
-    const hashedPassword = bcrypt.hashSync(password);
-    const user = await User.create({ email, firstName, lastName, username, hashedPassword });
 
-    const safeUser = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      username: user.username
-      
+    //check if user already exists
+    try {
+      const userWithEmail = await User.findOne({
+        where: {
+          email
+        }
+      })
+      const userWithUsername = await User.findOne({
+        where: {
+          username
+        }
+      })
+      if (userWithEmail) {
+        const error = new Error()
+        error.status = 500
+        error.message = "User already exists"
+        error.errors = {
+          email: "User with that email already exists"
+        }
+      }
+      if (userWithUsername) {
+        const error = new Error()
+        error.status = 500
+        error.message = "User already exists"
+        error.errors = {
+          email: "User with that username already exists"
+        }
+      }
 
-    };
+      const hashedPassword = bcrypt.hashSync(password);
+      const user = await User.create({ email, firstName, lastName, username, hashedPassword });
 
-    await setTokenCookie(res, safeUser);
+      const safeUser = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: user.username
 
-    return res.json({
-      user: safeUser
-    });
+
+      };
+
+      await setTokenCookie(res, safeUser);
+
+      return res.json({
+        user: safeUser
+      });
+    } catch (error) {
+      next(error)
+    }
+
+
   }
 );
 

@@ -17,6 +17,11 @@ module.exports = {
         status: "member"
       },
       {
+        userId:1,
+        groupId:1,
+        status: "organizer"
+      },
+      {
         userId:2,
         groupId:2,
         status: "organizer"
@@ -27,11 +32,16 @@ module.exports = {
         status: "co-host"
       },
       {
+        userId:3,
+        groupId:3,
+        status: "organizer"
+      },
+      {
         userId:1,
         groupId:3,
         status: "pending"
       },
-    ])
+    ], { validate: true })
   },
 
   async down(queryInterface, Sequelize) {
