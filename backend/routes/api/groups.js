@@ -41,13 +41,13 @@ router.get("/", async (req, res, next) => {
     let group = allGroups[i]
     const groupImages = await group.getGroupImages()
     group = group.toJSON()
-    
-    group.previewImage =null
+
+    group.previewImage = null
     for (let i = 0; i < groupImages.length; i++) {
-      
+
       let groupImage = groupImages[i].toJSON()
-      if(groupImage.preview===true){
-        
+      if (groupImage.preview === true) {
+
         group.previewImage = groupImage.url
 
       }
@@ -147,7 +147,7 @@ router.get("/:id", async (req, res, next) => {
     } else {
       next(
         {
-
+          status: 404,
           title: "404 Not Found",
           message: `Group ${req.params.id} couldn't be found`,
         }
@@ -158,5 +158,130 @@ router.get("/:id", async (req, res, next) => {
   }
 
 })
+
+
+// Create a Group
+// Creates and returns a new group.
+// Require Authentication: true
+router.post("/", requireAuth, async (req, res, next) => {
+
+  const { name, about, type, private, city, state } = req.body
+  const newGroup = await Group.create({
+    organizerId: req.user.id,
+    name,
+    about,
+    type,
+    private,
+    city,
+    state,
+  })
+
+  res.status(201).json(newGroup)
+})
+
+
+// Add an Image to a Group based on the Group's id
+// Create and return a new image for a group specified by id.
+// Require Authentication: true
+// Require proper authorization: Current User must be the organizer for the group
+router.post("/:id/images", requireAuth, async (req, res, next) => {
+  try {
+    const group = await Group.findByPk(req.params.id)
+    if (!group) {
+      next({
+        status: 404,
+        title: "404 Not Found",
+        message: `Group ${req.params.id} couldn't be found`
+      })
+    }
+
+    // authorization
+    if (req.user.id !== group.organizerId) {
+      next({
+        status: 403,
+        title: "403 Forbidden",
+        message: "Forbidden",
+      })
+    } else {
+      const newGroupImage = await group.createGroupImage(
+        {
+          url: "image url",
+          preview: true
+        }
+      )
+      res.json({
+        id: newGroupImage.id,
+        url: newGroupImage.url,
+        preview: newGroupImage.preview,
+      })
+    }
+
+  } catch (err) {
+    next(err);
+  }
+})
+
+
+// Edit a Group-Updates and returns an existing group.
+// Require Authentication: true
+// Require proper authorization: Group must belong to the current user
+router.put("/:id", requireAuth, async (req, res, next) => {
+  try {
+    // check to see if id is provided and matched
+    const { name, about, type, private, city, state } = req.body
+    console.log(private)
+    // find group by Id after id is provided and matched
+    const groupToUpdate = await Group.findByPk(req.params.id)
+    // find group memberships
+    if (groupToUpdate) {
+      const groupMemberships = await groupToUpdate.getMemberships()
+      for (let i = 0; i < groupMemberships.length; i++) {
+        let groupMembership = groupMemberships[i].toJSON()
+        // authorization
+        if (groupToUpdate.organizerId === req.user.id || groupMembership.userId === req.user.id) {
+
+          if (name) {
+            groupToUpdate.name = name
+          }
+          if (about) {
+            groupToUpdate.about = about
+          }
+          if (type) {
+            groupToUpdate.type = type
+          }
+          if (private !== undefined) {
+            groupToUpdate.private = private
+            
+          }
+          if (city) {
+            groupToUpdate.city = city
+          }
+          if (state) {
+            groupToUpdate.state = state
+          }
+          await groupToUpdate.save()
+          return res.json(groupToUpdate)
+        } else {
+          next({
+            status: 403,
+            title: "403 Forbidden",
+            message: "Forbidden",
+          })
+        }
+      }
+    } else {
+      next({
+        status: 404,
+        title: "404 Not Found",
+        message: `Group ${req.params.id} couldn't be found`
+      })
+    }
+  } catch (err) {
+    next(err);
+  }
+})
+
+
+
 
 module.exports = router;

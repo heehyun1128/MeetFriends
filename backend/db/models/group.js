@@ -45,7 +45,7 @@ module.exports = (sequelize, DataTypes) => {
       validate: {
         len: {
           args: [1, 60],
-          msg: "Name must be 60 characters or less"
+          msg: "Name cannot be empty and must be 60 characters or less"
         }
 
       }
@@ -66,7 +66,7 @@ module.exports = (sequelize, DataTypes) => {
       validate:{
         isIn: {
           args: [['Online', 'In Person']],
-          msg: "Type must be 'Online' or 'In person'"
+          msg: "Type must be 'Online' or 'In Person'"
         }
       }
     },
@@ -75,7 +75,12 @@ module.exports = (sequelize, DataTypes) => {
       validate:{
         isBoolean:{
           msg: "Private must be a boolean"
+        },
+        len:[4,5],
+        notEmpty: {
+          msg: "Private must be a boolean"
         }
+
       }
     },
     city: {
