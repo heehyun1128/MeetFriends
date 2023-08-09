@@ -17,7 +17,11 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 
   try{
     const { address, city, state, lat, lng } = req.body
-    const venueToEdit = await Venue.findByPk(req.params.id)
+    const venueToEdit = await Venue.findByPk(req.params.id,{
+      attributes: {
+        exclude: ["createdAt", "updatedAt"]
+      },
+    })
     if (!venueToEdit) {
       next({
         status: 404,
@@ -26,6 +30,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
       })
     } else {
       const groupOfVenue = await venueToEdit.getGroup({
+        
         include: {
           model: Membership,
           where: {
