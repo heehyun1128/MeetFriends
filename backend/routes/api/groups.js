@@ -5,7 +5,6 @@ const { requireAuth } = require("../../utils/auth")
 const { Group, GroupImage, Membership, User, Venue, sequelize } = require('../../db/models');
 
 const { Op } = require('sequelize');
-const e = require('express');
 
 const router = express.Router();
 
@@ -104,6 +103,75 @@ router.get("/current", requireAuth, async (req, res, next) => {
 
 })
 
+
+
+// Get All Venues for a Group specified by its id
+// Returns all venues for a group specified by its id
+
+// Require Authentication: true
+
+router.get("/:id/venues", requireAuth, async (req, res, next) => {
+  try {
+    const currGroup = await Group.findByPk(req.params.id)
+
+    if (!currGroup) {
+      next({
+        status: 404,
+        title: "404 Not Found",
+        message: `Group ${req.params.id} couldn't be found`,
+      })
+    } else {
+      const groupVenues = await currGroup.getVenues({
+        attributes:{
+          exclude: ["createdAt", "updatedAt"]
+        }
+      })
+      //get the memberships current user has in the specified group
+      const currUserMembershipInGroupArr = await currGroup.getMemberships({
+        where: {
+          userId: req.user.id
+        }
+      })
+      console.log(currUserMembershipInGroupArr)
+      //check if current user has membership in the group
+      //if in the group - check status
+      if (currGroup.organizerId === req.user.id) {
+        res.status(200).json({ Venues: groupVenues })
+      }else if (currUserMembershipInGroupArr.length>0) {
+        // console.log(currUserMembershipInGroupArr.length)
+        const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
+
+        if (currUserMembershipInGroup.status === "co-host") {
+          res.status(200).json({Venues:groupVenues})
+        } else {
+          next({
+            status: 403,
+            title: "403 Forbidden",
+            message: "Forbidden",
+          })
+        }
+
+      } else {
+        next({
+          status: 403,
+          title: "403 Forbidden",
+          message: "Forbidden",
+        })
+      }
+    }
+
+  } catch (err) {
+    next(err)
+  }
+
+
+
+
+})
+
+
+
+
 // Get details of a Group from an id
 router.get("/:id", async (req, res, next) => {
   let findGroupsById
@@ -139,7 +207,7 @@ router.get("/:id", async (req, res, next) => {
           ],
         ]
       },
-      group: ['Group.id','GroupImages.id']
+      group: ['Group.id', 'GroupImages.id']
 
     })
     if (findGroupsById) {
@@ -220,6 +288,69 @@ router.post("/:id/images", requireAuth, async (req, res, next) => {
 })
 
 
+// Create a new Venue for a Group specified by its id
+// Creates and returns a new venue for a group specified by its id
+
+// Require Authentication: true
+// Require Authentication: Current User must be the organizer of the group or a member of the group with a status of "co-host"
+
+router.post("/:id/venues", requireAuth, async (req, res, next)=>{
+  try {
+    const currGroup = await Group.findByPk(req.params.id)
+
+    if (!currGroup) {
+      next({
+        status: 404,
+        title: "404 Not Found",
+        message: `Group ${req.params.id} couldn't be found`,
+      })
+    } else {
+      const {address,city,state,lat,lng} = req.body
+      const newGroupVenues = await currGroup.createVenue({
+        address, city, state, lat, lng
+      })
+      //get the memberships current user has in the specified group
+      const currUserMembershipInGroupArr = await currGroup.getMemberships({
+        where: {
+          userId: req.user.id
+        }
+      })
+      //check if current user has membership in the group
+      //if in the group - check status
+      if (currGroup.organizerId === req.user.id) {
+        res.status(200).json({ Venues: newGroupVenues })
+      }else if (currUserMembershipInGroupArr.length > 0) {
+        // console.log(currUserMembershipInGroupArr.length)
+        const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
+
+        if (currUserMembershipInGroup.status === "co-host") {
+          res.status(200).json({ Venues: newGroupVenues })
+        } else {
+          next({
+            status: 403,
+            title: "403 Forbidden",
+            message: "Forbidden",
+          })
+        }
+
+      } else {
+        next({
+          status: 403,
+          title: "403 Forbidden",
+          message: "Forbidden",
+        })
+      }
+    }
+
+  } catch (err) {
+    next(err)
+  }
+})
+
+
+
+
+
 // Edit a Group-Updates and returns an existing group.
 // Require Authentication: true
 // Require proper authorization: Group must belong to the current user
@@ -232,26 +363,26 @@ router.put("/:id", requireAuth, async (req, res, next) => {
     const groupToUpdate = await Group.findByPk(req.params.id)
     // find group memberships
     if (groupToUpdate) {
-     
-        // authorization
-        if (groupToUpdate.organizerId === req.user.id) {
-            groupToUpdate.name = name
-            groupToUpdate.about = about
-            groupToUpdate.type = type
-            groupToUpdate.private = private
-            groupToUpdate.city = city
-            groupToUpdate.state = state
 
-          await groupToUpdate.save()
-          return res.json(groupToUpdate)
-        } else {
-          next({
-            status: 403,
-            title: "403 Forbidden",
-            message: "Forbidden",
-          })
-        }
-      
+      // authorization
+      if (groupToUpdate.organizerId === req.user.id) {
+        groupToUpdate.name = name
+        groupToUpdate.about = about
+        groupToUpdate.type = type
+        groupToUpdate.private = private
+        groupToUpdate.city = city
+        groupToUpdate.state = state
+
+        await groupToUpdate.save()
+        return res.json(groupToUpdate)
+      } else {
+        next({
+          status: 403,
+          title: "403 Forbidden",
+          message: "Forbidden",
+        })
+      }
+
     } else {
       next({
         status: 404,
@@ -271,13 +402,13 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 // Require proper authorization: Group must belong to the current user
 router.delete("/:id", requireAuth, async (req, res, next) => {
   const groupToDel = await Group.findByPk(req.params.id)
-  if(groupToDel){
+  if (groupToDel) {
     if (groupToDel.organizerId === req.user.id) {
       await groupToDel.destroy()
       res.status(200).json({
         message: "Successfully deleted"
       })
-    }else{
+    } else {
       next({
         status: 403,
         title: "403 Forbidden",
@@ -285,7 +416,7 @@ router.delete("/:id", requireAuth, async (req, res, next) => {
       })
     }
 
-  }else{
+  } else {
     next({
       status: 404,
       title: "404 Not Found",
