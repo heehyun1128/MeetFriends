@@ -137,10 +137,9 @@ router.get("/:id", async (req, res, next) => {
           [
             sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')), "numMembers"
           ],
-
         ]
       },
-      group: ['Group.id']
+      group: ['Group.id','GroupImages.id']
 
     })
     if (findGroupsById) {
@@ -157,7 +156,6 @@ router.get("/:id", async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-
 })
 
 
@@ -195,7 +193,6 @@ router.post("/:id/images", requireAuth, async (req, res, next) => {
         message: `Group ${req.params.id} couldn't be found`
       })
     }
-
     // authorization
     if (req.user.id !== group.organizerId) {
       next({

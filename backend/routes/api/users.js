@@ -13,6 +13,12 @@ const router = express.Router();
 
 
 const validateSignup = [
+  check('firstName')
+    .exists({ checkFalsy: true })
+    .withMessage('First Name is required'),
+  check('lastName')
+    .exists({ checkFalsy: true })
+    .withMessage('Last Name is required'),
   check('email')
     .exists({ checkFalsy: true })
     .isEmail()
@@ -36,7 +42,7 @@ const validateSignup = [
 router.post(
   '/',
   validateSignup,
-  async (req, res,next) => {
+  async (req, res, next) => {
     const { email, password, username, firstName, lastName } = req.body;
 
     //check if user already exists
@@ -46,26 +52,29 @@ router.post(
           email
         }
       })
+      console.log(userWithEmail)
       const userWithUsername = await User.findOne({
         where: {
           username
         }
       })
       if (userWithEmail) {
-        const error = new Error()
-        error.status = 500
-        error.message = "User already exists"
-        error.errors = {
-          email: "User with that email already exists"
-        }
+        next({
+          status: 500,
+          message: "User already exists",
+          errors: {
+            "username": "User with that email already exists"
+          }
+        })
       }
       if (userWithUsername) {
-        const error = new Error()
-        error.status = 500
-        error.message = "User already exists"
-        error.errors = {
-          email: "User with that username already exists"
-        }
+        next({
+          status: 500,
+          message: "User already exists",
+          errors: {
+            "username": "User with that username already exists"
+          }
+        })
       }
 
       const hashedPassword = bcrypt.hashSync(password);
@@ -77,8 +86,6 @@ router.post(
         lastName: user.lastName,
         email: user.email,
         username: user.username
-
-
       };
 
       await setTokenCookie(res, safeUser);
@@ -86,8 +93,8 @@ router.post(
       return res.json({
         user: safeUser
       });
-    } catch (error) {
-      next(error)
+    } catch (err) {
+      next(err)
     }
 
 
