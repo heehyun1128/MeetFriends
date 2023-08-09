@@ -58,7 +58,16 @@ router.put("/:id", requireAuth, async (req, res, next) => {
         if (currUserMembership.status === "co-host") {
           updateVenueFn()
           await venueToEdit.save()
-          return res.json(venueToEdit)
+          const venueToEditObj = {
+            id: venueToEdit.id,
+            groupId: venueToEdit.groupId,
+            address: venueToEdit.address,
+            city: venueToEdit.city,
+            state: venueToEdit.state,
+            lat: venueToEdit.lat,
+            lng: venueToEdit.lng,
+          }
+          return res.json(venueToEditObj)
         } else {
           next({
             status: 403,
@@ -73,8 +82,8 @@ router.put("/:id", requireAuth, async (req, res, next) => {
           message: "Forbidden",
         })
       }
-      console.log(groupMemberships)
-      res.json(groupOfVenue)
+     
+      res.json(venueToEditObj)
 
     }
   } catch (err) {
