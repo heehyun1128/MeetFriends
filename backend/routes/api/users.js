@@ -7,12 +7,18 @@ const { User } = require('../../db/models');
 
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
-
+const { Op } = require('sequelize')
 
 const router = express.Router();
 
 
 const validateSignup = [
+  check('firstName')
+    .exists({ checkFalsy: true })
+    .withMessage('First Name is required'),
+  check('lastName')
+    .exists({ checkFalsy: true })
+    .withMessage('Last Name is required'),
   check('email')
     .exists({ checkFalsy: true })
     .isEmail()
@@ -36,26 +42,62 @@ const validateSignup = [
 router.post(
   '/',
   validateSignup,
-  async (req, res) => {
+  async (req, res, next) => {
     const { email, password, username, firstName, lastName } = req.body;
-    const hashedPassword = bcrypt.hashSync(password);
-    const user = await User.create({ email, firstName, lastName, username, hashedPassword });
 
-    const safeUser = {
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      username: user.username
-      
+    //check if user already exists
+    try {
+      const userWithEmail = await User.findOne({
+        where: {
+          email
+        }
+      })
+      console.log(userWithEmail)
+      const userWithUsername = await User.findOne({
+        where: {
+          username
+        }
+      })
+      if (userWithEmail) {
+        next({
+          status: 500,
+          message: "User already exists",
+          errors: {
+            "username": "User with that email already exists"
+          }
+        })
+      }
+      if (userWithUsername) {
+        next({
+          status: 500,
+          message: "User already exists",
+          errors: {
+            "username": "User with that username already exists"
+          }
+        })
+      }
 
-    };
+      const hashedPassword = bcrypt.hashSync(password);
+      const user = await User.create({ email, firstName, lastName, username, hashedPassword });
 
-    await setTokenCookie(res, safeUser);
+      const safeUser = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        username: user.username
+      };
 
-    return res.json({
-      user: safeUser
-    });
+      await setTokenCookie(res, safeUser);
+
+      return res.json({
+        user: safeUser
+      });
+    } catch (err) {
+      next(err)
+    }
+
+
   }
 );
 

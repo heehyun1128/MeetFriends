@@ -6,6 +6,21 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       // define association here
+      User.belongsToMany(models.Event, {
+        through: models.Attendance,
+        foreignKey: "userId",
+        otherKey: "eventId"
+      })
+      User.hasMany(models.Group, {
+        foreignKey: "organizerId",
+        onDelete: "cascade",
+        hooks: true
+      })
+      User.hasMany(models.Membership, {
+        foreignKey: "userId",
+        onDelete: "cascade",
+        hooks: true
+      })
     }
   };
 
@@ -24,23 +39,29 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       },
-      firstName:{
+      firstName: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
-          isCapitalized(firstName){
-            if(firstName[0].toUpperCase() !== firstName[0]){
+        validate: {
+          notEmpty: {
+            msg: "First Name is required"
+          },
+          isCapitalized(firstName) {
+            if (firstName[0].toUpperCase() !== firstName[0]) {
               throw new Error("Firstname must be capitalized.")
             }
           }
         }
       },
-      lastName:{
+      lastName: {
         type: DataTypes.STRING,
         allowNull: false,
-        validate:{
-          isCapitalized(lastName){
-            if(lastName[0].toUpperCase() !== lastName[0]){
+        validate: {
+          notEmpty: {
+            msg: "Last Name is required"
+          },
+          isCapitalized(lastName) {
+            if (lastName[0].toUpperCase() !== lastName[0]) {
               throw new Error("Lastname must be capitalized.")
             }
           }
@@ -52,7 +73,10 @@ module.exports = (sequelize, DataTypes) => {
         unique: true,
         validate: {
           len: [3, 256],
-          isEmail: true
+          isEmail: {
+            args: true,
+            msg: "Invalid email"
+          }
         }
       },
       hashedPassword: {
@@ -63,14 +87,14 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     }, {
-      sequelize,
-      modelName: 'User',
-      defaultScope: {
-        attributes: {
-          exclude: ["hashedPassword", "email", "createdAt", "updatedAt"]
-        }
+    sequelize,
+    modelName: 'User',
+    defaultScope: {
+      attributes: {
+        exclude: ["hashedPassword", "email", "createdAt", "updatedAt"]
       }
     }
+  }
   );
   return User;
 };
