@@ -195,12 +195,16 @@ router.get("/current", requireAuth, async (req, res, next) => {
 
   const userMemberships = await Membership.findAll({
     where: {
-      userId: req.user.id
+      userId: req.user.id,
+      status: {
+        [Op.or]: ["co-host", "member", "organizer"]
+      }
     },
     include: {
       model: Group
     }
   })
+  // res.json(userMemberships)
 
 
   let groups = []
@@ -407,7 +411,7 @@ router.get("/:id", async (req, res, next) => {
           ],
         ]
       },
-      group: ['Group.id', 'GroupImages.id', 'Venues.id','Organizer.id']
+      group: ['Group.id', 'GroupImages.id', 'Venues.id', 'Organizer.id']
 
     })
     if (findGroupsById) {
@@ -443,6 +447,13 @@ router.post("/", requireAuth, async (req, res, next) => {
     state,
   })
 
+  // add organizer membership to current user who's creating a group
+  const currUser = await User.findByPk(req.user.id)
+  const currUserMemInGroup = await currUser.createMembership({
+    status: "organizer",
+    groupId: newGroup.id
+  })
+  console.log(currUserMemInGroup)
   res.status(201).json(newGroup)
 })
 
@@ -451,10 +462,10 @@ router.post("/", requireAuth, async (req, res, next) => {
 // Create and return a new image for a group specified by id.
 // Require Authentication: true
 // Require proper authorization: Current User must be the organizer for the group
-router.post("/:id/images", requireAuth, handleError404, handleAddGroupImgErr403,validateImageOnCreate, async (req, res, next) => {
+router.post("/:id/images", requireAuth, handleError404, handleAddGroupImgErr403, validateImageOnCreate, async (req, res, next) => {
   try {
     const group = await Group.findByPk(req.params.id)
-    
+
     const newGroupImage = await group.createGroupImage(
       {
         url: "image url",
@@ -466,7 +477,7 @@ router.post("/:id/images", requireAuth, handleError404, handleAddGroupImgErr403,
       url: newGroupImage.url,
       preview: newGroupImage.preview,
     })
-  
+
 
   } catch (err) {
     next(err);
@@ -483,20 +494,20 @@ router.post("/:id/venues", requireAuth, handleError404, handleError403, async (r
   try {
     const currGroup = await Group.findByPk(req.params.id)
 
-  
-      const { address, city, state, lat, lng } = req.body
-      const newGroupVenues = await currGroup.createVenue({
-        address, city, state, lat, lng
-      })
-      //get the memberships current user has in the specified group
-      const currUserMembershipInGroupArr = await currGroup.getMemberships({
-        where: {
-          userId: req.user.id
-        }
-      })
+
+    const { address, city, state, lat, lng } = req.body
+    const newGroupVenues = await currGroup.createVenue({
+      address, city, state, lat, lng
+    })
+    //get the memberships current user has in the specified group
+    const currUserMembershipInGroupArr = await currGroup.getMemberships({
+      where: {
+        userId: req.user.id
+      }
+    })
     res.status(200).json({ Venues: newGroupVenues })
-    
-  
+
+
 
   } catch (err) {
     next(err)
