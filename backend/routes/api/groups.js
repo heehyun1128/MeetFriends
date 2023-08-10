@@ -76,12 +76,12 @@ const checkMembershipInput = [
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage("Please Provide memberId")
-    .custom(async(value,{req})=>{
+    .custom(async (value, { req }) => {
       const membershipById = await Membership.findOne({
         where: { id: value }
       })
       if (!membershipById) {
-        throw new Error("User couldn't be found" )
+        throw new Error("User couldn't be found")
       }
     }),
   check('status')
@@ -91,11 +91,32 @@ const checkMembershipInput = [
     .custom(async (value) => {
       if (value === "pending") {
         throw new Error("Cannot change a membership status to pending")
-    }})
+      }
+    })
   ,
   handleValidationErrors
 ]
 
+const checkMemberDelInput = [
+  // const { memberId, status } = req.body
+  check('memberId')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Please Provide memberId")
+    .custom(async (value, { req }) => {
+      const { memberId } = req.body
+      const memberToDel = await Membership.findByPk(value, {
+        where: {
+          groupId: req.params.id
+        }
+      })
+      if (!memberToDel) {
+        throw new Error("User couldn't be found")
+      }
+    })
+  ,
+  handleValidationErrors
+]
 // handle 404 error on group id not found
 
 const handleError404 = async (req, res, next) => {
@@ -110,6 +131,25 @@ const handleError404 = async (req, res, next) => {
   }
   next()
 }
+
+// handle 404 member to delete not exist
+const handleMemDelError404 = async (req, res, next) => {
+  const {memberId}=req.body
+  const membershipToDel = await Membership.findByPk(memberId, {
+    where: {
+      groupId: req.params.id
+    }
+  })
+  if (!membershipToDel) {
+    return next({
+      status: 404,
+      message: "Membership does not exist for this User"
+    })
+  }
+  next()
+}
+
+
 
 //handle authorization
 // 403 error
@@ -161,6 +201,31 @@ const handleAddGroupImgErr403 = async (req, res, next) => {
   }
 }
 
+//handle 403 delete membership
+// Current User must be the host of the group, or the user whose membership is being deleted
+const handleDelMembership403 = async (req, res, next) => {
+  const group = await Group.findByPk(req.params.id)
+  const { memberId } = req.body
+  const memberToDel = await Membership.findByPk(memberId, {
+    where: {
+      groupId: req.params.id
+    }
+  })
+
+  if (memberToDel && req.user.id !== group.organizerId && req.user.id !== memberToDel.userId) {
+    return next({
+      status: 403,
+      title: "403 Forbidden",
+      message: "Forbidden",
+    })
+
+  } else {
+    next()
+  }
+
+
+
+}
 
 
 //Get all Groups - Require Authentication: false
@@ -840,8 +905,34 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 })
 
 
-// Delete a Group-Deletes an existing group.
 
+// Delete a membership to a group specified by id.
+// Require Authentication: true
+// Require proper authorization: Current User must be the host of the group, or the user whose membership is being deleted
+router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError404,handleDelMembership403, checkMemberDelInput, async (req, res, next) => {
+  // const group = await Group.findByPk(req.params.id)
+  const { memberId } = req.body
+  const membershipToDel = await Membership.findByPk(memberId, {
+    where: {
+      groupId: req.params.id
+    }
+  })
+  // if (!memberToDel) {
+  //   next({
+  //     status: 404,
+  //     message: "Membership does not exist for this User"
+  //   })
+  // } else {
+  await membershipToDel.destroy()
+  res.status(200).json({
+    "message": "Successfully deleted membership from group"
+  })
+  // }
+
+})
+
+
+// Delete a Group-Deletes an existing group.
 // Require Authentication: true
 // Require proper authorization: Group must belong to the current user
 router.delete("/:id", requireAuth, async (req, res, next) => {
