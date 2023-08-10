@@ -69,13 +69,40 @@ const validateImageOnCreate = [
   handleValidationErrors
 ]
 
+
+const checkMembershipInput = [
+  // const { memberId, status } = req.body
+  check('memberId')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Please Provide memberId")
+    .custom(async(value,{req})=>{
+      const membershipById = await Membership.findOne({
+        where: { id: value }
+      })
+      if (!membershipById) {
+        throw new Error("User couldn't be found" )
+      }
+    }),
+  check('status')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Please Provide status")
+    .custom(async (value) => {
+      if (value === "pending") {
+        throw new Error("Cannot change a membership status to pending")
+    }})
+  ,
+  handleValidationErrors
+]
+
 // handle 404 error on group id not found
 
 const handleError404 = async (req, res, next) => {
   const currGroup = await Group.findByPk(req.params.id)
 
   if (!currGroup) {
-    next({
+    return next({
       status: 404,
       title: "404 Not Found",
       message: `Group ${req.params.id} couldn't be found`,
@@ -123,7 +150,7 @@ const handleError403 = async (req, res, next) => {
 const handleAddGroupImgErr403 = async (req, res, next) => {
   const group = await Group.findByPk(req.params.id)
   if (req.user.id !== group.organizerId) {
-    next({
+    return next({
       status: 403,
       title: "403 Forbidden",
       message: "Forbidden",
@@ -247,7 +274,7 @@ router.get("/:id/venues", requireAuth, async (req, res, next) => {
     const currGroup = await Group.findByPk(req.params.id)
 
     if (!currGroup) {
-      next({
+      return next({
         status: 404,
         title: "404 Not Found",
         message: `Group ${req.params.id} couldn't be found`,
@@ -311,7 +338,7 @@ router.get("/:id/events", async (req, res, next) => {
     const currGroup = await Group.findByPk(req.params.id)
 
     if (!currGroup) {
-      next({
+      return next({
         status: 404,
         title: "404 Not Found",
         message: `Group ${req.params.id} couldn't be found`,
@@ -371,8 +398,78 @@ router.get("/:id/events", async (req, res, next) => {
 
 
 
+// Get all Members of a Group specified by its id
+// Returns the members of a group specified by its id.
+// Require Authentication: false
+router.get("/:id/members", handleError404, async (req, res, next) => {
+  // check if current user is an organizer or a co-host
+
+  const currGroup = await Group.findByPk(req.params.id)
+  //get all memberships in group
+  const allGroupMemberships = await currGroup.getMemberships({
+    include: {
+      model: User
+    }
+  })
+  const allMembersArr = []
+  for (let i = 0; i < allGroupMemberships.length; i++) {
+    const groupMember = allGroupMemberships[i]
+    const member = {
+      id: groupMember.id,
+      firstName: groupMember.User.firstName,
+      lastName: groupMember.User.lastName,
+      Membership: {
+        status: groupMember.status
+      }
+    }
+    allMembersArr.push(member)
+  }
 
 
+  // get pending members
+  const nonPendingMembers = await currGroup.getMemberships({
+    where: {
+      status: {
+        [Op.not]: "pending"
+      }
+    }
+  })
+
+  const nonPendingMemberArr = []
+
+  if (nonPendingMembers.length) {
+    for (let i = 0; i < nonPendingMembers.length; i++) {
+      const nonpendingMember = nonPendingMembers[i]
+      const nonpendingMemberObj = {
+        id: nonpendingMember.id,
+        firstName: nonpendingMember.firstName,
+        lastName: nonpendingMember.lastName,
+        Membership: {
+          status: nonpendingMember.status
+        }
+      }
+      nonPendingMemberArr.push(nonpendingMemberObj)
+    }
+  }
+
+  // get current user membership status
+  const currUserMembership = await Membership.findOne({
+    where: {
+      userId: req.user.id,
+      groupId: req.params.id
+    }
+  })
+
+  if (currGroup.organizerId === req.user.id) {
+    res.status(200).json({ Members: allMembersArr })
+  }
+
+  if (currUserMembership && currUserMembership.status === "co-host") {
+    res.status(200).json({ Members: allMembersArr })
+  }
+  res.status(200).json({ Members: nonPendingMemberArr })
+
+})
 
 
 
@@ -555,6 +652,144 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
   } catch (err) {
     console.log(err)
     next(err);
+  }
+})
+
+
+
+// Request a Membership for a Group based on the Group's id
+// Require Authentication: true
+router.post("/:id/membership", requireAuth, handleError404, async (req, res, next) => {
+  const currGroup = await Group.findByPk(req.params.id)
+  const currGroupMemberships = await currGroup.getMemberships()
+  if (currGroupMemberships.length) {
+    for (let i = 0; i < currGroupMemberships.length; i++) {
+      const currMem = currGroupMemberships[i]
+      if (currMem.userId === req.user.id) {
+        if (currMem.status === "pending") {
+          return next({
+            status: 400,
+            message: "Membership has already been requested"
+          })
+        } else {
+          return next({
+            status: 400,
+            message: "User is already a member of the group"
+          })
+        }
+      }
+    }
+  }
+
+  const createNewMembership = await currGroup.createMembership({
+    userId: req.user.id,
+    status: "pending"
+  })
+  res.status(200).json(
+    {
+      memberId: createNewMembership.id,
+      status: "pending"
+    }
+  )
+
+})
+
+
+// Change the status of a membership for a group specified by id.
+
+// Require Authentication: true
+// Require proper authorization:
+// To change the status from "pending" to "member":
+// Current User must already be the organizer or have a membership to the group with the status of "co-host"
+// To change the status from "member" to "co-host":
+// Current User must already be the organizer
+router.put("/:id/membership", requireAuth, handleError404, handleError403, checkMembershipInput, async (req, res, next) => {
+  try {
+    const currGroup = await Group.findByPk(req.params.id)
+    const { memberId, status } = req.body
+    // find current user membership
+    const currUserMembershipInGroup = await currGroup.getMemberships({
+      where: {
+        userId: req.user.id
+      }
+    })
+    //  If specified membership does not exist
+    const membershipById = await Membership.findOne({
+      where: { id: memberId }
+    })
+    // if (!membershipById) {
+    //   next({
+    //     status: 400,
+    //     message: { "memberId": "User couldn't be found" }
+    //   })
+    // }
+    // Check if the membership exists
+    const membershipToUpdate = await currGroup.getMemberships({
+      where: { id: memberId }
+    })
+    // 404 If membership does not exist
+    if (!membershipToUpdate.length) {
+      return next({
+        status: 404,
+        message: "Membership between the user and the group does not exist"
+      })
+    } else {
+      // if ( status === "pending") {
+      //   next({
+      //     status: 400,
+      //     message: "Cannot change a membership status to pending"
+      //   })
+      // }
+      const membershipToUpdateObj = membershipToUpdate[0].toJSON()
+      const userToUpdateMembership = await User.findByPk(membershipToUpdateObj.userId)
+      const userIdToUpdate = userToUpdateMembership.id
+
+      // authorization
+      let currUserMembership = currUserMembershipInGroup[0].toJSON()
+      // console.log(currUserMembership.status)
+      if (currUserMembership.status === "organizer") {
+        // To change the status from "pending" to "member"
+
+        if (status === "member" && membershipToUpdateObj.status === "pending") {
+          membershipToUpdate[0].status = "member"
+          await membershipToUpdate[0].save()
+          return res.json({
+            id: userIdToUpdate,
+            groupId: req.params.id,
+            memberId: memberId,
+            status: status
+          })
+        }
+        // To change the status from "member" to "co-host":
+        if (status === "co-host" && membershipToUpdateObj.status === "member") {
+          membershipToUpdate[0].status = "co-host"
+          await membershipToUpdate[0].save()
+          return res.json({
+            id: userIdToUpdate,
+            groupId: req.params.id,
+            memberId: memberId,
+            status: status
+          })
+        }
+      }
+      if (currUserMembership.status === "co-host") {
+        console.log(membershipToUpdate.status)
+        // To change the status from "pending" to "member"
+        if (status === "member" && membershipToUpdateObj.status === "pending") {
+          membershipToUpdate[0].status = "member"
+          await membershipToUpdate[0].save()
+          return res.json({
+            id: userIdToUpdate,
+            groupId: req.params.id,
+            memberId: memberId,
+            status: status
+          })
+        }
+      }
+    }
+
+  } catch (err) {
+    next(err)
   }
 })
 
