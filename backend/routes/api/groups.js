@@ -55,6 +55,20 @@ const validateEventInfoOnCreate = [
   handleValidationErrors
 ];
 
+const validateImageOnCreate = [
+  check('url')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Image url must be provided"),
+  check('preview')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .isBoolean()
+    .withMessage("Image preview must be true or false")
+  ,
+  handleValidationErrors
+]
+
 // handle 404 error on group id not found
 
 const handleError404 = async (req, res, next) => {
@@ -72,8 +86,8 @@ const handleError404 = async (req, res, next) => {
 
 //handle authorization
 // 403 error
-const handleError403=async(req,res,next)=>{
-  
+const handleError403 = async (req, res, next) => {
+
   const currGroup = await Group.findByPk(req.params.id)
   //get the memberships current user has in the specified group
   const currUserMembershipInGroupArr = await currGroup.getMemberships({
@@ -82,27 +96,42 @@ const handleError403=async(req,res,next)=>{
     }
   })
   if (currGroup.organizerId !== req.user.id) {
-     if (currUserMembershipInGroupArr.length > 0) {
-    const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
-    if (currUserMembershipInGroup.status !== "co-host") {
+    if (currUserMembershipInGroupArr.length > 0) {
+      const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
+      if (currUserMembershipInGroup.status !== "co-host") {
+        return next({
+          status: 403,
+          title: "403 Forbidden",
+          message: "Forbidden",
+        })
+      } else {
+        next()
+      }
+    } else {
       return next({
         status: 403,
         title: "403 Forbidden",
         message: "Forbidden",
       })
-    }else{
-      next()
     }
-  }else{
-       return next({
-         status: 403,
-         title: "403 Forbidden",
-         message: "Forbidden",
-       })
+  } else {
+    next()
   }
-}else{
-  next()
 }
+
+//handle 403 error for adding image
+const handleAddGroupImgErr403 = async (req, res, next) => {
+  const group = await Group.findByPk(req.params.id)
+  if (req.user.id !== group.organizerId) {
+    next({
+      status: 403,
+      title: "403 Forbidden",
+      message: "Forbidden",
+    })
+
+  } else {
+    next()
+  }
 }
 
 
@@ -423,36 +452,22 @@ router.post("/", requireAuth, async (req, res, next) => {
 // Create and return a new image for a group specified by id.
 // Require Authentication: true
 // Require proper authorization: Current User must be the organizer for the group
-router.post("/:id/images", requireAuth, async (req, res, next) => {
+router.post("/:id/images", requireAuth, handleError404, handleAddGroupImgErr403,validateImageOnCreate, async (req, res, next) => {
   try {
     const group = await Group.findByPk(req.params.id)
-    if (!group) {
-      next({
-        status: 404,
-        title: "404 Not Found",
-        message: `Group ${req.params.id} couldn't be found`
-      })
-    }
-    // authorization
-    if (req.user.id !== group.organizerId) {
-      next({
-        status: 403,
-        title: "403 Forbidden",
-        message: "Forbidden",
-      })
-    } else {
-      const newGroupImage = await group.createGroupImage(
-        {
-          url: "image url",
-          preview: true
-        }
-      )
-      res.json({
-        id: newGroupImage.id,
-        url: newGroupImage.url,
-        preview: newGroupImage.preview,
-      })
-    }
+    
+    const newGroupImage = await group.createGroupImage(
+      {
+        url: "image url",
+        preview: true
+      }
+    )
+    res.json({
+      id: newGroupImage.id,
+      url: newGroupImage.url,
+      preview: newGroupImage.preview,
+    })
+  
 
   } catch (err) {
     next(err);
@@ -465,17 +480,11 @@ router.post("/:id/images", requireAuth, async (req, res, next) => {
 // Require Authentication: true
 // Require Authentication: Current User must be the organizer of the group or a member of the group with a status of "co-host"
 
-router.post("/:id/venues", requireAuth, async (req, res, next) => {
+router.post("/:id/venues", requireAuth, handleError404, handleError403, async (req, res, next) => {
   try {
     const currGroup = await Group.findByPk(req.params.id)
 
-    if (!currGroup) {
-      next({
-        status: 404,
-        title: "404 Not Found",
-        message: `Group ${req.params.id} couldn't be found`,
-      })
-    } else {
+  
       const { address, city, state, lat, lng } = req.body
       const newGroupVenues = await currGroup.createVenue({
         address, city, state, lat, lng
@@ -486,32 +495,9 @@ router.post("/:id/venues", requireAuth, async (req, res, next) => {
           userId: req.user.id
         }
       })
-      //check if current user has membership in the group
-      //if in the group - check status
-      if (currGroup.organizerId === req.user.id) {
-        res.status(200).json({ Venues: newGroupVenues })
-      } else if (currUserMembershipInGroupArr.length > 0) {
-        // console.log(currUserMembershipInGroupArr.length)
-        const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
-
-        if (currUserMembershipInGroup.status === "co-host") {
-          res.status(200).json({ Venues: newGroupVenues })
-        } else {
-          next({
-            status: 403,
-            title: "403 Forbidden",
-            message: "Forbidden",
-          })
-        }
-
-      } else {
-        next({
-          status: 403,
-          title: "403 Forbidden",
-          message: "Forbidden",
-        })
-      }
-    }
+    res.status(200).json({ Venues: newGroupVenues })
+    
+  
 
   } catch (err) {
     next(err)
@@ -531,32 +517,32 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
 
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
 
- 
-     
-      //create new group event
-      const newGroupEvent = await currGroup.createEvent({
-        venueId, name, type, capacity, price, description, startDate, endDate
-      })
 
-      //check if current user has membership in the group
-      //if in the group - check status
-      const newGroupEventObj = {
-        id: newGroupEvent.id,
-        venueId: newGroupEvent.venueId,
-        name: newGroupEvent.name,
-        type: newGroupEvent.type,
-        capacity: newGroupEvent.capacity,
-        price: newGroupEvent.price,
-        description: newGroupEvent.description,
-        startDate: newGroupEvent.startDate,
-        endDate: newGroupEvent.endDate
-      }
-      // console.log(newGroupEventObj)
-      res.status(200).json(newGroupEventObj)
-      
-  
+
+    //create new group event
+    const newGroupEvent = await currGroup.createEvent({
+      venueId, name, type, capacity, price, description, startDate, endDate
+    })
+
+    //check if current user has membership in the group
+    //if in the group - check status
+    const newGroupEventObj = {
+      id: newGroupEvent.id,
+      venueId: newGroupEvent.venueId,
+      name: newGroupEvent.name,
+      type: newGroupEvent.type,
+      capacity: newGroupEvent.capacity,
+      price: newGroupEvent.price,
+      description: newGroupEvent.description,
+      startDate: newGroupEvent.startDate,
+      endDate: newGroupEvent.endDate
+    }
+    // console.log(newGroupEventObj)
+    res.status(200).json(newGroupEventObj)
+
+
   } catch (err) {
-console.log(err)
+    console.log(err)
     next(err);
   }
 })

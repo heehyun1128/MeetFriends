@@ -221,8 +221,10 @@ router.get("/", async (req, res, next) => {
     })
     event = event.toJSON()
     event.numAttending = eventAttendances.length
-    const eventImageUrl = eventImages[0].url
-    event.previewImage = eventImageUrl
+    if(eventImages.length){
+      const eventImageUrl = eventImages[0].url
+      event.previewImage = eventImageUrl
+    }
 
     allEventsArr.push(event)
   }
