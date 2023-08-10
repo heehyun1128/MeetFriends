@@ -88,10 +88,20 @@ const checkMembershipInput = [
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage("Please Provide status")
-    .custom(async (value) => {
+    .custom(async (value,{req}) => {
       if (value === "pending") {
         throw new Error("Cannot change a membership status to pending")
       }
+     const {memberId} = req.body
+      const currGroup = await Group.findByPk(req.params.id)
+      const membershipToUpdate = await currGroup.getMemberships({
+      where: { id: memberId }
+    })
+     const membershipToUpdateObj = membershipToUpdate[0].toJSON()
+      if (value === "co-host" && membershipToUpdateObj.status === "pending"){
+        throw new Error("The membership is pending. Please accept the membership application before changing it to co-host")
+      }
+    
     })
   ,
   handleValidationErrors
@@ -285,7 +295,6 @@ router.get("/", async (req, res, next) => {
 // Returns all the groups.
 // Require Authentication: true
 router.get("/current", requireAuth, async (req, res, next) => {
-
   const userMemberships = await Membership.findAll({
     where: {
       userId: req.user.id,
@@ -297,9 +306,7 @@ router.get("/current", requireAuth, async (req, res, next) => {
       model: Group
     }
   })
-  // res.json(userMemberships)
-
-
+ 
   let groups = []
   for (let i = 0; i < userMemberships.length; i++) {
     let group = userMemberships[i].Group
@@ -310,21 +317,16 @@ router.get("/current", requireAuth, async (req, res, next) => {
         preview: true
       }
     })
-
     group = group.toJSON()
     group.numMembers = groupMemberships.length
-
-    for (let i = 0; i < groupImages.length; i++) {
+    for (let j = 0; j < groupImages.length; j++) {
       let groupImage = groupImages[0].toJSON()
       let url = groupImage.url
       group.previewImage = url
     }
-
     groups.push(group)
   }
-
   res.json({ Groups: groups })
-
 })
 
 
@@ -445,8 +447,12 @@ router.get("/:id/events", async (req, res, next) => {
         })
         currGroupEvent = currGroupEvent.toJSON()
         currGroupEvent.numAttending = groupEventAttendances.length
-        const groupEventImageUrl = groupEventImages[0].url
-        currGroupEvent.previewImage = groupEventImageUrl
+        if (groupEventImages.length){
+          const groupEventImageUrl = groupEventImages[0].url
+          currGroupEvent.previewImage = groupEventImageUrl
+        }else{
+          currGroupEvent.previewImage = null
+        }
 
         allGroupEventsArr.push(currGroupEvent)
       }
@@ -782,12 +788,7 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
     const membershipById = await Membership.findOne({
       where: { id: memberId }
     })
-    // if (!membershipById) {
-    //   next({
-    //     status: 400,
-    //     message: { "memberId": "User couldn't be found" }
-    //   })
-    // }
+  
     // Check if the membership exists
     const membershipToUpdate = await currGroup.getMemberships({
       where: { id: memberId }
@@ -799,12 +800,7 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
         message: "Membership between the user and the group does not exist"
       })
     } else {
-      // if ( status === "pending") {
-      //   next({
-      //     status: 400,
-      //     message: "Cannot change a membership status to pending"
-      //   })
-      // }
+      
       const membershipToUpdateObj = membershipToUpdate[0].toJSON()
       const userToUpdateMembership = await User.findByPk(membershipToUpdateObj.userId)
       const userIdToUpdate = userToUpdateMembership.id
@@ -917,17 +913,12 @@ router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError4
       groupId: req.params.id
     }
   })
-  // if (!memberToDel) {
-  //   next({
-  //     status: 404,
-  //     message: "Membership does not exist for this User"
-  //   })
-  // } else {
+ 
   await membershipToDel.destroy()
   res.status(200).json({
     "message": "Successfully deleted membership from group"
   })
-  // }
+
 
 })
 
