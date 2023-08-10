@@ -82,7 +82,7 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     price: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.DECIMAL,
       validate: {
         isInt: {
           msg: "Price is invalid"
