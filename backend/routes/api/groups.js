@@ -2,12 +2,75 @@ const express = require('express');
 // const cookieParser = require('cookie-parser');
 const { requireAuth } = require("../../utils/auth")
 
-const { Group, GroupImage, Membership, User, Venue, sequelize } = require('../../db/models');
+const { Group, GroupImage, Membership, Attendance, User, Venue, sequelize } = require('../../db/models');
 
 const { Op } = require('sequelize');
 
 
 const router = express.Router();
+
+
+const { check } = require('express-validator');
+const { handleValidationErrors } = require('../../utils/validation');
+const validateEventInfoOnCreate = [
+  check('venueId')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Venue does not exist")
+    .custom(async (value) => {
+      const venue = await Venue.findByPk(value)
+      if (!venue) {
+        throw new Error("Venue does not exist")
+      }
+    }),
+  check("name")
+    .isLength({ min: 5 })
+    .withMessage("Name must be at least 5 characters"),
+  check("type")
+    .isIn(['Online', 'In Person'])
+    .withMessage("Type must be Online or In person"),
+  check("capacity")
+    .isInt()
+    .withMessage("Capacity must be an integer"),
+  check("price")
+    .isInt()
+    .withMessage("Price is invalid"),
+  check("description")
+    .notEmpty()
+    .withMessage("Description is required"),
+  check("startDate")
+    .isAfter()
+    .withMessage("Start date must be a valid datetime and Start date must be in the future"),
+  check("endDate")
+    .custom((value, { req }) => {
+      const startDate = new Date(req.body.startDate)
+      const endDate = new Date(value)
+      if (!value || !req.body.startDate || endDate <= startDate) {
+        throw new Error("End date must be a valid datetime and End date is less than start date")
+      } else {
+        return true
+      }
+    })
+  ,
+  handleValidationErrors
+];
+
+// handle 404 error on group id not found
+
+const handleError404 = async (req, res, next) => {
+  const currGroup = await Group.findByPk(req.params.id)
+
+  if (!currGroup) {
+    next({
+      status: 404,
+      title: "404 Not Found",
+      message: `Group ${req.params.id} couldn't be found`,
+    })
+  }
+  next()
+}
+
+
 
 //Get all Groups - Require Authentication: false
 router.get("/", async (req, res, next) => {
@@ -123,7 +186,7 @@ router.get("/:id/venues", requireAuth, async (req, res, next) => {
       })
     } else {
       const groupVenues = await currGroup.getVenues({
-        attributes:{
+        attributes: {
           exclude: ["createdAt", "updatedAt"]
         }
       })
@@ -138,12 +201,12 @@ router.get("/:id/venues", requireAuth, async (req, res, next) => {
       //if in the group - check status
       if (currGroup.organizerId === req.user.id) {
         res.status(200).json({ Venues: groupVenues })
-      }else if (currUserMembershipInGroupArr.length>0) {
+      } else if (currUserMembershipInGroupArr.length > 0) {
         // console.log(currUserMembershipInGroupArr.length)
         const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
 
         if (currUserMembershipInGroup.status === "co-host") {
-          res.status(200).json({Venues:groupVenues})
+          res.status(200).json({ Venues: groupVenues })
         } else {
           next({
             status: 403,
@@ -169,6 +232,79 @@ router.get("/:id/venues", requireAuth, async (req, res, next) => {
 
 
 })
+
+
+// Get all Events of a Group specified by its id
+// Returns all the events of a group specified by its id
+
+// Require Authentication: false
+router.get("/:id/events", async (req, res, next) => {
+  try {
+    const currGroup = await Group.findByPk(req.params.id)
+
+    if (!currGroup) {
+      next({
+        status: 404,
+        title: "404 Not Found",
+        message: `Group ${req.params.id} couldn't be found`,
+      })
+    } else {
+      const currGroupEvents = await currGroup.getEvents({
+        attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
+        include: [
+          {
+            model: Group,
+            required: false,
+            attributes: ["id", "name", "city", "state"]
+          }, {
+            model: Venue,
+            required: false,
+            attributes: ["id", "city", "state"]
+          }]
+      })
+
+
+      // numAttending:
+      let allGroupEventsArr = []
+      for (let i = 0; i < currGroupEvents.length; i++) {
+        let currGroupEvent = currGroupEvents[i]
+
+        const groupEventAttendances = await currGroupEvent.getUsers({
+          through: {
+            model: Attendance,
+            where: {
+              status: "attending"
+            }
+          }
+        })
+        // previewImage
+        const groupEventImages = await currGroupEvent.getEventImages({
+          where: {
+            preview: true
+          }
+        })
+        currGroupEvent = currGroupEvent.toJSON()
+        currGroupEvent.numAttending = groupEventAttendances.length
+        const groupEventImageUrl = groupEventImages[0].url
+        currGroupEvent.previewImage = groupEventImageUrl
+
+        allGroupEventsArr.push(currGroupEvent)
+      }
+
+
+
+      res.json({ Events: allGroupEventsArr })
+    }
+  } catch (err) {
+    next(err)
+  }
+
+})
+
+
+
+
+
 
 
 
@@ -291,11 +427,10 @@ router.post("/:id/images", requireAuth, async (req, res, next) => {
 
 // Create a new Venue for a Group specified by its id
 // Creates and returns a new venue for a group specified by its id
-
 // Require Authentication: true
 // Require Authentication: Current User must be the organizer of the group or a member of the group with a status of "co-host"
 
-router.post("/:id/venues", requireAuth, async (req, res, next)=>{
+router.post("/:id/venues", requireAuth, async (req, res, next) => {
   try {
     const currGroup = await Group.findByPk(req.params.id)
 
@@ -306,7 +441,7 @@ router.post("/:id/venues", requireAuth, async (req, res, next)=>{
         message: `Group ${req.params.id} couldn't be found`,
       })
     } else {
-      const {address,city,state,lat,lng} = req.body
+      const { address, city, state, lat, lng } = req.body
       const newGroupVenues = await currGroup.createVenue({
         address, city, state, lat, lng
       })
@@ -320,7 +455,7 @@ router.post("/:id/venues", requireAuth, async (req, res, next)=>{
       //if in the group - check status
       if (currGroup.organizerId === req.user.id) {
         res.status(200).json({ Venues: newGroupVenues })
-      }else if (currUserMembershipInGroupArr.length > 0) {
+      } else if (currUserMembershipInGroupArr.length > 0) {
         // console.log(currUserMembershipInGroupArr.length)
         const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
 
@@ -349,6 +484,95 @@ router.post("/:id/venues", requireAuth, async (req, res, next)=>{
 })
 
 
+
+// Create an Event for a Group specified by its id
+// Creates and returns a new event for a group specified by its id
+// Require Authentication: true
+// Require Authorization: Current User must be the organizer of the group or a member of the group with a status of "co-host"
+router.post("/:id/events", requireAuth, handleError404, validateEventInfoOnCreate, async (req, res, next) => {
+
+  try {
+    const currGroup = await Group.findByPk(req.params.id)
+
+    // if (!currGroup) {
+    //   next({
+    //     status: 404,
+    //     title: "404 Not Found",
+    //     message: `Group ${req.params.id} couldn't be found`,
+    //   })
+    // } else {
+    const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
+
+    // check if specified venueId exists in Venue table
+    const venues = await Venue.findAll()
+    for (let i = 0; i < venues.length; i++) {
+      // if venue exists
+      // if (venues[i].id === venueId) {
+      //create new group event
+      const newGroupEvent = await currGroup.createEvent({
+        venueId, name, type, capacity, price, description, startDate, endDate
+      })
+
+      //get the memberships current user has in the specified group
+      const currUserMembershipInGroupArr = await currGroup.getMemberships({
+        where: {
+          userId: req.user.id
+        }
+      })
+      //check if current user has membership in the group
+      //if in the group - check status
+      const newGroupEventObj = {
+        id: newGroupEvent.id,
+        venueId: newGroupEvent.venueId,
+        name: newGroupEvent.name,
+        type: newGroupEvent.type,
+        capacity: newGroupEvent.capacity,
+        price: newGroupEvent.price,
+        description: newGroupEvent.description,
+        startDate: newGroupEvent.startDate,
+        endDate: newGroupEvent.endDate
+      }
+      if (currGroup.organizerId === req.user.id) {
+        res.status(200).json(newGroupEventObj)
+      } else if (currUserMembershipInGroupArr.length > 0) {
+        const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
+
+        if (currUserMembershipInGroup.status === "co-host") {
+          res.status(200).json(newGroupEventObj)
+        } else {
+          next({
+            status: 403,
+            title: "403 Forbidden",
+            message: "Forbidden",
+          })
+        }
+
+      } else {
+        next({
+          status: 403,
+          title: "403 Forbidden",
+          message: "Forbidden",
+        })
+      }
+
+      // } 
+      // else {
+      //   next({
+      //     status: 404,
+      //     title: "404 Not Found",
+      //     message: `Venue does not exist`,
+      //   })
+      // }
+    }
+
+
+    // }
+
+  } catch (err) {
+
+    next(err);
+  }
+})
 
 
 
