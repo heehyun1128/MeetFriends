@@ -636,11 +636,11 @@ router.post("/", requireAuth, async (req, res, next) => {
 router.post("/:id/images", requireAuth, handleError404, handleAddGroupImgErr403, validateImageOnCreate, async (req, res, next) => {
   try {
     const group = await Group.findByPk(req.params.id)
-
+    const {url,preview}=req.body
     const newGroupImage = await group.createGroupImage(
       {
-        url: "image url",
-        preview: true
+        url,
+        preview
       }
     )
     res.json({
@@ -703,12 +703,13 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
       venueId, name, type, capacity, price, description, startDate, endDate
     })
 
-    //group organizer of an event automatically create new Attendance
-    const newAttendance = await Attendance.create({
-      eventId: newGroupEvent.id,
-      userId:req.user.id,
-      status:"attending"
-    })
+
+    // //group organizer of an event automatically create new Attendance
+    // const newAttendance = await Attendance.create({
+    //   eventId: newGroupEvent.id,
+    //   userId:req.user.id,
+    //   status:"attending"
+    // })
     //check if current user has membership in the group
     //if in the group - check status
     const newGroupEventObj = {

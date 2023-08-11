@@ -8,7 +8,7 @@ const { Op } = require('sequelize');
 
 const router = express.Router();
 
-
+const { query } = require('express-validator');
 const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const validateEventInfoOnCreate = [
@@ -89,6 +89,36 @@ const attendValidation = [
 ]
 
 
+const validateQueryParams = [
+  query('page')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .isLength({min:1})
+    .withMessage("Page must be greater than or equal to 1"),
+  query('size')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .isLength({ min: 1 })
+    .withMessage("Size must be greater than or equal to 1"),
+  query('name')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .isString()
+    .withMessage("Name must be a string"),
+  query('type')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .isIn(["Online","In Person"])
+    .withMessage("Type must be 'Online' or 'In Person'"),
+  query('startDate')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Start date must be a valid datetime")
+  ,
+  handleValidationErrors
+]
+
+
 const handleError404 = async (req, res, next) => {
   const currEvent = await Event.findByPk(req.params.id)
 
@@ -105,7 +135,7 @@ const handleError404 = async (req, res, next) => {
 // handle 404 attendance to delete not exist
 const attendanceDelError404 = async (req, res, next) => {
   const { userId } = req.body
-  if(!userId){
+  if (!userId) {
     return next({
       status: 400,
       message: "Please provide userId"
@@ -185,14 +215,17 @@ const handlePostImage403 = async (req, res, next) => {
   })
 
   // check if current user is attending
+  let isAttending = false;
   for (let i = 0; i < currAttendanceList.length; i++) {
     if (currAttendanceList[i].Attendance.userId === req.user.id) {
-      next()
+      isAttending = true;
+      break;
+   
     }
   }
 
-  // check if current user is organizer of group
-  if (currEventGroup.organizerId !== req.user.id) {
+  // check if current user is organizer of group & if current user is attending
+  if (currEventGroup.organizerId !== req.user.id && !isAttending ) {
     if (currUserMembershipInGroupArr.length > 0) {
       const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
       // check if current user is co-host of group
@@ -244,7 +277,40 @@ const handleDelMembership403 = async (req, res, next) => {
 // Get all Events
 // Returns all the events.
 // Require Authentication: false
-router.get("/", async (req, res, next) => {
+
+router.get("/", validateQueryParams,async (req, res, next) => {
+  // Add Query Filters to Get All Events
+  // test:/events?page=0&size=5&name=Event 1&type=In Person&startDate=2023-12-10 14:00:00
+  let { page, size,name,type,startDate } = req.query;
+  
+  page = (page === undefined) ? 1 : parseInt(page);
+  size = (size === undefined) ? 20 : parseInt(size);
+  if (page >10) {
+    page=10
+  }
+  if(size>20){
+    size=20
+  }
+  const pagination = {};
+  if (page >= 1 && size >= 1) {
+    pagination.limit = size;
+    pagination.offset = size * (page - 1);
+  }
+  name = req.query.name || null
+  type = req.query.type || null
+  startDate = req.query.startDate || null
+
+  const where = {}
+  if (name) {
+    where.name = name
+  }
+  if (type) {
+    where.type = type
+  }
+  if (startDate) {
+    where.startDate = startDate
+  }
+
   const allEvents = await Event.findAll({
     attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
     include: [
@@ -256,7 +322,9 @@ router.get("/", async (req, res, next) => {
         model: Venue,
         required: false,
         attributes: ["id", "city", "state"]
-      }]
+      }],
+    where,
+    ...pagination
   })
 
   // numAttending:
@@ -395,12 +463,15 @@ router.post("/:id/images", requireAuth, handleError404, handlePostImage403, vali
   const { url, preview } = req.body
 
   const eventImage = await currEvent.createEventImage({ url, preview })
-
+  console.log(eventImage.toJSON())
+  console.log("Before sending response");
   res.status(200).json({
-    id: eventImage.id,
-    url: eventImage.url,
-    preview: eventImage.preview,
+    id: eventImage.toJSON().id,
+    url: eventImage.toJSON().url,
+    preview: eventImage.toJSON().preview,
+   
   })
+ 
 })
 
 // Request attendance for an event specified by id.
@@ -546,7 +617,7 @@ router.put("/:id", requireAuth, handleError404, handleError403, validateEventInf
 
 router.delete("/:id/attendance", requireAuth, handleError404, attendanceDelError404, handleDelMembership403, async (req, res, next) => {
   const { userId } = req.body
-  
+
   const attendanceToDel = await Attendance.findOne({
     where: {
       userId,
