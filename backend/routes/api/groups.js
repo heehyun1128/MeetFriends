@@ -501,6 +501,9 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
 
   // get pending members
   const nonPendingMembers = await currGroup.getMemberships({
+    include: {
+      model: User
+    },
     where: {
       status: {
         [Op.not]: "pending"
@@ -515,8 +518,8 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
       const nonpendingMember = nonPendingMembers[i]
       const nonpendingMemberObj = {
         id: nonpendingMember.id,
-        firstName: nonpendingMember.firstName,
-        lastName: nonpendingMember.lastName,
+        firstName: nonpendingMember.User.firstName,
+        lastName: nonpendingMember.User.lastName,
         Membership: {
           status: nonpendingMember.status
         }
