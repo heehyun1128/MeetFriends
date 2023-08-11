@@ -703,9 +703,10 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
       venueId, name, type, capacity, price, description, startDate, endDate
     })
 
-    //create new Attendance
+    //group organizer of an event automatically create new Attendance
     const newAttendance = await Attendance.create({
       eventId: newGroupEvent.id,
+      userId:req.user.id,
       status:"attending"
     })
     //check if current user has membership in the group
@@ -926,6 +927,9 @@ router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError4
 
 
 })
+
+
+
 
 
 // Delete a Group-Deletes an existing group.
