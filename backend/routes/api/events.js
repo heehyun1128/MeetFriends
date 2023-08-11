@@ -102,6 +102,31 @@ const handleError404 = async (req, res, next) => {
   next()
 }
 
+// handle 404 attendance to delete not exist
+const attendanceDelError404 = async (req, res, next) => {
+  const { userId } = req.body
+  if(!userId){
+    return next({
+      status: 400,
+      message: "Please provide userId"
+    })
+  }
+  const attendanceToDel = await Attendance.findOne({
+    where: {
+      userId,
+      eventId: req.params.id
+    }
+  })
+
+  if (!attendanceToDel) {
+    return next({
+      status: 404,
+      message: "Attendance does not exist for this User"
+    })
+  }
+  next()
+}
+
 //handle authorization
 // 403 error
 const handleError403 = async (req, res, next) => {
@@ -187,6 +212,28 @@ const handlePostImage403 = async (req, res, next) => {
         message: "Forbidden",
       })
     }
+  } else {
+    next()
+  }
+
+}
+
+
+//handle 403 delete attendance
+// Current User must be the host of the group, or the user whose membership is being deleted
+const handleDelMembership403 = async (req, res, next) => {
+  const event = await Event.findByPk(req.params.id)
+  const groupId = event.toJSON().groupId
+  const group = await Group.findByPk(groupId)
+  const { userId } = req.body
+
+
+  if (req.user.id !== group.organizerId && req.user.id !== userId) {
+    return next({
+      status: 403,
+      message: "Only the User or organizer may delete an Attendance"
+    })
+
   } else {
     next()
   }
@@ -490,6 +537,30 @@ router.put("/:id", requireAuth, handleError404, handleError403, validateEventInf
 
 
 })
+
+
+
+// Delete attendance to an event specified by id
+// Require Authentication: true
+// Require proper authorization: Current User must be the host of the group, or the user whose attendance is being deleted
+
+router.delete("/:id/attendance", requireAuth, handleError404, attendanceDelError404, handleDelMembership403, async (req, res, next) => {
+  const { userId } = req.body
+  
+  const attendanceToDel = await Attendance.findOne({
+    where: {
+      userId,
+      eventId: req.params.id
+    }
+  })
+  await attendanceToDel.destroy()
+  res.status(200).json({
+    message: "Successfully deleted attendance from event"
+  })
+})
+
+
+
 
 // Delete an Event specified by its id
 // Require Authentication: true
