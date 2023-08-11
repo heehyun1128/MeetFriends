@@ -88,6 +88,8 @@ const checkMembershipInput = [
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage("Please Provide status")
+    .isIn(["organizer", "co-host", "member", "pending"])
+    .withMessage("Membership status must be organizer, co-host, member, or pending ")
     .custom(async (value,{req}) => {
       if (value === "pending") {
         throw new Error("Cannot change a membership status to pending")
@@ -696,13 +698,16 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
 
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
 
-
-
     //create new group event
     const newGroupEvent = await currGroup.createEvent({
       venueId, name, type, capacity, price, description, startDate, endDate
     })
 
+    //create new Attendance
+    const newAttendance = await Attendance.create({
+      eventId: newGroupEvent.id,
+      status:"attending"
+    })
     //check if current user has membership in the group
     //if in the group - check status
     const newGroupEventObj = {

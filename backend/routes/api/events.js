@@ -68,6 +68,27 @@ const validateImageOnCreate = [
   handleValidationErrors
 ]
 
+
+const attendValidation = [
+  check('userId')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("userId must be provided"),
+  check('status')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("status must be provided")
+    .isIn(["attending", "waitlist", "pending"])
+    .withMessage("Membership status must be attending, waitlist, or pending ")
+    .custom(async (value, { req }) => {
+      if (value === "pending") {
+        throw new Error("Cannot change an attendance status to pending")
+      }
+    }),
+  handleValidationErrors
+]
+
+
 const handleError404 = async (req, res, next) => {
   const currEvent = await Event.findByPk(req.params.id)
 
@@ -170,15 +191,6 @@ const handlePostImage403 = async (req, res, next) => {
     next()
   }
 
-
-
-
-
-
-
-
-
-
 }
 
 
@@ -221,7 +233,7 @@ router.get("/", async (req, res, next) => {
     })
     event = event.toJSON()
     event.numAttending = eventAttendances.length
-    if(eventImages.length){
+    if (eventImages.length) {
       const eventImageUrl = eventImages[0].url
       event.previewImage = eventImageUrl
     }
@@ -230,6 +242,53 @@ router.get("/", async (req, res, next) => {
   }
   res.json({ Events: allEventsArr })
 })
+
+
+// Get all Attendees of an Event specified by its id
+// Returns the attendees of an event specified by its id.
+// Require Authentication: false
+router.get("/:id/attendees", handleError404, async (req, res, next) => {
+  const currEvent = await Event.findByPk(req.params.id)
+  const allAttendees = await currEvent.getUsers({
+    attributes: ["id", "firstName", "lastName"]
+  })
+
+  const allAttendeeArr = []
+  const nonPendingAttendeeArr = []
+  for (let i = 0; i < allAttendees.length; i++) {
+    const attendee = allAttendees[i]
+    const attendeeObj = {
+      id: attendee.id,
+      firstName: attendee.firstName,
+      lastName: attendee.lastName,
+      Attendance: {
+        status: attendee.Attendance.status
+      }
+    }
+    allAttendeeArr.push(attendeeObj)
+
+    if (attendee.toJSON().Attendance.status !== "pending") {
+      nonPendingAttendeeArr.push(attendee.toJSON())
+    }
+
+  }
+
+  let currUserMemStatus = await Membership.findOne({
+    where: {
+      userId: req.user.id,
+      groupId: currEvent.toJSON().groupId
+    }
+  })
+
+  currUserMemStatus = currUserMemStatus.toJSON()
+  if (currUserMemStatus.status === "co-host" || currUserMemStatus.status === "organizer") {
+    res.json({ Attendees: allAttendeeArr })
+  } else {
+    res.json({ Attendees: nonPendingAttendeeArr })
+  }
+
+})
+
 
 
 // Get details of an Event specified by its id
@@ -273,7 +332,7 @@ router.get("/:id", async (req, res, next) => {
       res.json(event)
     }
   } catch (err) {
-    console.log(err instanceof ValidationError)
+    // console.log(err instanceof ValidationError)
     next(err)
   }
 })
@@ -296,6 +355,98 @@ router.post("/:id/images", requireAuth, handleError404, handlePostImage403, vali
     preview: eventImage.preview,
   })
 })
+
+// Request attendance for an event specified by id.
+// Require Authentication: true
+// Require Authorization: Current User must be a member of the group
+router.post("/:id/attendance", requireAuth, handleError404, async (req, res, next) => {
+  const currEvent = await Event.findByPk(req.params.id, {
+    include: { model: Group }
+  })
+  // check if current User already has a pending attendance for the event
+  const currUserMemStatus = await Membership.findOne({
+    userId: req.user.id,
+    groupId: currEvent.toJSON().Group.id
+  })
+  //  Require Authorization: Current User must be a member of the group
+  if (currUserMemStatus.toJSON().status === "pending") {
+    return next({
+      status: 403,
+      message: "Please join the event group before signing up for the event",
+    })
+  }
+
+  const userCurrAttendance = await Attendance.findOne({
+    where: {
+      userId: req.user.id,
+      eventId: req.params.id
+    }
+  })
+
+  if (userCurrAttendance) {
+    if (userCurrAttendance.toJSON().status === "pending" || userCurrAttendance.toJSON().status === "waitlist") {
+      return next({
+        status: 400,
+        message: "Attendance has already been requested"
+      })
+    } else if (userCurrAttendance.toJSON().status === "attending") {
+      return next({
+        status: 400,
+        message: "User is already an attendee of the event"
+      })
+    }
+  } else {
+    const newAttendee = await Attendance.create({
+      eventId: req.params.id,
+      userId: req.user.id,
+      status: "pending"
+    })
+    res.json({
+      userId: req.user.id,
+      status: "pending"
+    })
+  }
+
+
+
+})
+
+
+// Change the status of an attendance for an event specified by id.
+// Require Authentication: true
+// Require proper authorization: Current User must already be the organizer or have a membership to the group with the status of "co-host"
+router.put("/:id/attendance", requireAuth, handleError404, handleError403, attendValidation, async (req, res, next) => {
+  const { userId, status } = req.body
+  const attendancetoUpdate = await Attendance.findOne({
+    attributes: ["id", "eventId", "userId", "status"],
+    where: {
+      eventId: req.params.id,
+      userId
+    }
+  })
+
+  if (!attendancetoUpdate) {
+    return next({
+      status: 404,
+      message: "Attendance between the user and the event does not exist"
+    })
+  } else {
+    if (attendancetoUpdate.status !== status) {
+      attendancetoUpdate.status = status
+      await attendancetoUpdate.save()
+
+      res.json(attendancetoUpdate)
+    } else {
+      return next({
+        status: 404,
+        message: `The user is already in ${status} status`
+      })
+    }
+
+  }
+})
+
+
 
 // Edit an Event specified by its id
 // Edit and returns an event specified by its id
