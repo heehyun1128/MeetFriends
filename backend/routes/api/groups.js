@@ -212,6 +212,27 @@ const handleAddGroupImgErr403 = async (req, res, next) => {
   }
 }
 
+
+// handle del group 403
+const handleDelGroup403 = async (req, res, next) => {
+  const groupToDel = await Group.findByPk(req.params.id)
+if (groupToDel) {
+  if (groupToDel.organizerId !== req.user.id) {
+    next({
+      status: 403,
+      title: "403 Forbidden",
+      message: "Forbidden",
+    })
+  } else {
+    next()
+  }
+} else {
+  next()
+}
+}
+
+
+
 //handle 403 delete membership
 // Current User must be the host of the group, or the user whose membership is being deleted
 const handleDelMembership403 = async (req, res, next) => {
@@ -938,7 +959,7 @@ router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError4
 // Delete a Group-Deletes an existing group.
 // Require Authentication: true
 // Require proper authorization: Group must belong to the current user
-router.delete("/:id", requireAuth, async (req, res, next) => {
+router.delete("/:id", requireAuth, handleDelGroup403, async (req, res, next) => {
   const groupToDel = await Group.findByPk(req.params.id)
   if (groupToDel) {
     if (groupToDel.organizerId === req.user.id) {

@@ -436,7 +436,7 @@ router.get("/:id", async (req, res, next) => {
       next({
         status: 404,
         title: "404 Not Found",
-        message: `Group ${req.params.id} couldn't be found`,
+        message: `Event ${req.params.id} couldn't be found`,
       })
     } else {
       // numAttending:
