@@ -93,15 +93,15 @@ const checkMembershipInput = [
       if (value === "pending") {
         throw new Error("Cannot change a membership status to pending")
       }
-     const {memberId} = req.body
-      const currGroup = await Group.findByPk(req.params.id)
-      const membershipToUpdate = await currGroup.getMemberships({
-      where: { id: memberId }
-    })
-     const membershipToUpdateObj = membershipToUpdate[0].toJSON()
-      if (value === "co-host" && membershipToUpdateObj.status === "pending"){
-        throw new Error("The membership is pending. Please accept the membership application before changing it to co-host")
-      }
+    //  const {memberId} = req.body
+    //   const currGroup = await Group.findByPk(req.params.id)
+    //   const membershipToUpdate = await currGroup.getMemberships({
+    //   where: { id: memberId }
+    // })
+    //  const membershipToUpdateObj = membershipToUpdate[0].toJSON()
+    //   if (value === "co-host" && membershipToUpdateObj.status === "pending"){
+    //     throw new Error("The membership is pending. Please accept the membership application before changing it to co-host")
+    //   }
     
     })
   ,
@@ -500,6 +500,9 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
 
   // get pending members
   const nonPendingMembers = await currGroup.getMemberships({
+    include: {
+      model: User
+    },
     where: {
       status: {
         [Op.not]: "pending"
@@ -514,8 +517,8 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
       const nonpendingMember = nonPendingMembers[i]
       const nonpendingMemberObj = {
         id: nonpendingMember.id,
-        firstName: nonpendingMember.firstName,
-        lastName: nonpendingMember.lastName,
+        firstName: nonpendingMember.User.firstName,
+        lastName: nonpendingMember.User.lastName,
         Membership: {
           status: nonpendingMember.status
         }
@@ -827,9 +830,9 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
             status: status
           })
         }
-        // To change the status from "member" to "co-host":
-        if (status === "co-host" && membershipToUpdateObj.status === "member") {
-          membershipToUpdate[0].status = "co-host"
+        // To change the status from "member" to "co-host":and co-host to member
+        if ((status === "co-host" && membershipToUpdateObj.status === "member") || (status === "member" && membershipToUpdateObj.status === "co-host")) {
+          membershipToUpdate[0].status = status
           await membershipToUpdate[0].save()
           return res.json({
             id: userIdToUpdate,
