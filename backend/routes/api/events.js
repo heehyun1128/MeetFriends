@@ -91,26 +91,31 @@ const attendValidation = [
 
 const validateQueryParams = [
   query('page')
+    .optional()
     .exists({ checkFalsy: true })
     .notEmpty()
     .isLength({ min: 1 })
     .withMessage("Page must be greater than or equal to 1"),
   query('size')
+    .optional()
     .exists({ checkFalsy: true })
     .notEmpty()
     .isLength({ min: 1 })
     .withMessage("Size must be greater than or equal to 1"),
   query('name')
+    .optional()
     .exists({ checkFalsy: true })
     .notEmpty()
     .isString()
     .withMessage("Name must be a string"),
   query('type')
+    .optional()
     .exists({ checkFalsy: true })
     .notEmpty()
     .isIn(["Online", "In Person"])
     .withMessage("Type must be 'Online' or 'In Person'"),
   query('startDate')
+    .optional()
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage("Start date must be a valid datetime")

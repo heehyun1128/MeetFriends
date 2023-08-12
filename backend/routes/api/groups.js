@@ -32,7 +32,7 @@ const validateEventInfoOnCreate = [
     .isInt()
     .withMessage("Capacity must be an integer"),
   check("price")
-    .isInt()
+    .isDecimal()
     .withMessage("Price is invalid"),
   check("description")
     .notEmpty()
@@ -77,7 +77,8 @@ const checkMembershipInput = [
     .withMessage("Please Provide memberId")
     .custom(async (value, { req }) => {
       const membershipById = await Membership.findOne({
-        where: { id: value }
+        // memberId is User PK
+        where: { userId: value }
       })
       if (!membershipById) {
         throw new Error("User couldn't be found")
@@ -115,9 +116,10 @@ const checkMemberDelInput = [
     .notEmpty()
     .withMessage("Please Provide memberId")
     .custom(async (value, { req }) => {
-      const { memberId } = req.body
-      const memberToDel = await Membership.findByPk(value, {
+      // const { memberId } = req.body
+      const memberToDel = await Membership.findOne( {
         where: {
+          userId: value,
           groupId: req.params.id
         }
       })
@@ -146,8 +148,9 @@ const handleError404 = async (req, res, next) => {
 // handle 404 member to delete not exist
 const handleMemDelError404 = async (req, res, next) => {
   const {memberId}=req.body
-  const membershipToDel = await Membership.findByPk(memberId, {
+  const membershipToDel = await Membership.findByOne({
     where: {
+      userId: memberId,
       groupId: req.params.id
     }
   })
@@ -238,8 +241,9 @@ if (groupToDel) {
 const handleDelMembership403 = async (req, res, next) => {
   const group = await Group.findByPk(req.params.id)
   const { memberId } = req.body
-  const memberToDel = await Membership.findByPk(memberId, {
+  const memberToDel = await Membership.findOne( {
     where: {
+      userId:memberId,
       groupId: req.params.id
     }
   })
@@ -720,7 +724,7 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
     const currGroup = await Group.findByPk(req.params.id)
 
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
-
+console.log(typeof price)
     //create new group event
     const newGroupEvent = await currGroup.createEvent({
       venueId, name, type, capacity, price, description, startDate, endDate
@@ -737,6 +741,7 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
     //if in the group - check status
     const newGroupEventObj = {
       id: newGroupEvent.id,
+      groupId: parseInt(req.params.id),
       venueId: newGroupEvent.venueId,
       name: newGroupEvent.name,
       type: newGroupEvent.type,
@@ -788,7 +793,7 @@ router.post("/:id/membership", requireAuth, handleError404, async (req, res, nex
   })
   res.status(200).json(
     {
-      memberId: createNewMembership.id,
+      memberId: req.user.id,
       status: "pending"
     }
   )
@@ -816,12 +821,12 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
     })
     //  If specified membership does not exist
     const membershipById = await Membership.findOne({
-      where: { id: memberId }
+      where: { userId: memberId }
     })
-  
+    
     // Check if the membership exists
     const membershipToUpdate = await currGroup.getMemberships({
-      where: { id: memberId }
+      where: { userId: memberId }
     })
     // 404 If membership does not exist
     if (!membershipToUpdate.length) {
@@ -829,19 +834,20 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
         status: 404,
         message: "Membership between the user and the group does not exist"
       })
-    } else {
       
+    } else {
       const membershipToUpdateObj = membershipToUpdate[0].toJSON()
       const userToUpdateMembership = await User.findByPk(membershipToUpdateObj.userId)
       const userIdToUpdate = userToUpdateMembership.id
-
+      
       // authorization
       let currUserMembership = currUserMembershipInGroup[0].toJSON()
       // console.log(currUserMembership.status)
       if (currUserMembership.status === "organizer") {
         // To change the status from "pending" to "member"
-
+        
         if (status === "member" && membershipToUpdateObj.status === "pending") {
+          console.log("hee2")
           membershipToUpdate[0].status = "member"
           await membershipToUpdate[0].save()
           return res.json({
@@ -938,8 +944,10 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError404,handleDelMembership403, checkMemberDelInput, async (req, res, next) => {
   // const group = await Group.findByPk(req.params.id)
   const { memberId } = req.body
-  const membershipToDel = await Membership.findByPk(memberId, {
+  // memberId is userId User PK
+  const membershipToDel = await Membership.findOne( {
     where: {
+      userId:memberId,
       groupId: req.params.id
     }
   })
