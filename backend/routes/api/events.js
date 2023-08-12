@@ -32,7 +32,7 @@ const validateEventInfoOnCreate = [
     .isInt()
     .withMessage("Capacity must be an integer"),
   check("price")
-    .isInt()
+    .isDecimal()
     .withMessage("Price is invalid"),
   check("description")
     .notEmpty()
@@ -44,8 +44,8 @@ const validateEventInfoOnCreate = [
     .custom((value, { req }) => {
       const startDate = new Date(req.body.startDate)
       const endDate = new Date(value)
-      if (!value || !req.body.startDate || endDate <= startDate) {
-        throw new Error("End date must be a valid datetime and End date is less than start date")
+      if (!value || (!req.body.startDate && !endDate) || endDate <= startDate) {
+        throw new Error("End date must be a valid datetime and End date should be later than start date")
       } else {
         return true
       }
@@ -60,7 +60,7 @@ const validateImageOnCreate = [
     .notEmpty()
     .withMessage("Image url must be provided"),
   check('preview')
-    .exists({ checkFalsy: true })
+    // .exists({ checkFalsy: true })
     .notEmpty()
     .isBoolean()
     .withMessage("Image preview must be true or false")
@@ -160,6 +160,20 @@ const attendanceDelError404 = async (req, res, next) => {
     })
   }
   next()
+}
+
+// handle venue not found 404
+const handleVenue404 = async(req, res, next) =>{
+  const {venueId} = req.body
+  const venue = await Venue.findByPk(venueId)
+  if(!venue){
+    return next({
+      status: 404,
+      message: "Venue couldn't be found"
+    })
+  }else{
+    next()
+  }
 }
 
 //handle authorization
@@ -395,12 +409,16 @@ router.get("/:id/attendees", handleError404, async (req, res, next) => {
 
   }
 
-  let currUserMemStatus = await Membership.findOne({
+  let currUserMemStatus 
+  if(req.user){
+    currUserMemStatus = await Membership.findOne({
     where: {
       userId: req.user.id,
       groupId: currEvent.toJSON().groupId
     }
   })
+  }
+  
   if (currUserMemStatus) {
     currUserMemStatus = currUserMemStatus.toJSON()
     if (currUserMemStatus.status === "co-host" || currUserMemStatus.status === "organizer") {
@@ -581,7 +599,7 @@ router.put("/:id/attendance", requireAuth, handleError404, handleError403, atten
 // Edit and returns an event specified by its id
 // Require Authentication: true
 // Require Authorization: Current User must be the organizer of the group or a member of the group with a status of "co-host"
-router.put("/:id", requireAuth, handleError404, handleError403, validateEventInfoOnCreate, async (req, res, next) => {
+router.put("/:id", requireAuth, handleError404, handleVenue404, handleError403, validateEventInfoOnCreate, async (req, res, next) => {
 
   try {
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body

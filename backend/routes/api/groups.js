@@ -44,8 +44,8 @@ const validateEventInfoOnCreate = [
     .custom((value, { req }) => {
       const startDate = new Date(req.body.startDate)
       const endDate = new Date(value)
-      if (!value || !req.body.startDate || endDate <= startDate) {
-        throw new Error("End date must be a valid datetime and End date is less than start date")
+      if (!value || (!req.body.startDate && !endDate) || endDate <= startDate) {
+        throw new Error("End date must be a valid datetime and End date should be later than start date")
       } else {
         return true
       }
@@ -60,7 +60,7 @@ const validateImageOnCreate = [
     .notEmpty()
     .withMessage("Image url must be provided"),
   check('preview')
-    .exists({ checkFalsy: true })
+    // .exists({ checkFalsy: true })
     .notEmpty()
     .isBoolean()
     .withMessage("Image preview must be true or false")
@@ -88,23 +88,15 @@ const checkMembershipInput = [
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage("Please Provide status")
-    .isIn(["organizer", "co-host", "member", "pending"])
-    .withMessage("Membership status must be organizer, co-host, member, or pending ")
-    .custom(async (value,{req}) => {
+
+    .custom(async (value, { req }) => {
       if (value === "pending") {
         throw new Error("Cannot change a membership status to pending")
       }
-    //  const {memberId} = req.body
-    //   const currGroup = await Group.findByPk(req.params.id)
-    //   const membershipToUpdate = await currGroup.getMemberships({
-    //   where: { id: memberId }
-    // })
-    //  const membershipToUpdateObj = membershipToUpdate[0].toJSON()
-    //   if (value === "co-host" && membershipToUpdateObj.status === "pending"){
-    //     throw new Error("The membership is pending. Please accept the membership application before changing it to co-host")
-    //   }
-    
+
     })
+    .isIn(["co-host", "member", "pending", "organizer"])
+    .withMessage("Membership status must be co-host, member,organizer")
   ,
   handleValidationErrors
 ]
@@ -117,7 +109,7 @@ const checkMemberDelInput = [
     .withMessage("Please Provide memberId")
     .custom(async (value, { req }) => {
       // const { memberId } = req.body
-      const memberToDel = await Membership.findOne( {
+      const memberToDel = await Membership.findOne({
         where: {
           userId: value,
           groupId: req.params.id
@@ -147,7 +139,7 @@ const handleError404 = async (req, res, next) => {
 
 // handle 404 member to delete not exist
 const handleMemDelError404 = async (req, res, next) => {
-  const {memberId}=req.body
+  const { memberId } = req.body
   const membershipToDel = await Membership.findByOne({
     where: {
       userId: memberId,
@@ -219,19 +211,19 @@ const handleAddGroupImgErr403 = async (req, res, next) => {
 // handle del group 403
 const handleDelGroup403 = async (req, res, next) => {
   const groupToDel = await Group.findByPk(req.params.id)
-if (groupToDel) {
-  if (groupToDel.organizerId !== req.user.id) {
-    next({
-      status: 403,
-      title: "403 Forbidden",
-      message: "Forbidden",
-    })
+  if (groupToDel) {
+    if (groupToDel.organizerId !== req.user.id) {
+      next({
+        status: 403,
+        title: "403 Forbidden",
+        message: "Forbidden",
+      })
+    } else {
+      next()
+    }
   } else {
     next()
   }
-} else {
-  next()
-}
 }
 
 
@@ -241,9 +233,9 @@ if (groupToDel) {
 const handleDelMembership403 = async (req, res, next) => {
   const group = await Group.findByPk(req.params.id)
   const { memberId } = req.body
-  const memberToDel = await Membership.findOne( {
+  const memberToDel = await Membership.findOne({
     where: {
-      userId:memberId,
+      userId: memberId,
       groupId: req.params.id
     }
   })
@@ -332,7 +324,7 @@ router.get("/current", requireAuth, async (req, res, next) => {
       model: Group
     }
   })
- 
+
   let groups = []
   for (let i = 0; i < userMemberships.length; i++) {
     let group = userMemberships[i].Group
@@ -473,10 +465,10 @@ router.get("/:id/events", async (req, res, next) => {
         })
         currGroupEvent = currGroupEvent.toJSON()
         currGroupEvent.numAttending = groupEventAttendances.length
-        if (groupEventImages.length){
+        if (groupEventImages.length) {
           const groupEventImageUrl = groupEventImages[0].url
           currGroupEvent.previewImage = groupEventImageUrl
-        }else{
+        } else {
           currGroupEvent.previewImage = null
         }
 
@@ -553,16 +545,22 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
   }
 
   // get current user membership status
-  const currUserMembership = await Membership.findOne({
-    where: {
-      userId: req.user.id,
-      groupId: req.params.id
-    }
-  })
 
-  if (currGroup.organizerId === req.user.id) {
-    res.status(200).json({ Members: allMembersArr })
+  let currUserMembership
+  if (req.user) {
+    currUserMembership = await Membership.findOne({
+      where: {
+        userId: req.user.id,
+        groupId: req.params.id
+      }
+    })
+    if (currGroup.organizerId === req.user.id) {
+      res.status(200).json({ Members: allMembersArr })
+    }
+
   }
+
+
 
   if (currUserMembership && currUserMembership.status === "co-host") {
     res.status(200).json({ Members: allMembersArr })
@@ -663,7 +661,7 @@ router.post("/", requireAuth, async (req, res, next) => {
 router.post("/:id/images", requireAuth, handleError404, handleAddGroupImgErr403, validateImageOnCreate, async (req, res, next) => {
   try {
     const group = await Group.findByPk(req.params.id)
-    const {url,preview}=req.body
+    const { url, preview } = req.body
     const newGroupImage = await group.createGroupImage(
       {
         url,
@@ -703,7 +701,17 @@ router.post("/:id/venues", requireAuth, handleError404, handleError403, async (r
         userId: req.user.id
       }
     })
-    res.status(200).json({ Venues: newGroupVenues })
+    res.status(200).json({
+      id: newGroupVenues.id,
+      groupId: req.params.id,
+      address: newGroupVenues.address,
+      city: newGroupVenues.city,
+      state: newGroupVenues.state,
+      lat: newGroupVenues.lat,
+      lng: newGroupVenues.lng
+
+
+    })
 
 
 
@@ -724,7 +732,7 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
     const currGroup = await Group.findByPk(req.params.id)
 
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
-console.log(typeof price)
+    console.log(typeof price)
     //create new group event
     const newGroupEvent = await currGroup.createEvent({
       venueId, name, type, capacity, price, description, startDate, endDate
@@ -819,11 +827,7 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
         userId: req.user.id
       }
     })
-    //  If specified membership does not exist
-    const membershipById = await Membership.findOne({
-      where: { userId: memberId }
-    })
-    
+
     // Check if the membership exists
     const membershipToUpdate = await currGroup.getMemberships({
       where: { userId: memberId }
@@ -834,57 +838,46 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
         status: 404,
         message: "Membership between the user and the group does not exist"
       })
-      
+
     } else {
       const membershipToUpdateObj = membershipToUpdate[0].toJSON()
-      const userToUpdateMembership = await User.findByPk(membershipToUpdateObj.userId)
-      const userIdToUpdate = userToUpdateMembership.id
-      
+
       // authorization
       let currUserMembership = currUserMembershipInGroup[0].toJSON()
       // console.log(currUserMembership.status)
+      let resObj
       if (currUserMembership.status === "organizer") {
-        // To change the status from "pending" to "member"
-        
-        if (status === "member" && membershipToUpdateObj.status === "pending") {
-          console.log("hee2")
-          membershipToUpdate[0].status = "member"
-          await membershipToUpdate[0].save()
-          return res.json({
-            id: userIdToUpdate,
-            groupId: req.params.id,
-            memberId: memberId,
-            status: status
-          })
-        }
-        // To change the status from "member" to "co-host":and co-host to member
-        if ((status === "co-host" && membershipToUpdateObj.status === "member") || (status === "member" && membershipToUpdateObj.status === "co-host")) {
           membershipToUpdate[0].status = status
           await membershipToUpdate[0].save()
           return res.json({
-            id: userIdToUpdate,
+            id: membershipToUpdateObj.id,
             groupId: req.params.id,
             memberId: memberId,
             status: status
           })
-        }
-      }
-      if (currUserMembership.status === "co-host") {
-        console.log(membershipToUpdate.status)
-        // To change the status from "pending" to "member"
-        if (status === "member" && membershipToUpdateObj.status === "pending") {
-          membershipToUpdate[0].status = "member"
+      } else if (currUserMembership.status === "co-host") {
+        if (status !== "co-host") {
+          membershipToUpdate[0].status = status
           await membershipToUpdate[0].save()
           return res.json({
-            id: userIdToUpdate,
+            id: membershipToUpdateObj.id,
             groupId: req.params.id,
             memberId: memberId,
             status: status
           })
+        }else{
+          return next({
+            status: 403,
+            message: "You do not have authorization to change the status to co-host"
+          })
         }
+      }else{
+        return next({
+          status: 403,
+          message: "forbidden"
+        })
       }
     }
-
   } catch (err) {
     next(err)
   }
@@ -941,17 +934,17 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 // Delete a membership to a group specified by id.
 // Require Authentication: true
 // Require proper authorization: Current User must be the host of the group, or the user whose membership is being deleted
-router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError404,handleDelMembership403, checkMemberDelInput, async (req, res, next) => {
+router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError404, handleDelMembership403, checkMemberDelInput, async (req, res, next) => {
   // const group = await Group.findByPk(req.params.id)
   const { memberId } = req.body
   // memberId is userId User PK
-  const membershipToDel = await Membership.findOne( {
+  const membershipToDel = await Membership.findOne({
     where: {
-      userId:memberId,
+      userId: memberId,
       groupId: req.params.id
     }
   })
- 
+
   await membershipToDel.destroy()
   res.status(200).json({
     "message": "Successfully deleted membership from group"
