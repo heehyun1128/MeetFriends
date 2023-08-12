@@ -108,11 +108,10 @@ const checkMemberDelInput = [
     .notEmpty()
     .withMessage("Please Provide memberId")
     .custom(async (value, { req }) => {
-      // const { memberId } = req.body
-      const memberToDel = await Membership.findOne({
+      const { memberId } = req.body
+      const memberToDel = await User.findOne({
         where: {
-          userId: value,
-          groupId: req.params.id
+          id:memberId
         }
       })
       if (!memberToDel) {
@@ -140,7 +139,7 @@ const handleError404 = async (req, res, next) => {
 // handle 404 member to delete not exist
 const handleMemDelError404 = async (req, res, next) => {
   const { memberId } = req.body
-  const membershipToDel = await Membership.findByOne({
+  const membershipToDel = await Membership.findOne({
     where: {
       userId: memberId,
       groupId: req.params.id
@@ -934,7 +933,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 // Delete a membership to a group specified by id.
 // Require Authentication: true
 // Require proper authorization: Current User must be the host of the group, or the user whose membership is being deleted
-router.delete("/:id/membership", requireAuth, handleError404, handleMemDelError404, handleDelMembership403, checkMemberDelInput, async (req, res, next) => {
+router.delete("/:id/membership", requireAuth, handleError404, checkMemberDelInput,handleMemDelError404, handleDelMembership403, async (req, res, next) => {
   // const group = await Group.findByPk(req.params.id)
   const { memberId } = req.body
   // memberId is userId User PK
