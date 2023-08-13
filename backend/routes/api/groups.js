@@ -13,14 +13,17 @@ const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const validateEventInfoOnCreate = [
   check('venueId')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage("Venue does not exist")
+    // .exists({ checkFalsy: true })
+    // .notEmpty()
+    // .withMessage("Venue does not exist")
     .custom(async (value) => {
-      const venue = await Venue.findByPk(value)
+      if(value){
+        const venue = await Venue.findByPk(value)
       if (!venue) {
         throw new Error("Venue does not exist")
       }
+      }
+      return true
     }),
   check("name")
     .isLength({ min: 5 })
