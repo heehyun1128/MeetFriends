@@ -357,7 +357,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
           attributes: ["id", "city", "state"]
         }],
       where,
-      
+      ...pagination
     })
   }
   
