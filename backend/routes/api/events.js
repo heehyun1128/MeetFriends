@@ -19,9 +19,9 @@ const validateEventInfoOnCreate = [
     .custom(async (value) => {
       // console.log(typeof value)
       if (value !== null) {
-        if (typeof value !== "number"){
+        if (typeof value !== "number") {
           throw new Error("Venue does not exist")
-        }else{
+        } else {
           const venue = await Venue.findByPk(value)
           if (!venue) {
             throw new Error("Venue does not exist")
@@ -445,9 +445,17 @@ router.get("/:id/attendees", handleError404, async (req, res, next) => {
       }
     }
     allAttendeeArr.push(attendeeObj)
-
+    console.log(attendee.toJSON())
     if (attendee.toJSON().Attendance.status !== "pending") {
-      nonPendingAttendeeArr.push(attendee.toJSON())
+      const nonPendingattendeeObj = {
+        id: attendee.id,
+        firstName: attendee.firstName,
+        lastName: attendee.lastName,
+        Attendance: {
+          status: attendee.Attendance.status
+        }
+      }
+      nonPendingAttendeeArr.push(nonPendingattendeeObj)
     }
     // console.log(currEvent.toJSON())
 

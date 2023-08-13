@@ -521,7 +521,7 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
    for (let i = 0; i < allGroupMemberships.length; i++) {
      const groupMember = allGroupMemberships[i]
      const member = {
-       id: groupMember.id,
+       id: groupMember.User.id,
        firstName: groupMember.User.firstName,
        lastName: groupMember.User.lastName,
        Membership: {
@@ -550,7 +550,7 @@ router.get("/:id/members", handleError404, async (req, res, next) => {
      for (let i = 0; i < nonPendingMembers.length; i++) {
        const nonpendingMember = nonPendingMembers[i]
        const nonpendingMemberObj = {
-         id: nonpendingMember.id,
+         id: nonpendingMember.User.id,
          firstName: nonpendingMember.User.firstName,
          lastName: nonpendingMember.User.lastName,
          Membership: {
