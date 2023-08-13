@@ -384,6 +384,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
         }
       })
       event = event.toJSON()
+      event.previewImage=null
       event.numAttending = eventAttendances.length
       if (eventImages.length) {
         const eventImageUrl = eventImages[0].url
