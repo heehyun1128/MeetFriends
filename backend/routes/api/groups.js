@@ -330,7 +330,13 @@ router.get("/current", requireAuth, async (req, res, next) => {
   for (let i = 0; i < userMemberships.length; i++) {
     let group = userMemberships[i].Group
 
-    const groupMemberships = await group.getMemberships()
+    const groupMemberships = await group.getMemberships({
+      where: {
+        status: {
+          [Op.or]: ["co-host", "member", "organizer"]
+        }
+      }
+    })
     const groupImages = await group.getGroupImages({
       where: {
         preview: true
