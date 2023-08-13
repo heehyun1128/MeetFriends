@@ -17,11 +17,16 @@ const validateEventInfoOnCreate = [
     // .notEmpty()
     // .withMessage("Venue does not exist")
     .custom(async (value) => {
-      if(value){
-        const venue = await Venue.findByPk(value)
-      if (!venue) {
-        throw new Error("Venue does not exist")
-      }
+      console.log(typeof value)
+      if (value !== null) {
+        if (typeof value !== "number") {
+          throw new Error("Venue does not exist")
+        } else {
+          const venue = await Venue.findByPk(value)
+          if (!venue) {
+            throw new Error("Venue does not exist")
+          }
+        }
       }
       return true
     }),
@@ -770,7 +775,7 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
       name: newGroupEvent.name,
       type: newGroupEvent.type,
       capacity: newGroupEvent.capacity,
-      price: newGroupEvent.price,
+      price: Number(newGroupEvent.price),
       description: newGroupEvent.description,
       startDate: new Date(newGroupEvent.startDate),
       endDate: new Date(newGroupEvent.endDate)

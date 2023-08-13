@@ -17,10 +17,15 @@ const validateEventInfoOnCreate = [
     // .notEmpty()
     // .withMessage("Venue does not exist")
     .custom(async (value) => {
-      if (value) {
-        const venue = await Venue.findByPk(value)
-        if (!venue) {
+      console.log(typeof value)
+      if (value !== null) {
+        if (typeof value !== "number"){
           throw new Error("Venue does not exist")
+        }else{
+          const venue = await Venue.findByPk(value)
+          if (!venue) {
+            throw new Error("Venue does not exist")
+          }
         }
       }
       return true
@@ -162,15 +167,26 @@ const attendanceDelError404 = async (req, res, next) => {
 // handle venue not found 404
 const handleVenue404 = async (req, res, next) => {
   const { venueId } = req.body
-  const venue = await Venue.findByPk(venueId)
-  if (venueId !== null && !venue) {
-    return next({
-      status: 404,
-      message: "Venue couldn't be found"
-    })
+
+  // let venue 
+
+  if ((typeof venueId === "number") && venueId !== null) {
+    const venue = await Venue.findByPk(venueId)
+    if (!venue) {
+      console.log("handleVenue404-1")
+      return next({
+        status: 404,
+        message: "Venue couldn't be found"
+      })
+    } else {
+      next()
+
+    }
   } else {
     next()
+
   }
+
 }
 
 //handle authorization
@@ -186,6 +202,7 @@ const handleError403 = async (req, res, next) => {
       required: false
     }
   })
+  console.log(groupOfEvent.organizerId)
   const currUserMembershipArr = groupOfEvent.Memberships
   if (groupOfEvent.organizerId !== req.user.id) {
     if (currUserMembershipArr.length > 0) {
@@ -330,7 +347,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
     where.startDate = new Date(startDate)
     // console.log(new Date(startDate))
   }
-// console.log(where)
+  // console.log(where)
 
   let allEvents = await Event.findAll({
     attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
@@ -347,8 +364,8 @@ router.get("/", validateQueryParams, async (req, res, next) => {
     // where,
     ...pagination
   })
-  
-  if(name || type ||startDate){
+
+  if (name || type || startDate) {
     allEvents = await Event.findAll({
       attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
       include: [
@@ -368,38 +385,38 @@ router.get("/", validateQueryParams, async (req, res, next) => {
   // console.log(allEvents)
   // numAttending:
   // if(allEvents.length){
-    let allEventsArr = []
-    for (let i = 0; i < allEvents.length; i++) {
-      let event = allEvents[i]
+  let allEventsArr = []
+  for (let i = 0; i < allEvents.length; i++) {
+    let event = allEvents[i]
 
-      const eventAttendances = await event.getUsers({
-        through: {
-          model: Attendance,
-          where: {
-            status: "attending"
-          }
-        }
-      })
-      // previewImage
-      const eventImages = await event.getEventImages({
+    const eventAttendances = await event.getUsers({
+      through: {
+        model: Attendance,
         where: {
-          preview: true
+          status: "attending"
         }
-      })
-      event = event.toJSON()
-      event.previewImage=null
-      event.numAttending = eventAttendances.length
-      if (eventImages.length) {
-        const eventImageUrl = eventImages[0].url
-        event.previewImage = eventImageUrl
       }
-
-      allEventsArr.push(event)
+    })
+    // previewImage
+    const eventImages = await event.getEventImages({
+      where: {
+        preview: true
+      }
+    })
+    event = event.toJSON()
+    event.previewImage = null
+    event.numAttending = eventAttendances.length
+    if (eventImages.length) {
+      const eventImageUrl = eventImages[0].url
+      event.previewImage = eventImageUrl
     }
-    return res.json({ Events: allEventsArr })
+
+    allEventsArr.push(event)
+  }
+  return res.json({ Events: allEventsArr })
   // }
   // else{
-    
+
   //   return res.json({ Events: [] })
   // }
 })
@@ -436,16 +453,16 @@ router.get("/:id/attendees", handleError404, async (req, res, next) => {
 
   }
 
-  let currUserMemStatus 
-  if(req.user){
+  let currUserMemStatus
+  if (req.user) {
     currUserMemStatus = await Membership.findOne({
-    where: {
-      userId: req.user.id,
-      groupId: currEvent.toJSON().groupId
-    }
-  })
+      where: {
+        userId: req.user.id,
+        groupId: currEvent.toJSON().groupId
+      }
+    })
   }
-  
+
   if (currUserMemStatus) {
     currUserMemStatus = currUserMemStatus.toJSON()
     if (currUserMemStatus.status === "co-host" || currUserMemStatus.status === "organizer") {
@@ -641,7 +658,9 @@ router.put("/:id", requireAuth, handleError404, handleVenue404, handleError403, 
         required: false
       }
     })
-
+    // console.log(groupOfEvent)
+    const groupmem = groupOfEvent.Memberships
+    // console.log(groupmem)
 
 
     eventToEdit.venueId = venueId
