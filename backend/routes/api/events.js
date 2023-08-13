@@ -13,9 +13,9 @@ const { check } = require('express-validator');
 const { handleValidationErrors } = require('../../utils/validation');
 const validateEventInfoOnCreate = [
   check('venueId')
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .withMessage("Venue does not exist")
+    // .exists({ checkFalsy: true })
+    // .notEmpty()
+    // .withMessage("Venue does not exist")
     .custom(async (value) => {
       const venue = await Venue.findByPk(value)
       if (!venue) {
@@ -157,15 +157,15 @@ const attendanceDelError404 = async (req, res, next) => {
 }
 
 // handle venue not found 404
-const handleVenue404 = async(req, res, next) =>{
-  const {venueId} = req.body
+const handleVenue404 = async (req, res, next) => {
+  const { venueId } = req.body
   const venue = await Venue.findByPk(venueId)
-  if(!venue){
+  if (venueId !== null && !venue) {
     return next({
       status: 404,
       message: "Venue couldn't be found"
     })
-  }else{
+  } else {
     next()
   }
 }
