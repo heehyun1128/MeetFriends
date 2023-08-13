@@ -344,6 +344,7 @@ router.get("/current", requireAuth, async (req, res, next) => {
     })
     group = group.toJSON()
     group.numMembers = groupMemberships.length
+    group.previewImage=null
     for (let j = 0; j < groupImages.length; j++) {
       let groupImage = groupImages[0].toJSON()
       let url = groupImage.url
