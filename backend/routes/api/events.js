@@ -306,6 +306,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
   if (size > 20) {
     size = 20
   }
+  // console.log(size)
   const pagination = {};
   if (page >= 1 && size >= 1) {
     pagination.limit = size;
@@ -343,6 +344,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
     // where,
     ...pagination
   })
+  
   if(name || type ||startDate){
     allEvents = await Event.findAll({
       attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
@@ -360,9 +362,9 @@ router.get("/", validateQueryParams, async (req, res, next) => {
       ...pagination
     })
   }
-  
+  // console.log(allEvents)
   // numAttending:
-  if(allEvents.length){
+  // if(allEvents.length){
     let allEventsArr = []
     for (let i = 0; i < allEvents.length; i++) {
       let event = allEvents[i]
@@ -391,13 +393,11 @@ router.get("/", validateQueryParams, async (req, res, next) => {
       allEventsArr.push(event)
     }
     return res.json({ Events: allEventsArr })
-  }else{
+  // }
+  // else{
     
-    return next({
-      status: 404,
-      message: "No matching record found",
-    })
-  }
+  //   return res.json({ Events: [] })
+  // }
 })
 
 
