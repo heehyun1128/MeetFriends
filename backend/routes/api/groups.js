@@ -277,7 +277,7 @@ router.get("/", async (req, res, next) => {
     attributes: {
       include: [
         [
-          sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')), "numMembers"
+          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')),'integer'), "numMembers"
         ],
         // [sequelize.col('GroupImages.url'), 'previewImage']
       ]
@@ -615,7 +615,7 @@ router.get("/:id", async (req, res, next) => {
       attributes: {
         include: [
           [
-            sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')), "numMembers"
+            sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')),'integer'), "numMembers"
           ],
         ]
       },
