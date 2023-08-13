@@ -17,7 +17,7 @@ const validateEventInfoOnCreate = [
     // .notEmpty()
     // .withMessage("Venue does not exist")
     .custom(async (value) => {
-      console.log(typeof value)
+      // console.log(typeof value)
       if (value !== null) {
         if (typeof value !== "number") {
           throw new Error("Venue does not exist")

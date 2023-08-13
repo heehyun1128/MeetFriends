@@ -17,7 +17,7 @@ const validateEventInfoOnCreate = [
     // .notEmpty()
     // .withMessage("Venue does not exist")
     .custom(async (value) => {
-      console.log(typeof value)
+      // console.log(typeof value)
       if (value !== null) {
         if (typeof value !== "number"){
           throw new Error("Venue does not exist")
@@ -173,7 +173,7 @@ const handleVenue404 = async (req, res, next) => {
   if ((typeof venueId === "number") && venueId !== null) {
     const venue = await Venue.findByPk(venueId)
     if (!venue) {
-      console.log("handleVenue404-1")
+      // console.log("handleVenue404-1")
       return next({
         status: 404,
         message: "Venue couldn't be found"
@@ -202,7 +202,7 @@ const handleError403 = async (req, res, next) => {
       required: false
     }
   })
-  console.log(groupOfEvent.organizerId)
+  // console.log(groupOfEvent.organizerId)
   const currUserMembershipArr = groupOfEvent.Memberships
   if (groupOfEvent.organizerId !== req.user.id) {
     if (currUserMembershipArr.length > 0) {
@@ -643,7 +643,7 @@ router.put("/:id/attendance", requireAuth, handleError404, handleError403, atten
 // Edit and returns an event specified by its id
 // Require Authentication: true
 // Require Authorization: Current User must be the organizer of the group or a member of the group with a status of "co-host"
-router.put("/:id", requireAuth, handleError404, handleVenue404, handleError403, validateEventInfoOnCreate, async (req, res, next) => {
+router.put("/:id", requireAuth, handleError404, handleError403, handleVenue404, validateEventInfoOnCreate, async (req, res, next) => {
 
   try {
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
