@@ -118,7 +118,7 @@ const validateQueryParams = [
     .withMessage("Type must be 'Online' or 'In Person'"),
   query('startDate')
     .optional()
-    .toDate()
+    // .toDate()
     .isISO8601()
     .withMessage("Start date must be a valid datetime")
   ,
