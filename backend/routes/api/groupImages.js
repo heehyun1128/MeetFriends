@@ -24,21 +24,47 @@ const handleDelImgErr404 = async (req, res, next) => {
   next()
 }
 const handleError403 = async (req, res, next) => {
-  
+
   const groupImage = await GroupImage.findByPk(req.params.id)
   const groupId = groupImage.toJSON().groupId
-  const group = await Group.findByPk(groupId)
-  const { userId } = req.body
+  const currGroup = await Group.findByPk(groupId)
 
-  if (req.user.id !== group.organizerId && req.user.id !== userId) {
-    return next({
-      status: 403,
-      message: "Only group organizer or co-host can delete the image"
-    })
-
+  const currUserMembershipInGroupArr = await currGroup.getMemberships({
+    where: {
+      userId: req.user.id
+    }
+  })
+  if (currGroup.organizerId !== req.user.id) {
+    if (currUserMembershipInGroupArr.length > 0) {
+      const currUserMembershipInGroup = currUserMembershipInGroupArr[0].toJSON()
+      if (currUserMembershipInGroup.status !== "co-host") {
+        return next({
+          status: 403,
+          title: "403 Forbidden",
+          message: "Forbidden",
+        })
+      } else {
+        next()
+      }
+    } else {
+      return next({
+        status: 403,
+        title: "403 Forbidden",
+        message: "Forbidden",
+      })
+    }
   } else {
     next()
   }
+  // if (req.user.id !== group.organizerId && req.user.id !== userId) {
+  //   return next({
+  //     status: 403,
+  //     message: "Only group organizer or co-host can delete the image"
+  //   })
+
+  // } else {
+  //   next()
+  // }
 }
 
 // Delete an existing image for a Group.
