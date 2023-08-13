@@ -259,7 +259,12 @@ router.get("/", async (req, res, next) => {
     include: [
       {
         model: Membership,
-        attributes: []
+        attributes: [],
+        where:{
+          status:{
+            [Op.in]: ["organizer", "co-host", "member"]
+          }
+        }
       },
       // {
       //   model: GroupImage,
@@ -576,7 +581,12 @@ router.get("/:id", async (req, res, next) => {
       include: [
         {
           model: Membership,
-          attributes: []
+          attributes: [],
+          where:{
+            status: {
+              [Op.or]: ["co-host", "member", "organizer"]
+            }
+          }
         },
         {
           model: GroupImage,
