@@ -17,10 +17,13 @@ const validateEventInfoOnCreate = [
     // .notEmpty()
     // .withMessage("Venue does not exist")
     .custom(async (value) => {
-      const venue = await Venue.findByPk(value)
-      if (!venue) {
-        throw new Error("Venue does not exist")
+      if (value) {
+        const venue = await Venue.findByPk(value)
+        if (!venue) {
+          throw new Error("Venue does not exist")
+        }
       }
+      return true
     }),
   check("name")
     .isLength({ min: 5 })
