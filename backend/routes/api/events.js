@@ -633,8 +633,19 @@ router.put("/:id/attendance", requireAuth, handleError404, handleError403, atten
     if (attendancetoUpdate.status !== status) {
       attendancetoUpdate.status = status
       await attendancetoUpdate.save()
-
-      res.json(attendancetoUpdate)
+      console.log({
+        id: attendancetoUpdate.id,
+        eventId: Number(req.params.id),
+        userId,
+        status
+      })
+      console.log(attendancetoUpdate.toJSON())
+      res.json({
+        id: attendancetoUpdate.id,
+        eventId: req.params.id,
+        userId,
+        status
+      })
     } else {
       return next({
         status: 404,
