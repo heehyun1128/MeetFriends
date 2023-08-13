@@ -52,7 +52,7 @@ router.post(
           email
         }
       })
-      console.log(userWithEmail)
+      // console.log(userWithEmail)
       const userWithUsername = await User.findOne({
         where: {
           username

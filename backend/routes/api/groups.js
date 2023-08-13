@@ -76,10 +76,7 @@ const checkMembershipInput = [
     .notEmpty()
     .withMessage("Please Provide memberId")
     .custom(async (value, { req }) => {
-      const membershipById = await Membership.findOne({
-        // memberId is User PK
-        where: { userId: value }
-      })
+      const membershipById = await User.findByPk(value)
       if (!membershipById) {
         throw new Error("User couldn't be found")
       }
@@ -111,7 +108,7 @@ const checkMemberDelInput = [
       const { memberId } = req.body
       const memberToDel = await User.findOne({
         where: {
-          id:memberId
+          id: memberId
         }
       })
       if (!memberToDel) {
@@ -375,7 +372,7 @@ router.get("/:id/venues", requireAuth, async (req, res, next) => {
           userId: req.user.id
         }
       })
-      console.log(currUserMembershipInGroupArr)
+      // console.log(currUserMembershipInGroupArr)
       //check if current user has membership in the group
       //if in the group - check status
       if (currGroup.organizerId === req.user.id) {
@@ -490,81 +487,80 @@ router.get("/:id/events", async (req, res, next) => {
 // Returns the members of a group specified by its id.
 // Require Authentication: false
 router.get("/:id/members", handleError404, async (req, res, next) => {
-  // check if current user is an organizer or a co-host
+ try{
+   // check if current user is an organizer or a co-host
 
-  const currGroup = await Group.findByPk(req.params.id)
-  //get all memberships in group
-  const allGroupMemberships = await currGroup.getMemberships({
-    include: {
-      model: User
-    }
-  })
-  const allMembersArr = []
-  for (let i = 0; i < allGroupMemberships.length; i++) {
-    const groupMember = allGroupMemberships[i]
-    const member = {
-      id: groupMember.id,
-      firstName: groupMember.User.firstName,
-      lastName: groupMember.User.lastName,
-      Membership: {
-        status: groupMember.status
-      }
-    }
-    allMembersArr.push(member)
-  }
-
-
-  // get pending members
-  const nonPendingMembers = await currGroup.getMemberships({
-    include: {
-      model: User
-    },
-    where: {
-      status: {
-        [Op.not]: "pending"
-      }
-    }
-  })
-
-  const nonPendingMemberArr = []
-
-  if (nonPendingMembers.length) {
-    for (let i = 0; i < nonPendingMembers.length; i++) {
-      const nonpendingMember = nonPendingMembers[i]
-      const nonpendingMemberObj = {
-        id: nonpendingMember.id,
-        firstName: nonpendingMember.User.firstName,
-        lastName: nonpendingMember.User.lastName,
-        Membership: {
-          status: nonpendingMember.status
-        }
-      }
-      nonPendingMemberArr.push(nonpendingMemberObj)
-    }
-  }
-
-  // get current user membership status
-
-  let currUserMembership
-  if (req.user) {
-    currUserMembership = await Membership.findOne({
-      where: {
-        userId: req.user.id,
-        groupId: req.params.id
-      }
-    })
-    if (currGroup.organizerId === req.user.id) {
-      res.status(200).json({ Members: allMembersArr })
-    }
-
-  }
+   const currGroup = await Group.findByPk(req.params.id)
+   //get all memberships in group
+   const allGroupMemberships = await currGroup.getMemberships({
+     include: {
+       model: User
+     }
+   })
+   const allMembersArr = []
+   for (let i = 0; i < allGroupMemberships.length; i++) {
+     const groupMember = allGroupMemberships[i]
+     const member = {
+       id: groupMember.id,
+       firstName: groupMember.User.firstName,
+       lastName: groupMember.User.lastName,
+       Membership: {
+         status: groupMember.status
+       }
+     }
+     allMembersArr.push(member)
+   }
 
 
+   // get pending members
+   const nonPendingMembers = await currGroup.getMemberships({
+     include: {
+       model: User
+     },
+     where: {
+       status: {
+         [Op.not]: "pending"
+       }
+     }
+   })
 
-  if (currUserMembership && currUserMembership.status === "co-host") {
-    res.status(200).json({ Members: allMembersArr })
-  }
-  res.status(200).json({ Members: nonPendingMemberArr })
+   const nonPendingMemberArr = []
+
+   if (nonPendingMembers.length) {
+     for (let i = 0; i < nonPendingMembers.length; i++) {
+       const nonpendingMember = nonPendingMembers[i]
+       const nonpendingMemberObj = {
+         id: nonpendingMember.id,
+         firstName: nonpendingMember.User.firstName,
+         lastName: nonpendingMember.User.lastName,
+         Membership: {
+           status: nonpendingMember.status
+         }
+       }
+       nonPendingMemberArr.push(nonpendingMemberObj)
+     }
+   }
+
+   // get current user membership status
+
+   let currUserMembership
+   if (req.user) {
+     currUserMembership = await Membership.findOne({
+       where: {
+         userId: req.user.id,
+         groupId: req.params.id
+       }
+     })
+     if (currGroup.organizerId === req.user.id || (currUserMembership && currUserMembership.status === "co-host")) {
+       return res.status(200).json({ Members: allMembersArr })
+     }
+
+   }
+
+   res.status(200).json({ Members: nonPendingMemberArr })
+ }catch(err){
+  next(err)
+ }
 
 })
 
@@ -648,7 +644,7 @@ router.post("/", requireAuth, async (req, res, next) => {
     status: "organizer",
     groupId: newGroup.id
   })
-  console.log(currUserMemInGroup)
+  // console.log(currUserMemInGroup)
   res.status(201).json(newGroup)
 })
 
@@ -731,8 +727,9 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
     const currGroup = await Group.findByPk(req.params.id)
 
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
-    console.log(typeof price)
+    // console.log(typeof price)
     //create new group event
+    
     const newGroupEvent = await currGroup.createEvent({
       venueId, name, type, capacity, price, description, startDate, endDate
     })
@@ -755,15 +752,15 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
       capacity: newGroupEvent.capacity,
       price: newGroupEvent.price,
       description: newGroupEvent.description,
-      startDate: newGroupEvent.startDate,
-      endDate: newGroupEvent.endDate
+      startDate: new Date(newGroupEvent.startDate),
+      endDate: new Date(newGroupEvent.endDate)
     }
     // console.log(newGroupEventObj)
     res.status(200).json(newGroupEventObj)
 
 
   } catch (err) {
-    console.log(err)
+    // console.log(err)
     next(err);
   }
 })
@@ -846,14 +843,14 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
       // console.log(currUserMembership.status)
       let resObj
       if (currUserMembership.status === "organizer") {
-          membershipToUpdate[0].status = status
-          await membershipToUpdate[0].save()
-          return res.json({
-            id: membershipToUpdateObj.id,
-            groupId: req.params.id,
-            memberId: memberId,
-            status: status
-          })
+        membershipToUpdate[0].status = status
+        await membershipToUpdate[0].save()
+        return res.json({
+          id: membershipToUpdateObj.id,
+          groupId: req.params.id,
+          memberId: memberId,
+          status: status
+        })
       } else if (currUserMembership.status === "co-host") {
         if (status !== "co-host") {
           membershipToUpdate[0].status = status
@@ -864,13 +861,13 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
             memberId: memberId,
             status: status
           })
-        }else{
+        } else {
           return next({
             status: 403,
             message: "You do not have authorization to change the status to co-host"
           })
         }
-      }else{
+      } else {
         return next({
           status: 403,
           message: "forbidden"
@@ -933,7 +930,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
 // Delete a membership to a group specified by id.
 // Require Authentication: true
 // Require proper authorization: Current User must be the host of the group, or the user whose membership is being deleted
-router.delete("/:id/membership", requireAuth, handleError404, checkMemberDelInput,handleMemDelError404, handleDelMembership403, async (req, res, next) => {
+router.delete("/:id/membership", requireAuth, handleError404, checkMemberDelInput, handleMemDelError404, handleDelMembership403, async (req, res, next) => {
   // const group = await Group.findByPk(req.params.id)
   const { memberId } = req.body
   // memberId is userId User PK

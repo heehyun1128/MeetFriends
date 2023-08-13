@@ -20,8 +20,8 @@ module.exports = {
         type: "In Person",
         capacity:50,
         price:80,
-        startDate: "2023-12-10 14:00:00",
-        endDate: "2023-12-10 18:00:00",
+        startDate: new Date("2023-12-10 14:00:00"),
+        endDate: new Date("2023-12-10 18:00:00"),
       },
       {
         // event2
@@ -32,8 +32,8 @@ module.exports = {
         type: "In Person",
         capacity:150,
         price:50,
-        startDate: "2023-11-28 20:00:00",
-        endDate: "2023-11-28 22:00:00",
+        startDate: new Date("2023-11-28 20:00:00"),
+        endDate: new Date("2023-11-28 22:00:00"),
       },
       {
         // event3
@@ -44,8 +44,8 @@ module.exports = {
         type: "Online",
         capacity:50,
         price:50,
-        startDate: "2023-11-19 20:00:00",
-        endDate: "2023-11-19 22:00:00",
+        startDate: new Date("2023-11-19 20:00:00"),
+        endDate: new Date("2023-11-19 22:00:00"),
       },
      
     ], { validate: true })

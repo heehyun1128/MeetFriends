@@ -92,32 +92,26 @@ const attendValidation = [
 const validateQueryParams = [
   query('page')
     .optional()
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .isLength({ min: 1 })
+    .default(1)
+    .isInt({ min: 1 })
     .withMessage("Page must be greater than or equal to 1"),
   query('size')
     .optional()
-    .exists({ checkFalsy: true })
-    .notEmpty()
-    .isLength({ min: 1 })
+    .default(20)
+    .isInt({ min: 1 })
     .withMessage("Size must be greater than or equal to 1"),
   query('name')
     .optional()
-    .exists({ checkFalsy: true })
-    .notEmpty()
     .isString()
     .withMessage("Name must be a string"),
   query('type')
     .optional()
-    .exists({ checkFalsy: true })
-    .notEmpty()
     .isIn(["Online", "In Person"])
     .withMessage("Type must be 'Online' or 'In Person'"),
   query('startDate')
     .optional()
-    .exists({ checkFalsy: true })
-    .notEmpty()
+    .toDate()
+    .isISO8601()
     .withMessage("Start date must be a valid datetime")
   ,
   handleValidationErrors
@@ -304,9 +298,11 @@ router.get("/", validateQueryParams, async (req, res, next) => {
 
   page = (page === undefined) ? 1 : parseInt(page);
   size = (size === undefined) ? 20 : parseInt(size);
+  // console.log(page)
   if (page > 10) {
     page = 10
   }
+  // console.log(page)
   if (size > 20) {
     size = 20
   }
@@ -327,10 +323,12 @@ router.get("/", validateQueryParams, async (req, res, next) => {
     where.type = type
   }
   if (startDate) {
-    where.startDate = startDate
+    where.startDate = new Date(startDate)
+    // console.log(new Date(startDate))
   }
+// console.log(where)
 
-  const allEvents = await Event.findAll({
+  let allEvents = await Event.findAll({
     attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
     include: [
       {
@@ -342,39 +340,64 @@ router.get("/", validateQueryParams, async (req, res, next) => {
         required: false,
         attributes: ["id", "city", "state"]
       }],
-    where,
+    // where,
     ...pagination
   })
-
-  // numAttending:
-  let allEventsArr = []
-  for (let i = 0; i < allEvents.length; i++) {
-    let event = allEvents[i]
-
-    const eventAttendances = await event.getUsers({
-      through: {
-        model: Attendance,
-        where: {
-          status: "attending"
-        }
-      }
+  if(name || type ||startDate){
+    allEvents = await Event.findAll({
+      attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
+      include: [
+        {
+          model: Group,
+          required: false,
+          attributes: ["id", "name", "city", "state"]
+        }, {
+          model: Venue,
+          required: false,
+          attributes: ["id", "city", "state"]
+        }],
+      where,
+      
     })
-    // previewImage
-    const eventImages = await event.getEventImages({
-      where: {
-        preview: true
-      }
-    })
-    event = event.toJSON()
-    event.numAttending = eventAttendances.length
-    if (eventImages.length) {
-      const eventImageUrl = eventImages[0].url
-      event.previewImage = eventImageUrl
-    }
-
-    allEventsArr.push(event)
   }
-  res.json({ Events: allEventsArr })
+  
+  // numAttending:
+  if(allEvents.length){
+    let allEventsArr = []
+    for (let i = 0; i < allEvents.length; i++) {
+      let event = allEvents[i]
+
+      const eventAttendances = await event.getUsers({
+        through: {
+          model: Attendance,
+          where: {
+            status: "attending"
+          }
+        }
+      })
+      // previewImage
+      const eventImages = await event.getEventImages({
+        where: {
+          preview: true
+        }
+      })
+      event = event.toJSON()
+      event.numAttending = eventAttendances.length
+      if (eventImages.length) {
+        const eventImageUrl = eventImages[0].url
+        event.previewImage = eventImageUrl
+      }
+
+      allEventsArr.push(event)
+    }
+    return res.json({ Events: allEventsArr })
+  }else{
+    
+    return next({
+      status: 404,
+      message: "No matching record found",
+    })
+  }
 })
 
 
@@ -405,7 +428,7 @@ router.get("/:id/attendees", handleError404, async (req, res, next) => {
     if (attendee.toJSON().Attendance.status !== "pending") {
       nonPendingAttendeeArr.push(attendee.toJSON())
     }
-    console.log(currEvent.toJSON())
+    // console.log(currEvent.toJSON())
 
   }
 
@@ -492,8 +515,8 @@ router.post("/:id/images", requireAuth, handleError404, handlePostImage403, vali
   const { url, preview } = req.body
 
   const eventImage = await currEvent.createEventImage({ url, preview })
-  console.log(eventImage.toJSON())
-  console.log("Before sending response");
+  // console.log(eventImage.toJSON())
+  // console.log("Before sending response");
   res.status(200).json({
     id: eventImage.toJSON().id,
     url: eventImage.toJSON().url,
@@ -623,7 +646,7 @@ router.put("/:id", requireAuth, handleError404, handleVenue404, handleError403, 
     eventToEdit.capacity = capacity
     eventToEdit.price = price
     eventToEdit.description = description
-    eventToEdit.startDate = startDate
+    eventToEdit.startDate = new Date(startDate)
     eventToEdit.endDate = endDate
     await eventToEdit.save()
 
