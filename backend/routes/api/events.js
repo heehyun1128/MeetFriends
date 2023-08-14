@@ -120,6 +120,11 @@ const validateQueryParams = [
     .optional()
     // .toDate()
     .isISO8601()
+    .custom(value=>{
+      // use regex to check date format
+      const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
+      dateFormat.test(value)
+    })
     .withMessage("Start date must be a valid datetime")
   ,
   handleValidationErrors
