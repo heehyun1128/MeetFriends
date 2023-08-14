@@ -47,17 +47,42 @@ const validateEventInfoOnCreate = [
     .withMessage("Description is required"),
   check("startDate")
     .isAfter()
-    .withMessage("Start date must be a valid datetime and Start date must be in the future"),
+    .withMessage("Start date must be in the future")
+    .isISO8601()
+    .custom(value => {
+      // use regex to check date format
+      const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
+      if (!dateFormat.test(value)) {
+        throw new Error("Start date must be a valid datetime")
+      }
+      const date = new Date(value)
+      if (isNaN(date.getTime())) {
+        throw new Error("Start date must be a valid datetime")
+      }
+      return true
+    })
+    .withMessage("Start date must be a valid datetime")
+    ,
   check("endDate")
-    .custom((value, { req }) => {
+    .isISO8601()
+    .custom((value,{req} )=> {
+      // use regex to check date format
+      const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
+      if (!dateFormat.test(value)) {
+        throw new Error("End date must be a valid datetime")
+      }
+      const date = new Date(value)
+      if (isNaN(date.getTime())) {
+        throw new Error("End date must be a valid datetime")
+      }
       const startDate = new Date(req.body.startDate)
       const endDate = new Date(value)
-      if (!value || (!req.body.startDate && !endDate) || endDate <= startDate) {
-        throw new Error("End date must be a valid datetime and End date should be later than start date")
-      } else {
-        return true
+      if (endDate <= startDate){
+        throw new Error("End date should be later than start date")
       }
+      return true
     })
+    
   ,
   handleValidationErrors
 ];
