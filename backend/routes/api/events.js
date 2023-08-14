@@ -123,7 +123,14 @@ const validateQueryParams = [
     .custom(value=>{
       // use regex to check date format
       const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
-      dateFormat.test(value)
+      if (!dateFormat.test(value)){
+        throw new Error("Start date must be a valid datetime")
+      }
+      const date = new Date(value)
+      if (isNaN(date.getTime())){
+        throw new Error("Start date must be a valid datetime")
+      }
+      return true
     })
     .withMessage("Start date must be a valid datetime")
   ,
