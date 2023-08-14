@@ -110,6 +110,7 @@ const validateQueryParams = [
     .withMessage("Size must be greater than or equal to 1"),
   query('name')
     .optional()
+    .notEmpty()
     .isString()
     .withMessage("Name must be a string"),
   query('type')
