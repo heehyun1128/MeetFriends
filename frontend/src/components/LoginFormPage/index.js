@@ -11,6 +11,9 @@ function LoginFormPage() {
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
 
+  const [logInDivStyle, setLogInDivStyle] = useState("initial-login-div")
+  const [logInInputStyle, setLogInInputStyle] = useState("initial-login-input-label")
+  const [logInFormStyle, setLogInFormStyle] = useState("initial-login-form")
   if (sessionUser) return <Redirect to="/" />;
 
   const handleSubmit = (e) => {
@@ -25,10 +28,12 @@ function LoginFormPage() {
   };
 
   return (
-    <div id="login-div">
+    // conditionally render css
+    
+    <div id={logInDivStyle}>
       <h1>Log In</h1>
-      <form id='login-form' onSubmit={handleSubmit}>
-        <label className="login-input-label">
+      <form id={logInFormStyle} onSubmit={handleSubmit}>
+        <label className={logInInputStyle}>
           Username or Email
           <input
             type="text"
@@ -37,7 +42,7 @@ function LoginFormPage() {
             required
           />
         </label>
-        <label className="login-input-label">
+        <label className={logInInputStyle}>
           Password
           <input
             type="password"
