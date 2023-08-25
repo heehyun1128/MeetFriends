@@ -1,5 +1,5 @@
 #initial-login-div {
-  position: fixed;
+  /* position: fixed; */
   height: fit-content;
   width: 420px;
   display: flex;
@@ -9,6 +9,7 @@
   padding: 0;
   border: 1px solid rgb(220, 220, 220);
   padding: 50px 0 80px;
+  background-color: #fff;
 }
 
 #initial-login-div h1 {
@@ -46,5 +47,5 @@
   color: gray;
   border-radius: 5px;
   margin-top:2%;
-
+  cursor: pointer;
 }

@@ -1,5 +1,5 @@
 #initial-signup-div {
-  position: fixed;
+  /* position: fixed; */
   height: fit-content;
   width: 320px;
   display: flex;
@@ -8,7 +8,8 @@
   border-radius: 10px;
   padding: 0;
   border: 1px solid rgb(220, 220, 220);
-  padding-bottom:30px;
+  padding:20px 0 30px;
+  background-color: #fff;
 }
 #initial-signup-div h1{
 font-size:25px;
@@ -47,5 +48,5 @@ font-size:25px;
   color:gray;
   border-radius: 5px;
   margin-top:5%;
-
+cursor: pointer;
 }

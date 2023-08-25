@@ -1,0 +1,10 @@
+.login-signup-btn {
+  color: #000000;
+  text-decoration: none;
+  margin: 0px 10px;
+  font-weight: bold;
+  background-color: #fff;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
