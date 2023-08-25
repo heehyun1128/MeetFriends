@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
 import * as sessionActions from "../../store/session";
@@ -15,11 +15,25 @@ function SignupFormModal() {
   const [errors, setErrors] = useState({});
   const { closeModal } = useModal();
 
-
+// handle css style changes
   const [signupDivStyle, setSignupDivStyle] = useState("initial-signup-div")
   const [signupFormStyle, setSignupFormStyle] = useState("initial-signup-form")
   const [signupLabelStyle, setSignupLabelStyle] = useState("initial-signup-input-label")
 
+  // handle user input validation
+  const [disabled, setDisabled] = useState(false)
+
+  useEffect(()=>{
+    if (!email.length || !username.length || !firstName.length || !lastName.length || !password.length || !confirmPassword.length || username.length < 4 || password.length<6){
+      setDisabled(true)
+    }else{
+      setDisabled(false)
+    }
+  }, [email,
+    username,
+    firstName,
+    lastName,
+    password, confirmPassword])
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,9 +54,10 @@ function SignupFormModal() {
           if (data && data.errors) {
             setErrors(data.errors);
           }
+          console.log(data.errors)
         });
     }
-    return setErrors({
+    return setErrors({...errors,
       confirmPassword: "Confirm Password field must be the same as the Password field"
     });
   };
@@ -60,7 +75,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.email && <p>{errors.email}</p>}
+        {errors.email && <p className="signup-error-msg">{errors.email}</p>}
         <label className={signupLabelStyle}>
           Username
           <input
@@ -70,7 +85,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.username && <p>{errors.username}</p>}
+        {errors.username && <p className="signup-error-msg">{errors.username}</p>}
         <label className={signupLabelStyle}>
           First Name
           <input
@@ -80,7 +95,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.firstName && <p>{errors.firstName}</p>}
+        {errors.firstName && <p className="signup-error-msg">{errors.firstName}</p>}
         <label className={signupLabelStyle}>
           Last Name
           <input
@@ -90,7 +105,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.lastName && <p>{errors.lastName}</p>}
+        {errors.lastName && <p className="signup-error-msg">{errors.lastName}</p>}
         <label className={signupLabelStyle}>
           Password
           <input
@@ -100,7 +115,7 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.password && <p>{errors.password}</p>}
+        {errors.password && <p className="signup-error-msg">{errors.password}</p>}
         <label className={signupLabelStyle}>
           Confirm Password
           <input
@@ -110,8 +125,8 @@ function SignupFormModal() {
             required
           />
         </label>
-        {errors.confirmPassword && <p>{errors.confirmPassword}</p>}
-        <button type="submit">Sign Up</button>
+        {errors.confirmPassword && <p className="signup-error-msg">{errors.confirmPassword}</p>}
+        <button disabled={disabled} type="submit">Sign Up</button>
       </form>
     </div>
   );

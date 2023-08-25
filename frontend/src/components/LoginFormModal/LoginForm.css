@@ -49,3 +49,7 @@
   margin-top:2%;
   cursor: pointer;
 }
+
+.login-input-error{
+  color:red;
+}

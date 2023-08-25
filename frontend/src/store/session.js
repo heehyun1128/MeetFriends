@@ -46,10 +46,16 @@ export const signup = (user) => async (dispatch) => {
     method:'POST',
     body: JSON.stringify({ username, firstName, lastName, email, password })
   })
-  const data = await res.json();
-  console.log('Restored User:', data.user); // Log the user data
-  dispatch(setUser(data.user));
-  return res;
+  if(res.ok){
+
+    const data = await res.json();
+    // console.log('Restored User:', data.user); // Log the user data
+    dispatch(setUser(data.user));
+    return res;
+  }else{
+    const errors = await res.json();
+    return errors;
+  }
 }
 
 export const logout = () => async (dispatch) => {

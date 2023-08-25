@@ -51,6 +51,7 @@
   flex-direction: column;
   margin-top: 5px;
   background-color: #fff;
+  text-wrap: nowrap;
 }
 
 #logout-button {

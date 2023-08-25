@@ -50,3 +50,8 @@ font-size:25px;
   margin-top:5%;
 cursor: pointer;
 }
+
+.signup-error-msg{
+  color:red;
+  font-size: 14px;
+}

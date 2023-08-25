@@ -482,7 +482,7 @@ router.get("/:id/attendees", handleError404, async (req, res, next) => {
       }
     }
     allAttendeeArr.push(attendeeObj)
-    console.log(attendee.toJSON())
+    // console.log(attendee.toJSON())
     if (attendee.toJSON().Attendance.status !== "pending") {
       const nonPendingattendeeObj = {
         id: attendee.id,
@@ -670,13 +670,13 @@ router.put("/:id/attendance", requireAuth, handleError404, handleError403, atten
     if (attendancetoUpdate.status !== status) {
       attendancetoUpdate.status = status
       await attendancetoUpdate.save()
-      console.log({
-        id: attendancetoUpdate.id,
-        eventId: Number(req.params.id),
-        userId,
-        status
-      })
-      console.log(attendancetoUpdate.toJSON())
+      // console.log({
+      //   id: attendancetoUpdate.id,
+      //   eventId: Number(req.params.id),
+      //   userId,
+      //   status
+      // })
+      // console.log(attendancetoUpdate.toJSON())
       res.json({
         id: attendancetoUpdate.id,
         eventId: req.params.id,
