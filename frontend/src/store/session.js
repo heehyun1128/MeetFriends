@@ -5,42 +5,38 @@ import { csrfFetch } from './csrf'
 // remove the session user. Their types should be extracted as a constant and used by the action creator and the session reducer.
 
 /** Action Type Constants: */
-export const SET_SESSION_USER = 'session/SET_SESSION_USER'
-export const REMOVE_SESSION_USER = 'session/REMOVE_SESSION_USER'
+export const SET_USER = "session/setUser";
+export const REMOVE_USER = "session/removeUser";
 
 /**  Action Creators: */
-export const setSessionUser = (user) => ({
-  type: SET_SESSION_USER,
-  user
+export const setUser = (user) => ({
+  type: SET_USER,
+  payload: user,
 })
 
-export const removeSessionUser = () => ({
-  type: REMOVE_SESSION_USER,
+export const removeUser = () => ({
+  type: REMOVE_USER,
 })
 
 /** Thunk Action Creators: */
 export const login = (user) => async (dispatch) => {
-  const res = await csrfFetch('/api/session', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(user)
-  })
-  if (res.ok) {
-    const user = await res.json()
-    dispatch(setSessionUser(user))
-    return user
-  } else {
-    const errors = await res.json()
-    return errors
-  }
-}
+  const { credential, password } = user;
+  const response = await csrfFetch("/api/session", {
+    method: "POST",
+    body: JSON.stringify({
+      credential,
+      password,
+    }),
+  });
+  const data = await response.json();
+  dispatch(setUser(data.user));
+  return response;
+};
 
 export const restoreUser = () => async (dispatch) => {
   const response = await csrfFetch('/api/session')
   const data = await response.json()
-  dispatch(setSessionUser(data.user))
+  dispatch(setUser(data.user))
   return response
 }
 
@@ -52,23 +48,36 @@ export const signup = (user) => async (dispatch) => {
   })
   const data = await res.json();
   console.log('Restored User:', data.user); // Log the user data
-  dispatch(setSessionUser(data.user));
+  dispatch(setUser(data.user));
   return res;
 }
+
+export const logout = () => async (dispatch) => {
+  const response = await csrfFetch('/api/session', {
+    method: 'DELETE',
+  });
+  dispatch(removeUser());
+  return response;
+};
 
 const initialState = {
   user: null
 }
 /** session reducer */
 const sessionReducer = (state = initialState, action) => {
+  let newState;
   switch (action.type) {
-    case SET_SESSION_USER:
-      return { ...state, user: action.user }
-    case REMOVE_SESSION_USER:
-      return { ...state, user: null }
+    case SET_USER:
+      newState = Object.assign({}, state);
+      newState.user = action.payload;
+      return newState;
+    case REMOVE_USER:
+      newState = Object.assign({}, state);
+      newState.user = null;
+      return newState;
     default:
-      return state
+      return state;
   }
-}
+};
 
 export default sessionReducer
