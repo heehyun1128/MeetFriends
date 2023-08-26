@@ -63,7 +63,7 @@ router.post(
           status: 500,
           message: "User already exists",
           errors: {
-            "username": "User with that email already exists"
+            "email": "User with that email already exists"
           }
         })
       }
