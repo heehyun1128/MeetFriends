@@ -1,0 +1,114 @@
+#home-main{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#home-intro-section{
+  display: flex;
+  padding:30px 120px;
+  height: 330px;
+}
+
+#home-intro-section-left{
+  display: flex;
+  flex-direction: column;
+  flex:1;
+  margin-right: 40px;
+}
+
+#home-intro-section-right{
+  flex:1;
+  height:100%;
+  overflow:hidden;
+border-radius: 10px;
+}
+
+#home-intro-section-right img{
+  display: block;
+  height:260px;
+  /* margin-top: -20px; */
+}
+
+#intro-head{
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+#intro-description{
+font-size: 18px;
+
+}
+
+
+#home-detail-section{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+
+#home-detail-section-text{
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+#home-detail-items{
+  display: flex;
+  width:50%;
+}
+
+.home-detail-item-tab{
+  width:33%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-detail-item-tab img{
+  display: block;
+  /* width: 60%; */
+  height:100px;
+}
+.home-detail-item-tab-btn{
+  border: none;
+  background-color: #fff;
+  color:#0f6767;
+  font-weight: bold;
+  margin-top: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.home-detail-item-tab-btn:hover{
+  text-decoration: underline;
+}
+#home-join-button{
+  width:200px;
+  height:50px;
+  border-radius: 5px;
+  box-shadow: 4px 4px 2px black;
+  background-color: #0f6767;
+  color:white;
+  font-weight: bold;
+  font-size: 16px;
+  margin:10px 0;
+}
+
+.disabled{
+  color: gray;
+  cursor: default;
+}
+
+.disabled:hover{
+  text-decoration: none;
+  
+}
+.home-detail-item-tab-text{
+  font-size: 14px;
+  color: #707070;
+  margin:2px;
+  text-align: center;
+}

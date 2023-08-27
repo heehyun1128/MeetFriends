@@ -44,6 +44,28 @@ module.exports = {
         state: "WA",
      
       },
+      {
+          // group4
+        organizerId: 4,
+        name: "Group 4",
+        about: "About Group 4.If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        type: "In Person",
+        private: true,
+        city: "Los Angeles",
+        state: "CA",
+       
+      },
+      {
+          // group5
+        organizerId: 5,
+        name: "Group 5",
+        about: "About Group 5.If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        type: "Online",
+        private: false,
+        city: "San Jose",
+        state: "CA",
+     
+      },
     ],{ validate: true })
   },
 

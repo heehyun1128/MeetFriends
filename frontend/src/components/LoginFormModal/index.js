@@ -37,6 +37,18 @@ function LoginFormModal() {
       });
   };
 
+  const demoUserLogIn = (e) => {
+    e.preventDefault()
+    setErrors({});
+    return dispatch(sessionActions.login({ credential: "Demo-lition", password: "password" }))
+      .then(closeModal)
+      .catch(async (res) => {
+        const data = await res.json();
+        if (data && data.errors) {
+          setErrors(data.errors);
+        }
+      });
+  }
   return (
     // conditionally render css
     
@@ -63,6 +75,7 @@ function LoginFormModal() {
         </label>
         {errors.credential && <p className="login-input-error">{errors.credential}</p>}
         <button disabled={disabled} type="submit">Log In</button>
+        <div onClick={demoUserLogIn} id="demo-user-login">Demo User</div>
       </form>
     </div>
   );

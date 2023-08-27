@@ -14,7 +14,7 @@ module.exports = {
       {
         userId:2,
         groupId:1,
-        status: "member"
+        status: "co-host"
       },
       {
         userId:1,
@@ -40,6 +40,31 @@ module.exports = {
         userId:1,
         groupId:3,
         status: "pending"
+      },
+      {
+        userId:4,
+        groupId:4,
+        status: "organizer"
+      },
+      {
+        userId:4,
+        groupId:3,
+        status: "pending"
+      },
+      {
+        userId:5,
+        groupId:4,
+        status: "co-host"
+      },
+      {
+        userId:5,
+        groupId:3,
+        status: "pending"
+      },
+      {
+        userId:5,
+        groupId:5,
+        status: "organizer"
       },
     ], { validate: true })
   },

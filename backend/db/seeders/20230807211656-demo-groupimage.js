@@ -23,7 +23,47 @@ module.exports = {
       },
       {
         groupId: 2,
-        url: "group 2 image url",
+        url: "group 2 image url 1",
+        preview: true
+      },
+      {
+        groupId: 2,
+        url: "group 2 image url 2",
+        preview: true
+      },
+      {
+        groupId: 3,
+        url: "group 3 image url 1",
+        preview: true
+      },
+      {
+        groupId: 3,
+        url: "group 3 image url 2",
+        preview: true
+      },
+      {
+        groupId: 3,
+        url: "group 3 image url 3",
+        preview: true
+      },
+      {
+        groupId: 4,
+        url: "group 4 image url 1",
+        preview: true
+      },
+      {
+        groupId: 5,
+        url: "group 5 image url 1",
+        preview: true
+      },
+      {
+        groupId: 5,
+        url: "group 5 image url 2",
+        preview: true
+      },
+      {
+        groupId: 5,
+        url: "group 5 image url 3",
         preview: true
       },
     ], { validate: true })
