@@ -62,10 +62,10 @@ const validateEventInfoOnCreate = [
       return true
     })
     .withMessage("Start date must be a valid datetime")
-    ,
+  ,
   check("endDate")
     .isISO8601()
-    .custom((value,{req} )=> {
+    .custom((value, { req }) => {
       // use regex to check date format
       const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
       if (!dateFormat.test(value)) {
@@ -77,12 +77,12 @@ const validateEventInfoOnCreate = [
       }
       const startDate = new Date(req.body.startDate)
       const endDate = new Date(value)
-      if (endDate <= startDate){
+      if (endDate <= startDate) {
         throw new Error("End date should be later than start date")
       }
       return true
     })
-    
+
   ,
   handleValidationErrors
 ];
@@ -293,8 +293,8 @@ router.get("/", async (req, res, next) => {
       {
         model: Membership,
         attributes: [],
-        where:{
-          status:{
+        where: {
+          status: {
             [Op.in]: ["organizer", "co-host", "member"]
           }
         }
@@ -303,15 +303,21 @@ router.get("/", async (req, res, next) => {
         model: Event,
         attributes: []
       },
-    
+      {
+        model: User,
+        as: 'Organizer',
+        // attributes: ["firstName","lastName"]
+          
+        
+      }
     ],
     attributes: {
       include: [
         [
-          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')),'integer'), "numMembers"
+          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')), 'integer'), "numMembers"
         ],
         [
-          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Events"."id"')),'integer'), "numEvents"
+          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Events"."id"')), 'integer'), "numEvents"
         ],
         // [sequelize.col('GroupImages.url'), 'previewImage']
       ]
@@ -378,7 +384,7 @@ router.get("/current", requireAuth, async (req, res, next) => {
     })
     group = group.toJSON()
     group.numMembers = groupMemberships.length
-    group.previewImage=null
+    group.previewImage = null
     for (let j = 0; j < groupImages.length; j++) {
       let groupImage = groupImages[0].toJSON()
       let url = groupImage.url
@@ -533,80 +539,80 @@ router.get("/:id/events", async (req, res, next) => {
 // Returns the members of a group specified by its id.
 // Require Authentication: false
 router.get("/:id/members", handleError404, async (req, res, next) => {
- try{
-   // check if current user is an organizer or a co-host
+  try {
+    // check if current user is an organizer or a co-host
 
-   const currGroup = await Group.findByPk(req.params.id)
-   //get all memberships in group
-   const allGroupMemberships = await currGroup.getMemberships({
-     include: {
-       model: User
-     }
-   })
-   const allMembersArr = []
-   for (let i = 0; i < allGroupMemberships.length; i++) {
-     const groupMember = allGroupMemberships[i]
-     const member = {
-       id: groupMember.User.id,
-       firstName: groupMember.User.firstName,
-       lastName: groupMember.User.lastName,
-       Membership: {
-         status: groupMember.status
-       }
-     }
-     allMembersArr.push(member)
-   }
+    const currGroup = await Group.findByPk(req.params.id)
+    //get all memberships in group
+    const allGroupMemberships = await currGroup.getMemberships({
+      include: {
+        model: User
+      }
+    })
+    const allMembersArr = []
+    for (let i = 0; i < allGroupMemberships.length; i++) {
+      const groupMember = allGroupMemberships[i]
+      const member = {
+        id: groupMember.User.id,
+        firstName: groupMember.User.firstName,
+        lastName: groupMember.User.lastName,
+        Membership: {
+          status: groupMember.status
+        }
+      }
+      allMembersArr.push(member)
+    }
 
 
-   // get pending members
-   const nonPendingMembers = await currGroup.getMemberships({
-     include: {
-       model: User
-     },
-     where: {
-       status: {
-         [Op.not]: "pending"
-       }
-     }
-   })
+    // get pending members
+    const nonPendingMembers = await currGroup.getMemberships({
+      include: {
+        model: User
+      },
+      where: {
+        status: {
+          [Op.not]: "pending"
+        }
+      }
+    })
 
-   const nonPendingMemberArr = []
+    const nonPendingMemberArr = []
 
-   if (nonPendingMembers.length) {
-     for (let i = 0; i < nonPendingMembers.length; i++) {
-       const nonpendingMember = nonPendingMembers[i]
-       const nonpendingMemberObj = {
-         id: nonpendingMember.User.id,
-         firstName: nonpendingMember.User.firstName,
-         lastName: nonpendingMember.User.lastName,
-         Membership: {
-           status: nonpendingMember.status
-         }
-       }
-       nonPendingMemberArr.push(nonpendingMemberObj)
-     }
-   }
+    if (nonPendingMembers.length) {
+      for (let i = 0; i < nonPendingMembers.length; i++) {
+        const nonpendingMember = nonPendingMembers[i]
+        const nonpendingMemberObj = {
+          id: nonpendingMember.User.id,
+          firstName: nonpendingMember.User.firstName,
+          lastName: nonpendingMember.User.lastName,
+          Membership: {
+            status: nonpendingMember.status
+          }
+        }
+        nonPendingMemberArr.push(nonpendingMemberObj)
+      }
+    }
 
-   // get current user membership status
+    // get current user membership status
 
-   let currUserMembership
-   if (req.user) {
-     currUserMembership = await Membership.findOne({
-       where: {
-         userId: req.user.id,
-         groupId: req.params.id
-       }
-     })
-     if (currGroup.organizerId === req.user.id || (currUserMembership && currUserMembership.status === "co-host")) {
-       return res.status(200).json({ Members: allMembersArr })
-     }
+    let currUserMembership
+    if (req.user) {
+      currUserMembership = await Membership.findOne({
+        where: {
+          userId: req.user.id,
+          groupId: req.params.id
+        }
+      })
+      if (currGroup.organizerId === req.user.id || (currUserMembership && currUserMembership.status === "co-host")) {
+        return res.status(200).json({ Members: allMembersArr })
+      }
 
-   }
+    }
 
-   res.status(200).json({ Members: nonPendingMemberArr })
- }catch(err){
-  next(err)
- }
+    res.status(200).json({ Members: nonPendingMemberArr })
+  } catch (err) {
+    next(err)
+  }
 
 })
 
@@ -623,7 +629,7 @@ router.get("/:id", async (req, res, next) => {
         {
           model: Membership,
           attributes: [],
-          where:{
+          where: {
             status: {
               [Op.or]: ["co-host", "member", "organizer"]
             }
@@ -649,7 +655,7 @@ router.get("/:id", async (req, res, next) => {
       attributes: {
         include: [
           [
-            sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')),'integer'), "numMembers"
+            sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')), 'integer'), "numMembers"
           ],
         ]
       },
@@ -780,7 +786,7 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
     const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
     // console.log(typeof price)
     //create new group event
-    
+
     const newGroupEvent = await currGroup.createEvent({
       venueId, name, type, capacity, price, description, startDate, endDate
     })

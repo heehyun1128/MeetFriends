@@ -12,7 +12,7 @@ const GroupContent = () => {
   const groups = Object.values(
     groupObj
   );
-  console.log(groups[0])
+  // console.log(groups[0])
   const dispatch = useDispatch();
 
   useEffect(() => {
