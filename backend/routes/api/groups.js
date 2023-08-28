@@ -322,7 +322,7 @@ router.get("/", async (req, res, next) => {
         // [sequelize.col('GroupImages.url'), 'previewImage']
       ]
     },
-    group: ['Group.id']
+    group: ['Group.id','Organizer.id']
 
   })
   let groups = []
