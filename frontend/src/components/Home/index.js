@@ -8,6 +8,8 @@ import homeMainImage from '../../images/home/home-main-img.svg'
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from 'react-router-dom'
+import OpenModalMenuItem from '../Navigation/OpenModalMenuItem'
+import SignupFormModal from '../SignupFormModal'
 
 const Home = () => {
   const sessionUser = useSelector(state => state.session.user)
@@ -85,7 +87,17 @@ const Home = () => {
         </div>
       </div>
       <div id="home-detail-section">
-        {!sessionUser && <button id='home-join-button'>Join MeetFriends</button>}
+          {/* <button id='home-join-button'>Join MeetFriends</button>  */}
+        {!sessionUser &&
+          <div id='home-join-button'>
+            <OpenModalMenuItem
+              itemText="Join MeetFriends"
+              modalComponent={<SignupFormModal />}
+              id="signup-nav-link"
+            />
+          </div>
+
+        }
       </div>
     </div>
   )
