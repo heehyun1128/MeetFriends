@@ -14,10 +14,10 @@ module.exports = {
       {
         // group1
         organizerId: 1, //user id is 1
-        name: "Group 1",
-        about: "About Group 1. If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        name: "Hiking Group",
+        about: "This group is dedicated to New Yorkers who want to experience an outdoor adventure away from the city. We are determined in helping people find their interests and gather with others. We offer lunch, snacks, and water for attendees. Join us today to sign up for our incoming events",
         type: "In Person",
-        private: true,
+        private: false,
         city: "New York",
         state: "NY",
        
@@ -25,8 +25,8 @@ module.exports = {
       {
           // group2
         organizerId: 2,
-        name: "Group 2",
-        about: "About Group 2.If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        name: "UC Berkeley CEE",
+        about: "This is a group formed by current students and alumni from UC Berkeley Civil and Environmental Engineering department. We are passional about finding students great social and networking opportunities that contribute to their personal and career growth.",
         type: "In Person",
         private: true,
         city: "Berkeley",
@@ -36,8 +36,8 @@ module.exports = {
       {
           // group3
         organizerId: 3,
-        name: "Group 3",
-        about: "About Group 3.If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        name: "UC Berkeley EECS",
+        about: "This is a group formed by current students and alumni from UC Berkeley Electrical Engineering & Computer Sciences department. We are passional about finding students great social and networking opportunities that contribute to their personal and career growth.",
         type: "Online",
         private: false,
         city: "Seattle",
@@ -47,19 +47,19 @@ module.exports = {
       {
           // group4
         organizerId: 4,
-        name: "Group 4",
-        about: "About Group 4.If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        name: "Gamers",
+        about: "We do museum trips, ski trips, beach trips and all kinds of other fun events. This group is all about getting together to get to know new people and experience new things.",
         type: "In Person",
         private: true,
-        city: "Los Angeles",
+        city: "San Jose",
         state: "CA",
        
       },
       {
           // group5
         organizerId: 5,
-        name: "Group 5",
-        about: "About Group 5.If you use the ModelName.bulkCreate() method for seeding data with Sequelize, the schema is set by the Sequelize models so there is not need for us to specify the schema when using Model.bulkCreate(). Here's an example of how to use bulkCreate with the validate: true as the only key-value pair in the query options object",
+        name: "San Jose Social Club",
+        about: "We are a group of people who are devoted to help people grow. We offer all kinds of social networking events. Join us for more networking opportunities",
         type: "Online",
         private: false,
         city: "San Jose",

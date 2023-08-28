@@ -1,0 +1,48 @@
+.group-detail-div {
+  height: 200px;
+  display: flex;
+  width: 100%;
+  border-bottom: 2px solid rgb(209, 209, 209);
+  padding: 15px 0 5px;
+}
+
+.group-detail-div:hover {
+  cursor: pointer;
+}
+
+.group-image {
+  height: 90%;
+  width: 20%
+}
+
+.group-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.city {
+  color: gray;
+}
+
+.group-info-foot {
+  display: flex;
+  justify-content: flex-start;
+  color: gray;
+  
+}
+
+.numEvents {
+  padding-left: 0;
+}
+.centered-dot{
+  position: relative;
+}
+
+.centered-dot p{
+  position: absolute;
+  bottom: 25%;
+  left:-2px;
+  font-weight: 700;
+  /* border-radius: 50%; */
+}

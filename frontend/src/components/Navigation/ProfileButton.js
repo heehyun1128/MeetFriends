@@ -42,6 +42,12 @@ function ProfileButton({ user }) {
     history.push('/')
   };
 
+  const handleViewGroup = (e) => {
+    e.preventDefault();
+    closeMenu();
+    history.push('/groups')
+  };
+
   const ulClassName = "profile-dropdown" + (showMenu ? "" : " hidden");
 
   return (
@@ -60,7 +66,7 @@ function ProfileButton({ user }) {
             <li>Hello, {user.username}</li>
             {/* <li>{user.firstName} {user.lastName}</li> */}
             <li>{user.email}</li>
-            <NavLink id='start-new-group-nav' exact to='/groups'>View Groups</NavLink>
+            <NavLink onClick={handleViewGroup} id='start-new-group-nav' exact to='/groups'>View Groups</NavLink>
             <li id="logout-btn-li">
               <button id="logout-button" onClick={logout}>Log Out</button>
             </li>

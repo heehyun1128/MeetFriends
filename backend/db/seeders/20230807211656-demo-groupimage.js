@@ -1,11 +1,15 @@
 'use strict';
-
+const path = require('path');
 const { GroupImage } = require('../models');
 
 let options = {};
 if (process.env.NODE_ENV === 'production') {
   options.schema = process.env.SCHEMA;  // define your schema in options object
 }
+// const getImageUrl = fileName =>{
+//   return path.join(__dirname,'../../images' ,fileName)
+// }
+// const imageUrl = getImageUrl('groupImage1.jpg')
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
@@ -13,57 +17,57 @@ module.exports = {
     await GroupImage.bulkCreate([
       {
         groupId: 1,
-        url: "group1 image url1",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 1,
-        url: "group 1 image url2",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: false
       },
       {
         groupId: 2,
-        url: "group 2 image url 1",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 2,
-        url: "group 2 image url 2",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 3,
-        url: "group 3 image url 1",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 3,
-        url: "group 3 image url 2",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 3,
-        url: "group 3 image url 3",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 4,
-        url: "group 4 image url 1",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 5,
-        url: "group 5 image url 1",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 5,
-        url: "group 5 image url 2",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
         groupId: 5,
-        url: "group 5 image url 3",
+        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
     ], { validate: true })

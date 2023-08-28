@@ -19,7 +19,7 @@ function Navigation({ isLoaded }) {
       
       {isLoaded && (
         <li id="navbar-right">
-          {sessionUser && <NavLink id='navbar-right-create-group' exact to="/create-group">Start a new group</NavLink>}
+          {sessionUser && <NavLink id='navbar-right-create-group' exact to="/groups/new">Start a new group</NavLink>}
           <ProfileButton user={sessionUser} />
         
         </li>

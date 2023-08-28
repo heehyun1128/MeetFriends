@@ -2,7 +2,7 @@ const express = require('express');
 // const cookieParser = require('cookie-parser');
 const { requireAuth } = require("../../utils/auth")
 
-const { Group, GroupImage, Membership, Attendance, User, Venue, sequelize } = require('../../db/models');
+const { Group, GroupImage, Membership, Attendance, User, Venue, sequelize, Event } = require('../../db/models');
 
 const { Op } = require('sequelize');
 
@@ -299,18 +299,19 @@ router.get("/", async (req, res, next) => {
           }
         }
       },
-      // {
-      //   model: GroupImage,
-      //   attributes: [],
-      //   where: {
-      //     preview: true
-      //   }
-      // }
+      {
+        model: Event,
+        attributes: []
+      },
+    
     ],
     attributes: {
       include: [
         [
           sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')),'integer'), "numMembers"
+        ],
+        [
+          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Events"."id"')),'integer'), "numEvents"
         ],
         // [sequelize.col('GroupImages.url'), 'previewImage']
       ]

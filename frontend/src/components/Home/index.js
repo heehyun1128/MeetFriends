@@ -35,7 +35,7 @@ const Home = () => {
   }
   const handleStartGroup = (e) => {
     e.preventDefault()
-    history.push('/create-group')
+    history.push('/groups/new')
   }
 
   const startGroupBtn = "home-detail-item-tab-btn" + (startGroupDisabled ? " disabled" : "")

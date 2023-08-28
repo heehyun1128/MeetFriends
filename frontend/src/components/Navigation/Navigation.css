@@ -60,6 +60,7 @@ align-items: center;
 .profile-dropdown {
   position: absolute;
   right: 20px;
+  top:30px;
   border: 2px solid black;
   text-align: left;
   padding: 10px 15px;

@@ -6,6 +6,8 @@ import { Route, Switch } from "react-router-dom";
 import * as sessionActions from "./store/session";
 import Navigation from "./components/Navigation";
 import Home from "./components/Home";
+import Group from "./components/Group";
+import Event from "./components/Event";
 
 function App() {
   const dispatch = useDispatch();
@@ -19,6 +21,8 @@ function App() {
       <Navigation isLoaded={isLoaded} />
       {isLoaded && <Switch>
         <Route exact path="/"><Home /></Route>
+        <Route exact path="/groups"><Group /></Route>
+        <Route exact path="/events"><Event /></Route>
       </Switch>}
     </>
   );
