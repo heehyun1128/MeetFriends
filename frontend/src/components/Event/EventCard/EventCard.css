@@ -1,0 +1,42 @@
+#event-card-container{
+  /* border: 1px solid black; */
+  border-radius: 15px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding:10px;
+  background-color: #fff;
+  margin: 15px 0;
+}
+
+.event-card-upper{
+  width:100%;
+  height: fit-content;
+  display: flex;
+  height: 80%;
+}
+
+.event-image-preview{
+  display: block;
+  height:100%;
+  margin-right: 15px;
+}
+
+.event-card-upper-right{
+  display: flex;
+  flex-direction: column;
+}
+
+.event-card-upper-right > *{
+  margin-bottom: 10px;
+
+}
+
+#date-time{
+  color:#0f6767;
+}
+
+#event-city{
+  color:gray;
+}

@@ -1,0 +1,10 @@
+#group-info-main-div {
+  width: 100%;
+}
+
+.group-info-main-organizer h1,.group-info-main-organizer p{
+margin-bottom: 15px;
+}
+.group-info-main-about h2,.group-info-main-about p{
+margin-bottom: 15px;
+}

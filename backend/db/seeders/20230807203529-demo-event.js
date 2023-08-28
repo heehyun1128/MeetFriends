@@ -21,8 +21,8 @@ module.exports = {
         type: "In Person",
         capacity:30,
         price:20,
-        startDate: new Date("2023-12-10 14:00:00"),
-        endDate: new Date("2023-12-10 18:00:00"),
+        startDate: new Date("2023-12-10 10:00:00"),
+        endDate: new Date("2023-12-10 14:00:00"),
       },
       {
         // event2
@@ -95,6 +95,42 @@ module.exports = {
         price: 55,
         startDate: new Date("2023-10-20 16:00:00"),
         endDate: new Date("2023-10-20 20:00:00"),
+      },
+      {
+    
+        venueId: 1,
+        groupId: 1,
+        name: "Networking Event 2022",
+        description: "Join us to make connections with co-founders, partners, coaches or core team members for your career growth and potential hiring opportunities",
+        type: "In Person",
+        capacity: 100,
+        price: 55,
+        startDate: new Date("2022-10-20 16:00:00"),
+        endDate: new Date("2022-10-20 20:00:00"),
+      },
+      {
+    
+        venueId: 1,
+        groupId: 1,
+        name: "Networking Event 2021",
+        description: "Join us to make connections with co-founders, partners, coaches or core team members for your career growth and potential hiring opportunities",
+        type: "In Person",
+        capacity: 100,
+        price: 55,
+        startDate: new Date("2021-12-20 16:00:00"),
+        endDate: new Date("2021-12-20 20:00:00"),
+      },
+      {
+      
+        venueId: 1,
+        groupId: 1,
+        name: "Hiking Hiking",
+        description: "Come and meet friends who love hiking.",
+        type: "In Person",
+        capacity: 30,
+        price: 20,
+        startDate: new Date("2023-11-15 10:00:00"),
+        endDate: new Date("2023-11-15 16:00:00"),
       },
      
     ], { validate: true })

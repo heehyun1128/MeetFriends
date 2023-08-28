@@ -12,13 +12,13 @@ import { useParams } from 'react-router-dom'
 const GroupInfoPage = () => {
 
   const { groupId } = useParams()
-  console.log(groupId)
+  // console.log(groupId)
   const groupObj = useSelector((state) => (state.groups.allGroups ? state.groups.allGroups : []))
 
 
-  console.log(groupObj)
+  // console.log(groupObj)
   const groupInfo = groupObj[groupId]
-  console.log(groupInfo)
+  // console.log(groupInfo)
   const dispatch = useDispatch();
 
   useEffect(() => {
