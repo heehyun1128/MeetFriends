@@ -40,8 +40,8 @@ module.exports = {
         about: "This is a group formed by current students and alumni from UC Berkeley Electrical Engineering & Computer Sciences department. We are passional about finding students great social and networking opportunities that contribute to their personal and career growth.",
         type: "Online",
         private: false,
-        city: "Seattle",
-        state: "WA",
+        city: "Berkeley",
+        state: "CA",
      
       },
       {
