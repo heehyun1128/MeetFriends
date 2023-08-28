@@ -8,12 +8,13 @@
   border-radius: 10px;
   padding: 0;
   border: 1px solid rgb(220, 220, 220);
-  padding: 50px 0 80px;
+  padding: 50px 0 50px;
   background-color: #fff;
 }
 
 #initial-login-div h1 {
   font-size: 25px;
+  margin-bottom: 20px;
 }
 
 #initial-login-form {
@@ -48,8 +49,18 @@
   border-radius: 5px;
   margin-top:2%;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .login-input-error{
   color:red;
+}
+
+#demo-user-login{
+  text-decoration: underline;
+  color:rgb(96, 151, 182);
+  font-weight: 700;
+  text-align: center;
+  margin-top:20px;
+  cursor: pointer;
 }

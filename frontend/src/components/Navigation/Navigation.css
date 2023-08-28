@@ -15,10 +15,27 @@
   height:60px;
 }
 
+#navbar-right{
+display: flex;
+align-items: center;
+
+}
+
+#navbar-right-create-group{
+  text-decoration: none;
+  color: #0f6767;
+  cursor: pointer;
+  font-weight: 700;
+}
+
 #logo-style {
   color: #FF5A5F;
   font-weight: bold;
 
+}
+
+#profile-div{
+  cursor: pointer;
 }
 
 #profile-button {
@@ -28,7 +45,7 @@
   padding: 0;
   border: none;
   background-color: #fff;
-  margin-right: 30px;
+  margin-right: 10px;
   cursor: pointer;
 }
 
@@ -42,10 +59,11 @@
 
 .profile-dropdown {
   position: absolute;
-  right: 24px;
+  right: 20px;
+  top:30px;
   border: 2px solid black;
   text-align: left;
-  padding: 5px 5px;
+  padding: 10px 15px;
   width:fit-content;
   display: flex;
   flex-direction: column;
@@ -53,13 +71,22 @@
   background-color: #fff;
   text-wrap: nowrap;
 }
-
+#start-new-group-nav{
+  color:#0f6767;
+  text-decoration: none;
+  font-weight: 700;
+  margin:10px 10px;
+}
 #logout-button {
   border: none;
   background-color: #ffffff;
   cursor: pointer;
   width: 100%;
  text-align: left;
+ font-weight: 700;
+ font-size: 18px;
+ padding-top: 10px;
+
 }
 
 #logout-btn-li{
@@ -77,4 +104,11 @@
   display: none;
 }
 
+#login-nav-link {
+  cursor: pointer;
+}
+
+#signup-nav-link{
+  cursor: pointer;
+}
 

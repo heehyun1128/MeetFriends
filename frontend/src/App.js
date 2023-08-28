@@ -5,6 +5,10 @@ import { Route, Switch } from "react-router-dom";
 
 import * as sessionActions from "./store/session";
 import Navigation from "./components/Navigation";
+import Home from "./components/Home";
+import Group from "./components/Group";
+import Event from "./components/Event";
+import GroupInfoPage from "./components/Group/GroupInfoPage/GroupInfoPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -16,7 +20,12 @@ function App() {
   return (
     <>
       <Navigation isLoaded={isLoaded} />
-      {isLoaded && <Switch></Switch>}
+      {isLoaded && <Switch>
+        <Route exact path="/"><Home /></Route>
+        <Route exact path="/groups"><Group /></Route>
+        <Route exact path="/groups/:groupId"><GroupInfoPage /></Route>
+        <Route exact path="/events"><Event /></Route>
+      </Switch>}
     </>
   );
 }

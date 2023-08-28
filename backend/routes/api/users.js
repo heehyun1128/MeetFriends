@@ -22,15 +22,35 @@ const validateSignup = [
   check('email')
     .exists({ checkFalsy: true })
     .isEmail()
-    .withMessage('Please provide a valid email.'),
+    .withMessage('Please provide a valid email.')
+    .custom(async (value) => {
+      const user = await User.findOne({
+        where: {
+          email: value
+        }
+      })
+      if (user) {
+        throw new Error('User with that email already exists')
+      }
+    }),
   check('username')
     .exists({ checkFalsy: true })
     .isLength({ min: 4 })
-    .withMessage('Please provide a username with at least 4 characters.'),
-  check('username')
+    .withMessage('Please provide a username with at least 4 characters.')
     .not()
     .isEmail()
-    .withMessage('Username cannot be an email.'),
+    .withMessage('Username cannot be an email.')
+    .custom(async (value) => {
+      const user = await User.findOne({
+        where: {
+          username:value
+        }
+      })
+      if (user) {
+        throw new Error('User with that username already exists')
+      }
+    })
+    ,
   check('password')
     .exists({ checkFalsy: true })
     .isLength({ min: 6 })

@@ -13,17 +13,57 @@ module.exports = {
     await EventImage.bulkCreate([
       {
         eventId: 1,
-        url: "event1 image url",
+        url: "event1 image url 1",
         preview: true
       },
       {
         eventId: 1,
-        url: "event 1 image url",
+        url: "event 1 image url 2",
         preview: true
       },
       {
         eventId: 2,
-        url: "event 2 image url",
+        url: "event 2 image url 1",
+        preview: true
+      },
+      {
+        eventId: 2,
+        url: "event 2 image url 2",
+        preview: true
+      },
+      {
+        eventId: 3,
+        url: "event 3 image url 1",
+        preview: true
+      },
+      {
+        eventId: 3,
+        url: "event 3 image url 2",
+        preview: true
+      },
+      {
+        eventId: 3,
+        url: "event 3 image url 3",
+        preview: true
+      },
+      {
+        eventId: 4,
+        url: "event 4 image url",
+        preview: true
+      },
+      {
+        eventId: 5,
+        url: "event 5 image url",
+        preview: true
+      },
+      {
+        eventId: 5,
+        url: "event 5 image url 1",
+        preview: true
+      },
+      {
+        eventId: 5,
+        url: "event 5 image url 2",
         preview: true
       },
     ], { validate: true })

@@ -16,9 +16,12 @@ function Navigation({ isLoaded }) {
         <NavLink className="nav-link" exact to="/"><h1 id='logo-style'>MeetFriends</h1></NavLink>
       </li>
       {/* {isLoaded && sessionLinks} */}
+      
       {isLoaded && (
-        <li>
+        <li id="navbar-right">
+          {sessionUser && <NavLink id='navbar-right-create-group' exact to="/groups/new">Start a new group</NavLink>}
           <ProfileButton user={sessionUser} />
+        
         </li>
       )}
     </ul>
