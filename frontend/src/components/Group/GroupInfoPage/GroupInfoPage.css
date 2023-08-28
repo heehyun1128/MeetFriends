@@ -1,14 +1,30 @@
 #group-info-div{
-  margin: 20px 200px;
+  margin: 20px 0;
 }
 
 #group-info-div{
-  width:80vw;
+  width:100%;
   display:flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  
 }
 
 #group-info-head-section{
   width:100%;
+  margin:5px 20px 20px;
+  
+}
+
+
+#group-info-main-section{
+  min-width:1024px;
+  width:100%;
+  background-color: #e6e6e6;
+  padding:20px 10%;
+}
+
+.go-back-btn{
+  width:80%;
+  margin-left:10%;
 }

@@ -37,12 +37,14 @@
 }
 .centered-dot{
   position: relative;
+  width: 20px;
+    height: 20px;
 }
 
 .centered-dot p{
   position: absolute;
   bottom: 25%;
-  left:-2px;
+  left:6px;
   font-weight: 700;
   /* border-radius: 50%; */
 }

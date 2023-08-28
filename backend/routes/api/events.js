@@ -387,7 +387,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
   // console.log(where)
 
   let allEvents = await Event.findAll({
-    attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
+    attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate","description"],
     include: [
       {
         model: Group,
@@ -404,7 +404,7 @@ router.get("/", validateQueryParams, async (req, res, next) => {
 
   if (name || type || startDate) {
     allEvents = await Event.findAll({
-      attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate"],
+      attributes: ["id", "groupId", "venueId", "name", "type", "startDate", "endDate","description"],
       include: [
         {
           model: Group,

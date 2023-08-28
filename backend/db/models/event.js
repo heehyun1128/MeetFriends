@@ -92,11 +92,11 @@ module.exports = (sequelize, DataTypes) => {
           args:true,
           msg: "Start date must be a valid datetime"
       },  
-        isFutureDate(value) {
-          if (new Date(value) <= new Date()) {
-            throw new Error('Start date must be in the future');
-          }
-        }
+        // isFutureDate(value) {
+        //   if (new Date(value) <= new Date()) {
+        //     throw new Error('Start date must be in the future');
+        //   }
+        // }
       }
     },
     endDate: {

@@ -25,7 +25,7 @@ const GroupInfoHead = ({ group }) => {
             <p className="group-info-organizer">Organized By {group && group.Organizer.firstName} {group && group.Organizer.lastName}</p>
           </div>
         </div>
-        {group && sessionUser.id !== group.organizerId && <button id="join-this-group-btn" onClick={handleJoinGroup}>
+        {group && sessionUser && sessionUser.id !== group.organizerId && <button id="join-this-group-btn" onClick={handleJoinGroup}>
           Join this group
         </button>}
       </div>
