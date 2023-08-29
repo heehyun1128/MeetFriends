@@ -9,6 +9,7 @@ import Home from "./components/Home";
 import Group from "./components/Group";
 import Event from "./components/Event";
 import GroupInfoPage from "./components/Group/GroupInfoPage/GroupInfoPage";
+import GroupForm from "./components/Group/GroupForm/GroupForm";
 
 function App() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ function App() {
       {isLoaded && <Switch>
         <Route exact path="/"><Home /></Route>
         <Route exact path="/groups"><Group /></Route>
+        <Route exact path="/groups/new"><GroupForm /></Route>
         <Route exact path="/groups/:groupId"><GroupInfoPage /></Route>
         <Route exact path="/events"><Event /></Route>
       </Switch>}

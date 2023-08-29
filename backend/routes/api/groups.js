@@ -151,8 +151,48 @@ const checkMemberDelInput = [
   ,
   handleValidationErrors
 ]
-// handle 404 error on group id not found
 
+const checkCreateGroupInput = [
+  // const { memberId, status } = req.body
+  check('name')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Name is required"),
+  check('city')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("City is required"),
+  check('state')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("State is required"),
+  check('about')
+    .exists({ checkFalsy: true })
+    .isLength({min:30})
+    .withMessage("Description must be at least 30 characters long"),
+  check('type')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Group Type is required"),
+  check('private')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    // .isBoolean()
+    .withMessage("Visibility Type is required"),
+  check('imageUrl')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("")
+    .custom(value=>{
+      if (!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")){
+        throw new Error("Image URL must end in .png, .jpg, or .jpeg")
+      }
+      return true
+    })
+,
+  handleValidationErrors
+]
+// handle 404 error on group id not found
 const handleError404 = async (req, res, next) => {
   const currGroup = await Group.findByPk(req.params.id)
 
@@ -289,14 +329,14 @@ const handleDelMembership403 = async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   const allGroups = await Group.findAll({
     attributes: ["id", "organizerId", "name", "about", "type", "private", "city", "state", "createdAt", "updatedAt"],
-  
+
 
   })
   let groups = []
   for (let i = 0; i < allGroups.length; i++) {
     let group = allGroups[i]
     const groupImages = await group.getGroupImages()
-    const groupEvents=await group.getEvents()
+    const groupEvents = await group.getEvents()
     const groupMemberships = await group.getMemberships({
       where: {
         status: {
@@ -315,7 +355,7 @@ router.get("/", async (req, res, next) => {
       if (groupImage.preview === true) {
 
         group.previewImage = groupImage.url
-        
+
 
       }
     }
@@ -660,9 +700,9 @@ router.get("/:id", async (req, res, next) => {
 // Create a Group
 // Creates and returns a new group.
 // Require Authentication: true
-router.post("/", requireAuth, async (req, res, next) => {
+router.post("/", requireAuth, checkCreateGroupInput, async (req, res, next) => {
 
-  const { name, about, type, private, city, state } = req.body
+  const { name, about, type, private, city, state, imageUrl } = req.body
   const newGroup = await Group.create({
     organizerId: req.user.id,
     name,
@@ -672,6 +712,8 @@ router.post("/", requireAuth, async (req, res, next) => {
     city,
     state,
   })
+  const groupImageUrl=await newGroup.createGroupImage({url:imageUrl})
+ 
 
   // add organizer membership to current user who's creating a group
   const currUser = await User.findByPk(req.user.id)
@@ -679,8 +721,19 @@ router.post("/", requireAuth, async (req, res, next) => {
     status: "organizer",
     groupId: newGroup.id
   })
+
   // console.log(currUserMemInGroup)
-  res.status(201).json(newGroup)
+  res.status(201).json({
+    id:newGroup.id,
+    organizerId: newGroup.organizerId,
+    name: newGroup.name,
+    about: newGroup.about,
+    type: newGroup.type,
+    private: newGroup.private,
+    city: newGroup.city,
+    state: newGroup.state,
+    imageUrl: groupImageUrl.url
+  })
 })
 
 

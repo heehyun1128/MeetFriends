@@ -12,9 +12,9 @@ export const loadGroups = groups => ({
   groups
 })
 
-export const getGroup = group => ({
+export const getGroup = (group) => ({
   type: GET_GROUP,
-  group
+    group,
 })
 export const editGroup = group => ({
   type: EDIT_GROUP,
@@ -34,7 +34,7 @@ export const fetchGroups = () => async (dispatch) => {
   if (res.ok) {
     const groups = await res.json()
     dispatch(loadGroups(groups))
-    console.log("fetch groups action creator",groups)
+    // console.log("fetch groups action creator", groups)
     return groups
   }
 }
@@ -44,7 +44,7 @@ export const fetchGroupDetail = (groupId) => async (dispatch) => {
 
   if (res.ok) {
     const groupDetails = await res.json()
-  
+
     dispatch(getGroup(groupDetails))
   } else {
     const errors = await res.json()
@@ -58,12 +58,15 @@ export const createGroup = group => async (dispatch) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(group)
   })
+
   if (res.ok) {
     const newGroup = await res.json()
     dispatch(getGroup(newGroup))
     return newGroup
   } else {
+  
     const errors = await res.json()
+    
     return errors
   }
 }
@@ -106,7 +109,7 @@ const initialState = {
 }
 const groupReducer = (state = initialState, action) => {
   // let newState = {}
-// store shape:
+  // store shape:
   // groups: {
   //   allGroups: {
   //     [groupId]: {
@@ -125,18 +128,29 @@ const groupReducer = (state = initialState, action) => {
 
   switch (action.type) {
     case LOAD_GROUPS:
-      const updatedState = {...state,allGroups:{...state.allGroups}}
-      action.groups.Groups.forEach(group=>{
-        updatedState.allGroups[group.id]=group}
+      const updatedState = { ...state, allGroups: { ...state.allGroups } }
+      action.groups.Groups.forEach(group => {
+        updatedState.allGroups[group.id] = group
+      }
       )
-  
+
       return updatedState
     case GET_GROUP:
+      const a = {
+        ...state,
+        singleGroup: {
+          ...state.singleGroup,
+          groupData: action.group,
+
+        }
+      }
+      console.log(a)
       return {
         ...state,
         singleGroup: {
           ...state.singleGroup,
-          groupData: action.group
+          groupData: action.group,
+         
         }
       }
     case EDIT_GROUP:
@@ -150,7 +164,7 @@ const groupReducer = (state = initialState, action) => {
     case REMOVE_GROUP:
       const newState = { ...state, allGroups: { ...state.allGroups } }
       delete newState.allGroups[action.groupId]
-      console.log("Del",newState)
+      console.log("Del", newState)
       return newState
 
     default:

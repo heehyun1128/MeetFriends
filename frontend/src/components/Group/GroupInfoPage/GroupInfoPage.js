@@ -24,7 +24,7 @@ const GroupInfoPage = () => {
   useEffect(() => {
     dispatch(fetchGroups());
   }, [dispatch]);
-console.log("11111111")
+// console.log("11111111")
 
   return (
     <div id="group-info-div">

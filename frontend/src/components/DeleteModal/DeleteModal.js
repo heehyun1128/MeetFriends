@@ -20,7 +20,7 @@ const DeleteModal = ({ groupId }) => {
      closeModal()
 
      history.push('/groups')
-     dispatch(fetchGroups());
+    //  dispatch(fetchGroups());
    })
  
 

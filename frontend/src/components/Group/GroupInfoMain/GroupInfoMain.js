@@ -10,7 +10,7 @@ const GroupInfoMain = ({ group }) => {
   const { groupId } = useParams()
   // console.log(groupId)
 
-  const eventObj = useSelector((state) => (state.events.allEvents ? state.events.allEvents : []))
+  const eventObj = useSelector((state) => (state.events.allEvents ? state.events.allEvents : {}))
 
   const events = Object.values(
     eventObj
@@ -50,7 +50,7 @@ const GroupInfoMain = ({ group }) => {
      {upcomingEvents.length ? (<div className="upcoming-events">
         <h2>Upcoming Events ({upcomingEventCount})</h2>
         { <EventList events={upcomingEvents} />}
-      </div>):(<></>)}
+      </div>):(<h2>No Upcoming Events</h2>)}
       {pastEvents.length ? (<div className="past-events">
         <h2>Past Events ({pastEventCount})</h2>
         {<EventList events={pastEvents} />}

@@ -1,0 +1,67 @@
+#group-form-div{
+display: flex;
+flex-direction: column;
+align-items: center;
+margin-top: 20px;
+padding-bottom: 150px;
+}
+
+.one h4{
+  color: #0f6767;
+  /* margin-bottom: 10px; */
+}
+
+.group-form-section{
+  border-bottom: 2px solid gray;
+  margin:10px 0;
+  padding: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.group-form-section p{
+  display: block;
+  width:650px;
+  /* margin-top: 10px; */
+}
+
+input{
+  width:400px;
+  height: 36px;
+  border: 3px solid black;
+  background-color: rgb(210, 230, 239);
+  /* margin-top: 15px; */
+}
+textarea{
+  width:400px;
+  height: 240px;
+  border: 3px solid black;
+  background-color: rgb(210, 230, 239);
+  /* margin-top: 15px; */
+}
+
+.group-form-section>*{
+  margin-bottom: 15px;
+} 
+.group-form-section div>*{
+margin-bottom: 5px;
+}
+select{
+  background-color: rgb(210, 230, 239);
+  border: 3px solid black;
+width:150px;
+height:36px;
+}
+
+#create-group-btn{
+  background-color: rgb(231, 62, 62);
+  color: white;
+  width:200px;
+  height:50px;
+  font-size: 20px;
+  box-shadow: 3px 3px 3px black;
+}
+
+.group-form-errors{
+  color:red;
+}
