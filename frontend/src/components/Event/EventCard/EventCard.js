@@ -3,9 +3,8 @@ import { useHistory } from 'react-router-dom'
 import './EventCard.css'
 
 
-// import { useParams } from 'react-router-dom'
 const EventCard = ({ event }) => {
-  // const {groupId} = useParams()
+
 
   const date = event.startDate.split('T')[0]
   const time = event.startDate.split('T')[1].slice(0, 8)

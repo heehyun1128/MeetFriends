@@ -13,7 +13,7 @@ const GroupInfoPage = () => {
 
   const { groupId } = useParams()
   // console.log(groupId)
-  const groupObj = useSelector((state) => (state.groups.allGroups ? state.groups.allGroups : []))
+  const groupObj = useSelector((state) => (Object.values(state.groups.allGroups).length ? state.groups.allGroups : {}))
 
 
   // console.log(groupObj)
@@ -24,7 +24,7 @@ const GroupInfoPage = () => {
   useEffect(() => {
     dispatch(fetchGroups());
   }, [dispatch]);
-
+console.log("11111111")
 
   return (
     <div id="group-info-div">

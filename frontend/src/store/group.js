@@ -34,7 +34,7 @@ export const fetchGroups = () => async (dispatch) => {
   if (res.ok) {
     const groups = await res.json()
     dispatch(loadGroups(groups))
-    // console.log(groups)
+    console.log("fetch groups action creator",groups)
     return groups
   }
 }
@@ -105,8 +105,8 @@ const initialState = {
   singleGroup: {}
 }
 const groupReducer = (state = initialState, action) => {
-  let newState = {}
-
+  // let newState = {}
+// store shape:
   // groups: {
   //   allGroups: {
   //     [groupId]: {
@@ -125,12 +125,12 @@ const groupReducer = (state = initialState, action) => {
 
   switch (action.type) {
     case LOAD_GROUPS:
-      newState = {...state,allGroups:{...state.allGroups}}
+      const updatedState = {...state,allGroups:{...state.allGroups}}
       action.groups.Groups.forEach(group=>{
-        
-        // console.log(group)
-       return newState.allGroups[group.id]=group})
-      return newState
+        updatedState.allGroups[group.id]=group}
+      )
+  
+      return updatedState
     case GET_GROUP:
       return {
         ...state,
@@ -148,8 +148,9 @@ const groupReducer = (state = initialState, action) => {
         }
       }
     case REMOVE_GROUP:
-      newState = { ...state }
-      delete newState[action.reportId]
+      const newState = { ...state, allGroups: { ...state.allGroups } }
+      delete newState.allGroups[action.groupId]
+      console.log("Del",newState)
       return newState
 
     default:

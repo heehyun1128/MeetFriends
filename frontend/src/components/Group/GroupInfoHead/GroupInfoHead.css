@@ -64,3 +64,20 @@
   margin-left:10px;
   cursor: pointer;
 }
+
+#gray-buttons{
+  display:flex;
+
+   
+}
+
+.gray-btn{
+  width:fit-content;
+  padding: 0 15px;
+  height:24px;
+  background-color: gray;
+  box-shadow: 2px 2px 4px black;
+  color:white;
+  margin-right: 15px;
+  cursor: pointer;
+}
