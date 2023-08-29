@@ -7,7 +7,7 @@ import EventCard from '../EventCard/EventCard';
 
 
 const EventList = ({events}) => {
-  console.log(events)
+  // console.log(events)
 
  
   return (

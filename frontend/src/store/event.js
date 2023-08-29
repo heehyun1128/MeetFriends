@@ -116,13 +116,14 @@ const eventReducer = (state = initialState, action) => {
 
   switch (action.type) {
     case LOAD_EVENTS:
-      newState = { ...state, allEvents: { ...state.allEvents } }
+      const updatedState = { ...state, allEvents: { ...state.allEvents } }
       action.events.Events.forEach(event => {
 
         // console.log(event)
-        return newState.allEvents[event.id] = event
+        // newState.allEvents={...newState.allEvents, [event.id] : event}
+        updatedState.allEvents[event.id] = event
       })
-      return newState
+      return updatedState
     case GET_EVENT:
       return {
         ...state,
@@ -132,8 +133,9 @@ const eventReducer = (state = initialState, action) => {
         }
       }
     case REMOVE_EVENT:
-      newState = { ...state }
-      delete newState[action.reportId]
+      // newState = { ...state }
+      newState = { ...state, allEvents: { ...state.allEvents } }
+      delete newState.allEvents[action.eventId]
       return newState
 
     default:

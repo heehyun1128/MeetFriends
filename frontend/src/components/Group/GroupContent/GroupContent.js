@@ -7,17 +7,24 @@ import GroupDetail from '../GroupDetail/GroupDetail';
 import './GroupContent.css'
 
 const GroupContent = () => {
-  const groupObj = useSelector((state) => (state.groups.allGroups ? state.groups.allGroups : []))
-
+  const groupObj = useSelector((state) => (Object.values(state.groups.allGroups).length ? state.groups.allGroups : {}))
+useSelector(state=>console.log("state 123",state))
   const groups = Object.values(
     groupObj
   );
-  // console.log(groups)
+  console.log("get all groups", groups)
+  // sort group - recently created group at the top
+  groups.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(fetchGroups());
   }, [dispatch]);
+
+  if (!Object.values(groupObj).length) {
+    return null
+  }
 
   // const groups = useSelector(state=>state.allGroups)
   return (

@@ -8,7 +8,7 @@ import './GroupInfoMain.css'
 
 const GroupInfoMain = ({ group }) => {
   const { groupId } = useParams()
-  console.log(groupId)
+  // console.log(groupId)
 
   const eventObj = useSelector((state) => (state.events.allEvents ? state.events.allEvents : []))
 
@@ -17,7 +17,7 @@ const GroupInfoMain = ({ group }) => {
   );
   // group events
   const groupEvents = events.filter(event => Number(event.groupId) === Number(groupId))
-  console.log(new Date())
+  // console.log(new Date())
 
   // upcoming events
   const upcomingEvents = groupEvents.filter(event => new Date(event.startDate) > new Date())
@@ -39,7 +39,7 @@ const GroupInfoMain = ({ group }) => {
     <div id='group-info-main-div'>
       <div className="group-info-main-organizer">
         <h1>Organizer</h1>
-        <p>{group && `${group.Organizer.firstName} ${group.Organizer.lastName}`}</p>
+        <p>{group && `${group.organizer.firstName} ${group.organizer.lastName}`}</p>
       </div>
       <div className="group-info-main-about">
         <h2>What we're about</h2>

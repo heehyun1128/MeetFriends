@@ -1,12 +1,30 @@
 import React from 'react'
 import './GroupInfoHead.css'
 import { useSelector } from "react-redux";
+import {useHistory,useParams} from 'react-router-dom'
+import OpenModalMenuItem from '../../Navigation/OpenModalMenuItem';
+import DeleteModal from '../../DeleteModal/DeleteModal';
+
+
 const GroupInfoHead = ({ group }) => {
   const sessionUser = useSelector(state => state.session.user)
-  const handleJoinGroup = e=>{
+  const handleJoinGroup = e => {
     e.preventDefault()
-   alert("Feature coming soon...")
+    alert("Feature coming soon...")
   }
+
+  const history = useHistory()
+  const {groupId} = useParams()
+  const handleCreateEvent = e => {
+    e.preventDefault()
+    history.push('/events/new')
+  }
+  const handleUpdateEvent = e => {
+    e.preventDefault()
+    history.push(`/groups/${groupId}/edit`)
+  }
+
+
   return (
     <div id="group-info-head-container">
       <div className="image-div">
@@ -22,12 +40,31 @@ const GroupInfoHead = ({ group }) => {
               <div className="group-info-centered-dot"><p>.</p></div>
               <p className='group-info-private'>{group && group.private ? "Private" : "Public"}</p>
             </div>
-            <p className="group-info-organizer">Organized By {group && group.Organizer.firstName} {group && group.Organizer.lastName}</p>
+            <p className="group-info-organizer">Organized By {group && group.organizer.firstName} {group && group.organizer.lastName}</p>
           </div>
         </div>
         {group && sessionUser && sessionUser.id !== group.organizerId && <button id="join-this-group-btn" onClick={handleJoinGroup}>
           Join this group
         </button>}
+        {group && sessionUser && sessionUser.id === group.organizerId &&
+          <div id='gray-buttons'>
+            <button className="gray-btn" onClick={handleCreateEvent}>
+              Create Event
+            </button>
+            <button className="gray-btn" onClick={handleUpdateEvent}>
+              Update
+            </button>
+            <button className="gray-btn" >
+              <OpenModalMenuItem
+              itemText="Delete"
+              modalComponent={<DeleteModal groupId={groupId}/>}
+         
+            />
+            </button>
+
+            
+          </div>
+        }
       </div>
     </div>
 

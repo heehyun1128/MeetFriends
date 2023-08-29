@@ -289,55 +289,33 @@ const handleDelMembership403 = async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   const allGroups = await Group.findAll({
     attributes: ["id", "organizerId", "name", "about", "type", "private", "city", "state", "createdAt", "updatedAt"],
-    include: [
-      {
-        model: Membership,
-        attributes: [],
-        where: {
-          status: {
-            [Op.in]: ["organizer", "co-host", "member"]
-          }
-        }
-      },
-      {
-        model: Event,
-        attributes: []
-      },
-      {
-        model: User,
-        as: 'Organizer',
-        // attributes: ["firstName","lastName"]
-          
-        
-      }
-    ],
-    attributes: {
-      include: [
-        [
-          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Memberships"."id"')), 'integer'), "numMembers"
-        ],
-        [
-          sequelize.cast(sequelize.fn('COUNT', sequelize.literal('DISTINCT "Events"."id"')), 'integer'), "numEvents"
-        ],
-        // [sequelize.col('GroupImages.url'), 'previewImage']
-      ]
-    },
-    group: ['Group.id','Organizer.id']
+  
 
   })
   let groups = []
   for (let i = 0; i < allGroups.length; i++) {
     let group = allGroups[i]
     const groupImages = await group.getGroupImages()
+    const groupEvents=await group.getEvents()
+    const groupMemberships = await group.getMemberships({
+      where: {
+        status: {
+          [Op.in]: ["organizer", "co-host", "member"]
+        }
+      }
+    })
     group = group.toJSON()
+    group.numEvemts = groupEvents.length ? groupEvents.length : 0
+    group.numMembers = groupMemberships.length ? groupMemberships.length : 0
+    group.organizer = await User.findByPk(group.organizerId)
 
     group.previewImage = null
     for (let i = 0; i < groupImages.length; i++) {
-
       let groupImage = groupImages[i].toJSON()
       if (groupImage.preview === true) {
 
         group.previewImage = groupImage.url
+        
 
       }
     }

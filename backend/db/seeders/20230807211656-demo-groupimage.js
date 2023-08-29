@@ -61,12 +61,12 @@ module.exports = {
         preview: true
       },
       {
-        groupId: 5,
+        groupId: 6,
         url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
       {
-        groupId: 5,
+        groupId: 7,
         url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },

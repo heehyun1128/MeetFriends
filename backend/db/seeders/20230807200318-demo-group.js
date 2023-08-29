@@ -22,6 +22,7 @@ module.exports = {
         state: "NY",
        
       },
+      
       {
           // group2
         organizerId: 2,
@@ -65,6 +66,28 @@ module.exports = {
         city: "San Jose",
         state: "CA",
      
+      },
+      {
+        // group1.1
+        organizerId: 1, //user id is 1
+        name: "Hiking Group 2",
+        about: "This group is dedicated to New Yorkers who want to experience an outdoor adventure away from the city. We are determined in helping people find their interests and gather with others. We offer lunch, snacks, and water for attendees. Join us today to sign up for our incoming events",
+        type: "In Person",
+        private: false,
+        city: "New York",
+        state: "NY",
+
+      },
+      {
+        // group1.1
+        organizerId: 1, //user id is 1
+        name: "Hiking Group 3",
+        about: "This group is dedicated to New Yorkers who want to experience an outdoor adventure away from the city. We are determined in helping people find their interests and gather with others. We offer lunch, snacks, and water for attendees. Join us today to sign up for our incoming events",
+        type: "In Person",
+        private: false,
+        city: "New York",
+        state: "NY",
+
       },
     ],{ validate: true })
   },
