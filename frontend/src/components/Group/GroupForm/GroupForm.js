@@ -2,24 +2,28 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { createGroup } from '../../../store/group';
+import { createGroup, updateGroup } from '../../../store/group';
 
 
 import './GroupForm.css'
-const GroupForm = () => {
+const GroupForm = ({ group, formType }) => {
+  const history = useHistory()
+  // const previewImage=group.GroupImages.find(image=>image.preview===true)
+  console.log(group)
 
-
-
-
-  const [city, setCity] = useState("")
-  const [state, setState] = useState("")
-  const [groupName, setGroupName] = useState("")
-  const [description, setDescription] = useState("")
-  const [groupType, setGroupType] = useState("")
-  const [groupVisibility, setGroupVisibility] = useState("")
-  const [groupVisibilityBoolean, setGroupVisibilityBoolean] = useState()
-  const [groupImageUrl, setgroupImageUrl] = useState("")
+  const [city, setCity] = useState(group.city || "")
+  const [state, setState] = useState(group.state || "")
+  const [groupName, setGroupName] = useState(group.name || "")
+  const [description, setDescription] = useState(group.about || "")
+  const [groupType, setGroupType] = useState(group.type || "")
+  const [groupVisibility, setGroupVisibility] = useState(group.private.toString() || "")
+ 
+  const [groupImageUrl, setgroupImageUrl] = useState(group.GroupImages?.find(image => image.preview === true).url  || "")
   const [validationError, setValidationError] = useState({})
+
+ 
+  
+  
 
   const dispatch = useDispatch();
 
@@ -33,51 +37,56 @@ const GroupForm = () => {
     setgroupImageUrl("")
     setValidationError("")
   }
-  useEffect(() => {
-    if (groupVisibility === "Public") {
-      setGroupVisibilityBoolean(Boolean(true))
-    }
-    if (groupVisibility === "Private") {
-      setGroupVisibilityBoolean(Boolean(false))
-    }
-    if (groupVisibility === "") {
-      setGroupVisibilityBoolean("")
-    }
-    return () => {
+  
 
-    };
-  }, [groupVisibility]);
 
-  const history = useHistory()
   const handleGroupFormSubmit = (e) => {
     console.log(groupVisibility)
 
-    console.log(Boolean(groupVisibilityBoolean))
+    // console.log(Boolean(groupVisibilityBoolean))
     e.preventDefault()
-    const groupInfo = {
+    group = {
+      ...group,
       city,
       state,
       name: groupName,
       about: description,
       type: groupType,
-      private: groupVisibilityBoolean,
+      private: JSON.parse(groupVisibility),
       imageUrl: groupImageUrl
     }
     // const imageUrl = groupImageUrl 
-    const newGroup = dispatch(createGroup(groupInfo)).then(
-      (newGroupRes) => {
-        history.push(`/groups/${newGroupRes.id}`)
-        resetGroupForm()
-       
-      }
+    if (formType === "createGroup") {
+      const newGroup = dispatch(createGroup(group)).then(
+        (newGroupRes) => {
+          history.push(`/groups/${newGroupRes.id}`)
+          resetGroupForm()
+          group = newGroup
+        }
+      ).catch(async (res) => {
+        const data = await res.json();
+        if (data && data.errors) {
+          setValidationError(data.errors);
+        }
+    
+      });
+    } else if (formType === "updateGroup") {
+      const updatedGroup = dispatch(updateGroup(group))
+        .then(
+          (updatedGroupRes) => {
+            history.push(`/groups/${updatedGroupRes.id}`)
+            resetGroupForm()
+            group = updatedGroup
+          }
+        ).catch(async (res) => {
+          const data = await res.json();
+          if (data && data.errors) {
+            setValidationError(data.errors);
+          }
+   
+        });
+    }
 
-    ).catch(async (res) => {
-      const data = await res.json();
-      if (data && data.errors) {
-        setValidationError(data.errors);
-      }
-      console.log(data.errors)
-    });
 
 
   }
@@ -169,12 +178,12 @@ const GroupForm = () => {
               value={groupVisibility}
               onChange={(e) => {
                 setGroupVisibility(e.target.value)
-                console.log("changed???")
+                console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
-              <option value="Public">Public</option>
-              <option value="Private">Private</option>
+              <option value="false">Public</option>
+              <option value="true">Private</option>
             </select>
             <p className="group-form-errors">
               {validationError.private && `${validationError.private}`}
@@ -193,7 +202,8 @@ const GroupForm = () => {
             {validationError.imageUrl && `${validationError.imageUrl}`}
           </p>
         </section>
-        <button id="create-group-btn">Create Group</button>
+        {formType==="createGroup" && <button id="create-group-btn">Create Group</button>}
+        {formType==="updateGroup" && <button id="create-group-btn">Update Group</button>}
       </form>
     </div>
   )

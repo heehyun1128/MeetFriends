@@ -168,7 +168,7 @@ const checkCreateGroupInput = [
     .withMessage("State is required"),
   check('about')
     .exists({ checkFalsy: true })
-    .isLength({min:30})
+    .isLength({ min: 30 })
     .withMessage("Description must be at least 30 characters long"),
   check('type')
     .exists({ checkFalsy: true })
@@ -183,13 +183,13 @@ const checkCreateGroupInput = [
     .exists({ checkFalsy: true })
     .notEmpty()
     .withMessage("")
-    .custom(value=>{
-      if (!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")){
+    .custom(value => {
+      if (!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")) {
         throw new Error("Image URL must end in .png, .jpg, or .jpeg")
       }
       return true
     })
-,
+  ,
   handleValidationErrors
 ]
 // handle 404 error on group id not found
@@ -345,7 +345,7 @@ router.get("/", async (req, res, next) => {
       }
     })
     group = group.toJSON()
-    group.numEvemts = groupEvents.length ? groupEvents.length : 0
+    group.numEvents = groupEvents.length ? groupEvents.length : 0
     group.numMembers = groupMemberships.length ? groupMemberships.length : 0
     group.organizer = await User.findByPk(group.organizerId)
 
@@ -681,6 +681,15 @@ router.get("/:id", async (req, res, next) => {
 
     })
     if (findGroupsById) {
+      // const previewImage = findGroupsById.groupImage
+      // console.log(findGroupsById.toJSON().GroupImages)
+      // const groupImageArr = findGroupsById.GroupImages
+      // const previewImage=groupImageArr.filter(image=>image.preview===true)
+      // console.log(previewImage)
+      // res.json({
+      //   ...findGroupsById,
+      //   previewImage:previewImage[0]
+      // })
       res.json(findGroupsById)
     } else {
       next(
@@ -712,8 +721,8 @@ router.post("/", requireAuth, checkCreateGroupInput, async (req, res, next) => {
     city,
     state,
   })
-  const groupImageUrl=await newGroup.createGroupImage({url:imageUrl})
- 
+  const groupImage = await newGroup.createGroupImage({ url: imageUrl })
+
 
   // add organizer membership to current user who's creating a group
   const currUser = await User.findByPk(req.user.id)
@@ -724,7 +733,7 @@ router.post("/", requireAuth, checkCreateGroupInput, async (req, res, next) => {
 
   // console.log(currUserMemInGroup)
   res.status(201).json({
-    id:newGroup.id,
+    id: newGroup.id,
     organizerId: newGroup.organizerId,
     name: newGroup.name,
     about: newGroup.about,
@@ -732,7 +741,8 @@ router.post("/", requireAuth, checkCreateGroupInput, async (req, res, next) => {
     private: newGroup.private,
     city: newGroup.city,
     state: newGroup.state,
-    imageUrl: groupImageUrl.url
+    imageUrl: groupImage.url,
+    imageId: groupImage.id
   })
 })
 
@@ -975,10 +985,18 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
 router.put("/:id", requireAuth, async (req, res, next) => {
   try {
     // check to see if id is provided and matched
-    const { name, about, type, private, city, state } = req.body
+    const { name, about, type, private, city, state, imageUrl } = req.body
     // console.log(private)
     // find group by Id after id is provided and matched
     const groupToUpdate = await Group.findByPk(req.params.id)
+    // find group images
+    const groupImages = await groupToUpdate.getGroupImages({
+      where: {
+        preview: true
+      }
+    })
+    groupImages[0].toJSON().url = imageUrl
+    // console.log(previewImageUrl)
     // find group memberships
     if (groupToUpdate) {
 
@@ -992,7 +1010,16 @@ router.put("/:id", requireAuth, async (req, res, next) => {
         groupToUpdate.state = state
 
         await groupToUpdate.save()
-        return res.json(groupToUpdate)
+        return res.json({
+          id: groupToUpdate.id,
+          name: groupToUpdate.name,
+          about: groupToUpdate.about,
+          type: groupToUpdate.type,
+          private: groupToUpdate.private,
+          city: groupToUpdate.city,
+          state: groupToUpdate.state,
+          imageUrl: imageUrl
+        })
       } else {
         next({
           status: 403,

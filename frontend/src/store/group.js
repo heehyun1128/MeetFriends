@@ -14,7 +14,7 @@ export const loadGroups = groups => ({
 
 export const getGroup = (group) => ({
   type: GET_GROUP,
-    group,
+  group,
 })
 export const editGroup = group => ({
   type: EDIT_GROUP,
@@ -64,9 +64,9 @@ export const createGroup = group => async (dispatch) => {
     dispatch(getGroup(newGroup))
     return newGroup
   } else {
-  
+
     const errors = await res.json()
-    
+
     return errors
   }
 }
@@ -117,13 +117,13 @@ const groupReducer = (state = initialState, action) => {
   //     },
   //     optionalOrderedList: [],
   //   },
-  //   singleGroup: {
-  //     groupData,
-  //       GroupImages: [imagesData],
-  //         Organizer: {
-  //       organizerData,
+  // singleGroup: {
+  //   groupData,
+  //     GroupImages: [imagesData],
+  //       Organizer: {
+  //     organizerData,
   //     },
-  //     Venues: [venuesData],
+  //   Venues: [venuesData],
   //   },
 
   switch (action.type) {
@@ -136,29 +136,23 @@ const groupReducer = (state = initialState, action) => {
 
       return updatedState
     case GET_GROUP:
-      const a = {
+      return {
         ...state,
         singleGroup: {
           ...state.singleGroup,
-          groupData: action.group,
+          groupData:
+            action.group
+          
 
         }
       }
-      console.log(a)
+    case EDIT_GROUP:
+      console.log(state.singleGroup)
       return {
         ...state,
         singleGroup: {
           ...state.singleGroup,
           groupData: action.group,
-         
-        }
-      }
-    case EDIT_GROUP:
-      return {
-        ...state,
-        allGroups: {
-          ...state.allGroups,
-          [action.group.id]: action.group
         }
       }
     case REMOVE_GROUP:

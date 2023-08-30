@@ -1,10 +1,20 @@
 import GroupForm from "./GroupForm";
 
-
-
 const CreateGroupForm = () => {
+  const group = {
+    city:'',
+    state:'',
+    name: '',
+    about: '',
+    type: '',
+    private: '',
+    imageUrl: ''
+  }
   return (
-    <div>CreateGroupForm</div>
+    <GroupForm 
+      group={group}
+      formType="createGroup"
+    />
   )
 }
 

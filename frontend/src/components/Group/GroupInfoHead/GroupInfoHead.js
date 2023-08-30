@@ -6,7 +6,7 @@ import OpenModalMenuItem from '../../Navigation/OpenModalMenuItem';
 import DeleteModal from '../../DeleteModal/DeleteModal';
 
 
-const GroupInfoHead = ({ group }) => {
+const GroupInfoHead = ({ group,groupData }) => {
   const sessionUser = useSelector(state => state.session.user)
   const handleJoinGroup = e => {
     e.preventDefault()
@@ -23,12 +23,13 @@ const GroupInfoHead = ({ group }) => {
     e.preventDefault()
     history.push(`/groups/${groupId}/edit`)
   }
-
+  console.log(group)
+  // console.log(groupData.GroupImages.find(image => image.preview === true))
 
   return (
     <div id="group-info-head-container">
       <div className="image-div">
-        <img className='group-info-image' src={group && group.previewImage} alt="groupImage" />
+        <img className='group-info-image' src={groupData && groupData.GroupImages && groupData.GroupImages.find(image=>image.preview===true).url} alt="groupImage" />
       </div>
       <div className="group-head-right">
         <div>
