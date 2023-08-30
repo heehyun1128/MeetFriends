@@ -30,7 +30,7 @@ function App() {
         <Route exact path="/groups/:groupId/edit"><EditGroupForm /></Route>
         <Route exact path="/groups/:groupId"><GroupInfoPage /></Route>
         <Route exact path="/events"><Event /></Route>
-        <Route exact path="/events/:id"><EventDetail /></Route>
+        <Route exact path="/events/:eventId"><EventDetail /></Route>
       </Switch>}
     </>
   );

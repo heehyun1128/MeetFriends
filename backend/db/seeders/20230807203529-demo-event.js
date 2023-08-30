@@ -96,24 +96,26 @@ module.exports = {
         startDate: new Date("2023-10-20 16:00:00"),
         endDate: new Date("2023-10-20 20:00:00"),
       },
+      // event8
       {
     
         venueId: 1,
         groupId: 1,
-        name: "Networking Event 2022",
-        description: "Join us to make connections with co-founders, partners, coaches or core team members for your career growth and potential hiring opportunities",
+        name: "Let's Go Swimming",
+        description: "Calling all water enthusiasts and aqua adventurers! Get ready to make a splash at the most exciting swimming event of the year - Summer 2023. Join us for a day of fitness and fun in the water. Engage in exciting water-based activities that will keep you energized and entertained.",
         type: "In Person",
         capacity: 100,
         price: 55,
         startDate: new Date("2022-10-20 16:00:00"),
         endDate: new Date("2022-10-20 20:00:00"),
       },
+      // event 9
       {
     
         venueId: 1,
         groupId: 1,
-        name: "Networking Event 2021",
-        description: "Join us to make connections with co-founders, partners, coaches or core team members for your career growth and potential hiring opportunities",
+        name: "BBQ Night",
+        description: "Get ready to fire up your taste buds at the most mouthwatering event of the season – the Ultimate BBQ Festival! Join us for a sizzling experience that will tantalize your senses and leave you craving for more.",
         type: "In Person",
         capacity: 100,
         price: 55,
@@ -125,7 +127,7 @@ module.exports = {
         venueId: 1,
         groupId: 1,
         name: "Hiking Hiking",
-        description: "Come and meet friends who love hiking.",
+        description: "Get ready to lace up your boots, breathe in the fresh air, and explore the great outdoors like never before! Join us on an unforgettable hiking journey that will take you through stunning landscapes, challenge your limits, and leave you with memories to cherish.",
         type: "In Person",
         capacity: 30,
         price: 20,

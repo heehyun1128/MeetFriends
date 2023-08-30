@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import GroupNav from '../Group/GroupNav/GroupNav'
 import EventList from './EventList/EventList'
 import { fetchEvents } from '../../store/event';
-
+import './EventList/EventList.css'
 
 const Event = () => {
 
@@ -26,7 +26,7 @@ const Event = () => {
   return (
     <>
       <GroupNav />
-      <EventList events={events}/>
+      <div id='centered-event-list'><EventList events={events} /></div>
     </>
   )
 }

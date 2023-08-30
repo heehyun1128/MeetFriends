@@ -17,7 +17,7 @@ const EventCard = ({ event }) => {
   return (
     <div id='event-card-container' onClick={handleViewEventDetails}>
       <div className="event-card-upper">
-        {event.previewImage ? (<img className='event-image-preview' src={event && event.previewImage} alt="EventImage" />) : (<div className='event-image-preview'>No Event Image</div>)}
+        {event.previewImage ? (<div id='image-div'><img className='event-image-preview' src={event && event.previewImage} alt="EventImage" /></div>) : (<div image-div className='event-image-preview'>No Event Image</div>)}
         <div className="event-card-upper-right">
           <div id='event-card-date-time'>
             {event && <h4 id='date-time'>{date}</h4>}

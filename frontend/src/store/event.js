@@ -47,6 +47,7 @@ export const fetchEventDetail = (eventId) => async (dispatch) => {
   }
 }
 
+
 export const createEvent = event => async (dispatch) => {
   const res = await csrfFetch('/api/events', {
     method: 'POST',

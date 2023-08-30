@@ -197,15 +197,18 @@ const GroupForm = ({ group, groupInfo,formType }) => {
             </p>
           </div>
           <div>
+            {formType === "createGroup" && <>
             <h4>Please add an image url for your group below:</h4>
-            <input
-              type="text"
-              placeholder='Image Url'
-              value={groupImageUrl}
-              onChange={e => {
-                // console.log("groupImageUrl", groupImageUrl)
-                setgroupImageUrl(e.target.value)}}
-            />
+              <input
+                type="text"
+                placeholder='Image Url'
+                value={groupImageUrl}
+                onChange={e => {
+                  // console.log("groupImageUrl", groupImageUrl)
+                  setgroupImageUrl(e.target.value)
+                }}
+              />
+            </>}
           </div>
           <p className="group-form-errors">
             {validationError.imageUrl && `${validationError.imageUrl}`}

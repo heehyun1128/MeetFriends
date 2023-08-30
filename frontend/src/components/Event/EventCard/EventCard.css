@@ -9,6 +9,9 @@
   background-color: #fff;
   margin: 15px 0;
   cursor: pointer;
+  min-width: 620px;
+  min-height: 260px;
+  height:fit-content;
 }
 
 .event-card-upper{
@@ -16,8 +19,16 @@
   height: fit-content;
   display: flex;
   height: 80%;
+ 
 }
-
+#image-div{
+  overflow: hidden;
+  width:240px;
+  margin-right:20px;
+}
+.event-card-upper img{
+  height:160px;
+}
 .event-image-preview{
   display: block;
   height:100%;
