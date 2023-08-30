@@ -127,6 +127,10 @@ const eventReducer = (state = initialState, action) => {
     case GET_EVENT:
       return {
         ...state,
+        allEvents:{
+          ...state.allEvents,
+          [action.event.id]:action.event
+        },
         singleEvent: {
           ...state.singleEvent,
           eventData: action.event

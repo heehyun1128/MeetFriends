@@ -8,6 +8,7 @@
   padding:10px;
   background-color: #fff;
   margin: 15px 0;
+  cursor: pointer;
 }
 
 .event-card-upper{
@@ -33,10 +34,22 @@
 
 }
 
-#date-time{
-  color:#0f6767;
-}
+
 
 #event-city{
   color:gray;
+}
+
+#event-card-date-time{
+  display: flex;
+  color: #0f6767;
+  align-items: center;
+}
+
+#event-card-dot p{
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  font-weight: bold;
+
 }

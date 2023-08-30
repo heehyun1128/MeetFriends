@@ -41,11 +41,11 @@ export const fetchGroups = () => async (dispatch) => {
 
 export const fetchGroupDetail = (groupId) => async (dispatch) => {
   const res = await csrfFetch(`/api/groups/${groupId}`)
-
   if (res.ok) {
     const groupDetails = await res.json()
-
+    
     dispatch(getGroup(groupDetails))
+    // console.log("res",groupDetails)
   } else {
     const errors = await res.json()
     return errors
@@ -72,6 +72,7 @@ export const createGroup = group => async (dispatch) => {
 }
 
 export const updateGroup = group => async (dispatch) => {
+  console.log("update group reducer passed in data",group)
   const res = await csrfFetch(`/api/groups/${group.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -79,6 +80,7 @@ export const updateGroup = group => async (dispatch) => {
   })
   if (res.ok) {
     const updatedGroup = await res.json()
+    console.log("update group reducer returned data",updatedGroup)
     dispatch(editGroup(updatedGroup))
     return updatedGroup
   } else {
@@ -128,7 +130,10 @@ const groupReducer = (state = initialState, action) => {
 
   switch (action.type) {
     case LOAD_GROUPS:
-      const updatedState = { ...state, allGroups: { ...state.allGroups } }
+      const updatedState = { 
+        ...state, 
+        allGroups: { ...state.allGroups }
+       }
       action.groups.Groups.forEach(group => {
         updatedState.allGroups[group.id] = group
       }
@@ -138,18 +143,23 @@ const groupReducer = (state = initialState, action) => {
     case GET_GROUP:
       return {
         ...state,
+        allGroups: {
+          ...state.allGroups,
+          [action.group.id]: action.group
+        },
         singleGroup: {
           ...state.singleGroup,
-          groupData:
-            action.group
-          
-
+          groupData:action.group
         }
       }
     case EDIT_GROUP:
-      console.log(state.singleGroup)
+      // console.log("state.singleGroup",action.group)
       return {
         ...state,
+        allGroups:{
+          ...state.allGroups,
+          [action.group.id]:action.group
+        },
         singleGroup: {
           ...state.singleGroup,
           groupData: action.group,
@@ -158,7 +168,7 @@ const groupReducer = (state = initialState, action) => {
     case REMOVE_GROUP:
       const newState = { ...state, allGroups: { ...state.allGroups } }
       delete newState.allGroups[action.groupId]
-      console.log("Del", newState)
+      // console.log("Del", newState)
       return newState
 
     default:

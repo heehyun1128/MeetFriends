@@ -6,7 +6,8 @@ import OpenModalMenuItem from '../../Navigation/OpenModalMenuItem';
 import DeleteModal from '../../DeleteModal/DeleteModal';
 
 
-const GroupInfoHead = ({ group,groupData }) => {
+// const GroupInfoHead = ({ group,groupData }) => {
+const GroupInfoHead = ({ groupData, groupInfo }) => {
   const sessionUser = useSelector(state => state.session.user)
   const handleJoinGroup = e => {
     e.preventDefault()
@@ -23,31 +24,33 @@ const GroupInfoHead = ({ group,groupData }) => {
     e.preventDefault()
     history.push(`/groups/${groupId}/edit`)
   }
-  console.log(group)
-  // console.log(groupData.GroupImages.find(image => image.preview === true))
+  // console.log(group)
+  // console.log(groupInfo)
+ 
 
   return (
     <div id="group-info-head-container">
       <div className="image-div">
-        <img className='group-info-image' src={groupData && groupData.GroupImages && groupData.GroupImages.find(image=>image.preview===true).url} alt="groupImage" />
+        {/* <img className='group-info-image' src={groupData && groupData.GroupImages && groupData.GroupImages.find(image=>image.preview===true).url} alt="groupImage" /> */}
+        <img className='group-info-image' src={groupInfo && groupInfo.previewImage} alt="groupImage" />
       </div>
       <div className="group-head-right">
         <div>
-          <h1>{group && group.name}</h1>
+          <h1>{groupData && groupData.name}</h1>
           <div className="group-info-sub-head">
-            <p className='group-info-city'>{group && group.city}</p>
+            <p className='group-info-city'>{groupData && groupData.city}</p>
             <div className='event-privacy-div'>
-              <p className='group-info-numEvents'>{group && group.numEvents} events</p>
+              <p className='group-info-numEvents'>{groupData && groupData.numEvents} events</p>
               <div className="group-info-centered-dot"><p>.</p></div>
-              <p className='group-info-private'>{group && group.private ? "Private" : "Public"}</p>
+              <p className='group-info-private'>{groupData && groupData.private ? "Private" : "Public"}</p>
             </div>
-            <p className="group-info-organizer">Organized By {group && group.organizer.firstName} {group && group.organizer.lastName}</p>
+            <p className="group-info-organizer">Organized By {groupData && groupData.Organizer && groupData.Organizer.firstName} {groupData && groupData.Organizer && groupData.Organizer.lastName}</p>
           </div>
         </div>
-        {group && sessionUser && sessionUser.id !== group.organizerId && <button id="join-this-group-btn" onClick={handleJoinGroup}>
+        {groupData && sessionUser && sessionUser.id !== groupData.organizerId && <button id="join-this-group-btn" onClick={handleJoinGroup}>
           Join this group
         </button>}
-        {group && sessionUser && sessionUser.id === group.organizerId &&
+        {groupData && sessionUser && sessionUser.id === groupData.organizerId &&
           <div id='gray-buttons'>
             <button className="gray-btn" onClick={handleCreateEvent}>
               Create Event

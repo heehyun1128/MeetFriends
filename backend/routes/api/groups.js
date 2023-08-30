@@ -655,7 +655,8 @@ router.get("/:id", async (req, res, next) => {
         },
         {
           model: GroupImage,
-          attributes: ["id", "url", "preview"]
+          attributes: ["id", "url", "preview"],
+         
         },
         {
           model: User,
@@ -683,13 +684,15 @@ router.get("/:id", async (req, res, next) => {
     if (findGroupsById) {
       // const previewImage = findGroupsById.groupImage
       // console.log(findGroupsById.toJSON().GroupImages)
-      // const groupImageArr = findGroupsById.GroupImages
-      // const previewImage=groupImageArr.filter(image=>image.preview===true)
-      // console.log(previewImage)
-      // res.json({
-      //   ...findGroupsById,
-      //   previewImage:previewImage[0]
-      // })
+      const groupImageArr = findGroupsById.GroupImages
+      const previewImage=groupImageArr.filter(image=>image.preview===true)
+      previewImage.sort((a,b)=>b.id-a.id)
+      // console.log(previewImage[0].toJSON().url)
+      if(previewImage.length>0){
+
+        findGroupsById.previewImage = previewImage[0].url
+      }
+     
       res.json(findGroupsById)
     } else {
       next(
@@ -993,9 +996,13 @@ router.put("/:id", requireAuth, async (req, res, next) => {
     const groupImages = await groupToUpdate.getGroupImages({
       where: {
         preview: true
-      }
+      },
+      order:[['id','DESC']]
     })
-    groupImages[0].toJSON().url = imageUrl
+    console.log(groupImages[0].url)
+    groupImages[0].url = imageUrl
+    console.log(groupImages[0].url)
+    await groupImages[0].save()
     // console.log(previewImageUrl)
     // find group memberships
     if (groupToUpdate) {

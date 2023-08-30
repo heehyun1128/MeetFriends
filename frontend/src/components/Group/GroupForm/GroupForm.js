@@ -4,12 +4,11 @@ import { useHistory } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { createGroup, updateGroup } from '../../../store/group';
 
-
 import './GroupForm.css'
-const GroupForm = ({ group, formType }) => {
+
+const GroupForm = ({ group, groupInfo,formType }) => {
   const history = useHistory()
-  // const previewImage=group.GroupImages.find(image=>image.preview===true)
-  console.log(group)
+  console.log("group.GroupImages", group.GroupImages)
 
   const [city, setCity] = useState(group.city || "")
   const [state, setState] = useState(group.state || "")
@@ -18,13 +17,10 @@ const GroupForm = ({ group, formType }) => {
   const [groupType, setGroupType] = useState(group.type || "")
   const [groupVisibility, setGroupVisibility] = useState(group.private.toString() || "")
  
-  const [groupImageUrl, setgroupImageUrl] = useState(group.GroupImages?.find(image => image.preview === true).url  || "")
+  const [groupImageUrl, setgroupImageUrl] = useState(groupInfo?.previewImage  || "")
   const [validationError, setValidationError] = useState({})
 
  
-  
-  
-
   const dispatch = useDispatch();
 
   const resetGroupForm = () => {
@@ -37,31 +33,26 @@ const GroupForm = ({ group, formType }) => {
     setgroupImageUrl("")
     setValidationError("")
   }
-  
 
 
   const handleGroupFormSubmit = (e) => {
-    console.log(groupVisibility)
-
-    // console.log(Boolean(groupVisibilityBoolean))
     e.preventDefault()
-    group = {
-      ...group,
-      city,
-      state,
-      name: groupName,
-      about: description,
-      type: groupType,
-      private: JSON.parse(groupVisibility),
-      imageUrl: groupImageUrl
-    }
-    // const imageUrl = groupImageUrl 
+
     if (formType === "createGroup") {
+      group = {
+        city,
+        state,
+        name: groupName,
+        about: description,
+        type: groupType,
+        private: groupVisibility,
+        imageUrl: groupImageUrl
+      }
       const newGroup = dispatch(createGroup(group)).then(
         (newGroupRes) => {
           history.push(`/groups/${newGroupRes.id}`)
           resetGroupForm()
-          group = newGroup
+          group = newGroupRes
         }
       ).catch(async (res) => {
         const data = await res.json();
@@ -71,12 +62,27 @@ const GroupForm = ({ group, formType }) => {
     
       });
     } else if (formType === "updateGroup") {
+      // console.log(group)
+      group = {
+        ...group,
+        city,
+        state,
+        name: groupName,
+        about: description,
+        type: groupType,
+        private: JSON.parse(groupVisibility),
+        imageUrl: groupImageUrl,
+        // GroupImages: [...group.GroupImages[0],url:groupImageUrl]
+      }
+      group.GroupImages[0].url = groupImageUrl
+    
       const updatedGroup = dispatch(updateGroup(group))
         .then(
           (updatedGroupRes) => {
-            history.push(`/groups/${updatedGroupRes.id}`)
             resetGroupForm()
-            group = updatedGroup
+            group = updatedGroupRes
+            // console.log(group)
+            history.push(`/groups/${updatedGroupRes.id}`)
           }
         ).catch(async (res) => {
           const data = await res.json();
@@ -95,7 +101,8 @@ const GroupForm = ({ group, formType }) => {
     <div id="group-form-div">
       <form onSubmit={handleGroupFormSubmit}>
         <section className="group-form-section one">
-          <h4>BECOME AN ORGANIZER</h4>
+          {formType ==="createGroup" && <h4>BECOME AN ORGANIZER</h4>}
+          {formType ==="updateGroup" && <h4>UPDATE YOUR GROUP'S INFORMATION</h4>}
           <h2>We'll walk you through a few steps to build your local community</h2>
         </section>
         <section className="group-form-section two">
@@ -178,7 +185,7 @@ const GroupForm = ({ group, formType }) => {
               value={groupVisibility}
               onChange={(e) => {
                 setGroupVisibility(e.target.value)
-                console.log(e.target.value)
+                // console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
@@ -195,7 +202,9 @@ const GroupForm = ({ group, formType }) => {
               type="text"
               placeholder='Image Url'
               value={groupImageUrl}
-              onChange={e => setgroupImageUrl(e.target.value)}
+              onChange={e => {
+                // console.log("groupImageUrl", groupImageUrl)
+                setgroupImageUrl(e.target.value)}}
             />
           </div>
           <p className="group-form-errors">

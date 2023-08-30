@@ -6,7 +6,7 @@ import { fetchEvents } from '../../../store/event';
 import { useParams } from 'react-router-dom'
 import './GroupInfoMain.css'
 
-const GroupInfoMain = ({ group }) => {
+const GroupInfoMain = ({ groupData }) => {
   const { groupId } = useParams()
   // console.log(groupId)
 
@@ -34,17 +34,17 @@ const GroupInfoMain = ({ group }) => {
   useEffect(() => {
     dispatch(fetchEvents());
   }, [dispatch]);
-
+console.log(groupData?.Organizer)
   return (
     <div id='group-info-main-div'>
       <div className="group-info-main-organizer">
         <h1>Organizer</h1>
-        <p>{group && `${group.organizer.firstName} ${group.organizer.lastName}`}</p>
+        <p>{groupData && groupData?.Organizer && `${groupData?.Organizer.firstName} ${groupData?.Organizer.lastName}`}</p>
       </div>
       <div className="group-info-main-about">
         <h2>What we're about</h2>
         <p className="about-detail">
-          {group && group.about}
+          {groupData && groupData.about}
         </p>
       </div>
      {upcomingEvents.length ? (<div className="upcoming-events">

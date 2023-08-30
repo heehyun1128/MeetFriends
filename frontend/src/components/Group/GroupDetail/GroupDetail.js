@@ -3,6 +3,7 @@ import './GroupDetail.css'
 import {useHistory} from 'react-router-dom'
 
 const GroupDetail = ({group}) => {
+  console.log(group)
 const history = useHistory()
   const handleViewGroupDetail = (e)=>{
     e.preventDefault()

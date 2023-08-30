@@ -19,7 +19,11 @@ const EventCard = ({ event }) => {
       <div className="event-card-upper">
         {event.previewImage ? (<img className='event-image-preview' src={event && event.previewImage} alt="EventImage" />) : (<div className='event-image-preview'>No Event Image</div>)}
         <div className="event-card-upper-right">
-          <h4 id='date-time'>{event && `${date} ${time}`}</h4>
+          <div id='event-card-date-time'>
+            {event && <h4 id='date-time'>{date}</h4>}
+            {event && <h4 id='event-card-dot'><p>.</p></h4>}
+            {event && <h4 id='date-time'>{time}</h4>}
+         </div>
           <h3>{event && event.name}</h3>
           <p id='event-city'>{event && event.Venue ? event.Venue.city : "Online"}</p>
         </div>

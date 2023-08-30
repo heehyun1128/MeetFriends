@@ -13,25 +13,27 @@ import { useParams } from 'react-router-dom'
 const GroupInfoPage = () => {
 
   const { groupId } = useParams()
-  // console.log(groupId)
+  const dispatch = useDispatch();
+  
+  // get all groups
   const groupObj = useSelector((state) => (Object.values(state.groups.allGroups).length ? state.groups.allGroups : {}))
-  // console.log(groupObj)
   const groupInfo = groupObj[groupId]
-  // console.log(groupInfo)
-
+  // get single group
   const singleGroupObj = useSelector((state) => (Object.values(state.groups.singleGroup).length ? state.groups.singleGroup : {}))
   const groupData = singleGroupObj.groupData
-  console.log(groupData)
-  const dispatch = useDispatch();
 
+  
   useEffect(() => {
     dispatch(fetchGroups());
   }, [dispatch]);
+  
   useEffect(() => {
     dispatch(fetchGroupDetail(groupId));
   }, [dispatch, groupId]);
-// console.log("11111111")
-  if (!Object.values(groupObj).length) return (<></>)
+  
+  // console.log("123456789",groupData)
+  // console.log("qwertyui",groupInfo)
+  // if (!Object.values(groupObj).length) return (<></>)
   return (
     <div id="group-info-div">
       <div id="group-info-head-section">
@@ -39,10 +41,12 @@ const GroupInfoPage = () => {
           <i class="fa-solid fa-angle-left"></i>
           <NavLink exact to="/groups">Groups</NavLink>
         </div>
-        <GroupInfoHead group={groupInfo} groupData={groupData} />
+        <GroupInfoHead groupData={groupData} groupInfo={groupInfo}/>
+        {/* <GroupInfoHead group={groupInfo} groupData={groupData} /> */}
       </div>
       <div id="group-info-main-section">
-        <GroupInfoMain group={groupInfo} groupData={groupData} />
+        <GroupInfoMain groupData={groupData} groupInfo={groupInfo }/>
+        {/* <GroupInfoMain group={groupInfo} groupData={groupData} /> */}
       </div>
     </div>
   )
