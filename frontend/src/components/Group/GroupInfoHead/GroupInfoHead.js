@@ -18,7 +18,7 @@ const GroupInfoHead = ({ groupData, groupInfo }) => {
   const {groupId} = useParams()
   const handleCreateEvent = e => {
     e.preventDefault()
-    history.push('/events/new')
+    history.push(`/groups/${groupId}/events/new`)
   }
   const handleUpdateEvent = e => {
     e.preventDefault()

@@ -1,0 +1,179 @@
+#event-detail-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#event-detail-header {
+  width: 80%;
+}
+
+#event-detail-main {
+  /* padding:10%; */
+  background-color: #e6e6e6;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#event-detail-main>* {
+  width: 80%;
+}
+
+#event-detail-main-upper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50%;
+  min-height: 200px;
+  margin-bottom: 20px;
+}
+
+#event-info-image-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  height:90%;
+  overflow: hidden;
+ 
+}
+
+#event-info-image {
+  width: 500px;
+}
+
+#event-main-upper-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width:350px;
+  width:47%;
+}
+
+#event-main-group-info {
+  display: flex;
+  background-color: #fff;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  padding:20px 15px;
+}
+
+#event-detail-header {
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+#event-detail-header>* {
+  margin-bottom: 10px;
+}
+
+#hosted-by {
+  color: gray;
+}
+
+#goback-event-nav {
+  color: #0f6767;
+  font-weight: bold;
+}
+
+#event-main-group-details {
+  display: flex;
+ 
+background-color: white;
+border-radius: 15px;
+padding:20px 20px 0;
+height:160px;
+
+}
+
+/* #event-main-group-detail-left{
+  width: 90%;
+} */
+#delete-event-btn-div{
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+#delete-event-btn{
+  width:80px;
+height:30px;
+
+  padding: 0 15px;
+  height: 24px;
+  background-color: gray;
+  box-shadow: 2px 2px 4px black;
+  color: white;
+  margin-bottom: 25px;
+  cursor: pointer;
+}
+
+.icon-div {
+  width:22px;
+  height:22px;
+  margin-right: 15px;
+  text-align: center;
+}
+
+
+
+#div-one,
+#div-two,
+#div-three {
+  display: flex;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+
+#dollar-icon{
+  width: 22px;
+    height: 22px;
+  border-radius: 50%;
+  border:2px solid gray;
+  text-align: center;
+}
+
+#dates{
+  display: flex;
+  flex-direction: column;
+}
+
+#start-end>*{
+  display: flex;
+
+
+}
+
+#group-info-image-div{
+height:50px;
+width:50px;
+margin-right: 15px;
+overflow: hidden;
+}
+
+#group-info-image{
+  height:60px;
+
+}
+
+#start, #end{
+  width:60px;
+}
+
+#flow-box p{
+  display: flex;
+}
+
+#dot-dot{
+  width:15px;
+  height:15px;
+  align-items: center;
+  justify-content: center;
+}

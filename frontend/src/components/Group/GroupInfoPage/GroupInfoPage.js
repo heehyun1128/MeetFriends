@@ -39,7 +39,7 @@ const GroupInfoPage = () => {
       <div id="group-info-head-section">
         <div className="go-back-btn">
           <i class="fa-solid fa-angle-left"></i>
-          <NavLink exact to="/groups">Groups</NavLink>
+          <NavLink className="go-back-btn-link" exact to="/groups">Groups</NavLink>
         </div>
         <GroupInfoHead groupData={groupData} groupInfo={groupInfo}/>
         {/* <GroupInfoHead group={groupInfo} groupData={groupData} /> */}

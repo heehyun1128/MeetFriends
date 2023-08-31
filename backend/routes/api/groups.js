@@ -31,21 +31,36 @@ const validateEventInfoOnCreate = [
       return true
     }),
   check("name")
-    .isLength({ min: 5 })
-    .withMessage("Name must be at least 5 characters"),
-  check("type")
-    .isIn(['Online', 'In Person'])
-    .withMessage("Type must be Online or In person"),
-  check("capacity")
-    .isInt()
-    .withMessage("Capacity must be an integer"),
-  check("price")
-    .isDecimal()
-    .withMessage("Price is invalid"),
-  check("description")
     .notEmpty()
-    .withMessage("Description is required"),
+    .withMessage("Name is required"),
+  check("type")
+    .notEmpty()
+    .withMessage("Event Type is required")
+  // .isIn(['Online', 'In Person'])
+  // .withMessage("Type must be Online or In person")
+  ,
+  check('private')
+    .notEmpty()
+    .withMessage("Visibility is required"),
+  // check("capacity")
+  //   .isInt()
+  //   .withMessage("Capacity must be an integer"),
+  check("price")
+    .custom(value=>{
+      if (value === null || value === undefined || value === ""){
+        throw new Error("Price is required")
+      } else if (isNaN(parseFloat(value)) || parseFloat(value) <0){
+        throw new Error("Price must be a number that is greater than or equal to 0")
+      }
+    })
+  ,
+  check("description")
+    .exists({ checkFalsy: true })
+    .isLength({ min: 30 })
+    .withMessage("Description must be at least 30 characters long"),
   check("startDate")
+    .notEmpty()
+    .withMessage("Event start date is required")
     .isAfter()
     .withMessage("Start date must be in the future")
     .isISO8601()
@@ -64,6 +79,8 @@ const validateEventInfoOnCreate = [
     .withMessage("Start date must be a valid datetime")
   ,
   check("endDate")
+    .notEmpty()
+    .withMessage("Event end date is required")
     .isISO8601()
     .custom((value, { req }) => {
       // use regex to check date format
@@ -82,7 +99,17 @@ const validateEventInfoOnCreate = [
       }
       return true
     })
-
+  ,
+  check('imageUrl')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("")
+    .custom(value => {
+      if (!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")) {
+        throw new Error("Image URL must end in .png, .jpg, or .jpeg")
+      }
+      return true
+    })
   ,
   handleValidationErrors
 ];
@@ -656,7 +683,7 @@ router.get("/:id", async (req, res, next) => {
         {
           model: GroupImage,
           attributes: ["id", "url", "preview"],
-         
+
         },
         {
           model: User,
@@ -685,14 +712,14 @@ router.get("/:id", async (req, res, next) => {
       // const previewImage = findGroupsById.groupImage
       // console.log(findGroupsById.toJSON().GroupImages)
       const groupImageArr = findGroupsById.GroupImages
-      const previewImage=groupImageArr.filter(image=>image.preview===true)
-      previewImage.sort((a,b)=>b.id-a.id)
+      const previewImage = groupImageArr.filter(image => image.preview === true)
+      previewImage.sort((a, b) => b.id - a.id)
       // console.log(previewImage[0].toJSON().url)
-      if(previewImage.length>0){
+      if (previewImage.length > 0) {
 
         findGroupsById.previewImage = previewImage[0].url
       }
-     
+
       res.json(findGroupsById)
     } else {
       next(
@@ -827,21 +854,14 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
   try {
     const currGroup = await Group.findByPk(req.params.id)
 
-    const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
+    const { venueId, name, type, capacity, price, description, startDate, endDate, imageUrl, private } = req.body
     // console.log(typeof price)
     //create new group event
 
     const newGroupEvent = await currGroup.createEvent({
-      venueId, name, type, capacity, price, description, startDate, endDate
+      venueId, name, type, capacity, price, description, startDate, endDate, private
     })
-
-
-    // //group organizer of an event automatically create new Attendance
-    // const newAttendance = await Attendance.create({
-    //   eventId: newGroupEvent.id,
-    //   userId:req.user.id,
-    //   status:"attending"
-    // })
+    const eventImage = await newGroupEvent.createEventImage({ url: imageUrl })
     //check if current user has membership in the group
     //if in the group - check status
     const newGroupEventObj = {
@@ -854,7 +874,9 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
       price: Number(newGroupEvent.price),
       description: newGroupEvent.description,
       startDate: new Date(newGroupEvent.startDate),
-      endDate: new Date(newGroupEvent.endDate)
+      endDate: new Date(newGroupEvent.endDate),
+      private: newGroupEvent.private,
+      imageUrl: eventImage.url
     }
     // console.log(newGroupEventObj)
     res.status(200).json(newGroupEventObj)
@@ -997,7 +1019,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
       where: {
         preview: true
       },
-      order:[['id','DESC']]
+      order: [['id', 'DESC']]
     })
     console.log(groupImages[0].url)
     groupImages[0].url = imageUrl

@@ -38,6 +38,7 @@
 .event-card-upper-right{
   display: flex;
   flex-direction: column;
+  width: 400px;
 }
 
 .event-card-upper-right > *{

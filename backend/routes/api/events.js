@@ -36,9 +36,9 @@ const validateEventInfoOnCreate = [
   check("type")
     .isIn(['Online', 'In Person'])
     .withMessage("Type must be Online or In person"),
-  check("capacity")
-    .isInt()
-    .withMessage("Capacity must be an integer"),
+  // check("capacity")
+  //   .isInt()
+  //   .withMessage("Capacity must be an integer"),
   check("price")
     .isDecimal()
     .withMessage("Price is invalid"),
@@ -539,7 +539,7 @@ router.get("/:id", async (req, res, next) => {
         include:[{
           model: User,
           as: "Organizer",
-          attributes:['firstName','lastName']
+          attributes:['firstName','lastName','id']
         },{
           model:GroupImage,
           attributes:['url','id'],

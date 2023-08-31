@@ -73,17 +73,33 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    capacity: {
-      type: DataTypes.INTEGER,
+    private: {
+      type: DataTypes.ENUM("Public", "Private"),
+      allowNull: false,
       validate: {
-        isInt: {
-          msg: "Capacity must be an integer"
+        isIn: {
+          args: [["Public", "Private"]],
+          msg: "Type must be 'Public' or 'Private'"
         }
       }
     },
+    capacity: {
+      type: DataTypes.INTEGER,
+      allowNull:true
+      // validate: {
+      //   isInt: {
+      //     msg: "Capacity must be an integer"
+      //   }
+      // }
+    },
     price: {
       type: DataTypes.DECIMAL,
-      
+      allowNull: false,
+      validate: {
+        notNull: {
+          msg: "Price is required"
+        }
+      }
     },
     startDate: {
       type: DataTypes.DATE,

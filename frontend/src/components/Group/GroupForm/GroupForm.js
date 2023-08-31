@@ -164,8 +164,6 @@ const GroupForm = ({ group, groupInfo,formType }) => {
           <div>
             <h4>Is this an in person or online group?</h4>
             <select
-              name=""
-              id=""
               value={groupType}
               onChange={(e) => setGroupType(e.target.value)}
             >
@@ -179,19 +177,19 @@ const GroupForm = ({ group, groupInfo,formType }) => {
           </div>
           <div>
             <h4>Is this group private or public?</h4>
-            <select
-              name=""
-              id=""
-              value={groupVisibility}
-              onChange={(e) => {
-                setGroupVisibility(e.target.value)
-                // console.log(e.target.value)
-              }}
-            >
-              <option value="" disabled selected>(select one)</option>
-              <option value="false">Public</option>
-              <option value="true">Private</option>
-            </select>
+            <div className="select-container">
+              <select
+                value={groupVisibility}
+                onChange={(e) => {
+                  setGroupVisibility(e.target.value)
+                  // console.log(e.target.value)
+                }}
+              >
+                <option value="" disabled selected>(select one)</option>
+                <option value="false">Public</option>
+                <option value="true">Private</option>
+              </select>
+            </div>
             <p className="group-form-errors">
               {validationError.private && `${validationError.private}`}
             </p>
