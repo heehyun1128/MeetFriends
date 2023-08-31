@@ -7,6 +7,8 @@ import './EventForm.css'
 import { useParams } from 'react-router-dom';
 import { fetchGroups } from '../../../store/group';
 
+
+
 const EventForm = ({ event }) => {
   const [name, setName] = useState("")
   const [eventType, setEventType] = useState("")
@@ -40,17 +42,32 @@ const EventForm = ({ event }) => {
     setImageUrl("")
     setDescription("")
   }
-  console.log(Number(price))
+  
+ // format start date and end date for backend validation
+  const formatDate = (date) => {
 
+    const isMorning = date.split(" ")[2] === "AM" ? true : false
+    const isNight = date.split(" ")[2] === "PM" ? true : false
+    console.log(date.split(" "))
+
+    let year = date.split(" ")[0].slice(6)
+    let month = date.split(" ")[0].slice(0, 2)
+    let day = date.split(" ")[0].slice(3, 5)
+    let hour
+    let minute = date.split(" ")[1].slice(3, 5)
+
+    if (isMorning) {
+      hour = date.split(" ")[1].slice(0, 2)
+    }
+    if (isNight) {
+      hour = (Number(date.split(" ")[1].slice(0, 2)) + 12).toString()
+    }
+    const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:00`
+    return formattedDate
+  }
   const handleEventFormSubmit = (e) => {
     e.preventDefault()
-    // if (price === "" || price === undefined || price===null){
-    //   setValidationError(
-    //     {...validationError,
-    //     price:"123"}
-    //   )
-
-    // }
+    // console.log(formatDate(startDate))
 
     event = {
       venueId: null,
@@ -58,8 +75,8 @@ const EventForm = ({ event }) => {
       type: eventType,
       price: Number(price),
       description,
-      startDate,
-      endDate,
+      startDate: startDate && formatDate(startDate),
+      endDate: endDate && formatDate(endDate),
       imageUrl,
       private: eventVisibility
     }
@@ -103,7 +120,10 @@ const EventForm = ({ event }) => {
             <h4>Is this an in person or online event?</h4>
             <select
               value={eventType}
-              onChange={(e) => setEventType(e.target.value)}
+              onChange={(e) => {
+                setEventType(e.target.value)
+                console.log(e.target.value)
+                }}
             >
               <option value="" disabled selected>(select one)</option>
               <option value="In Person">In Person</option>
@@ -119,12 +139,12 @@ const EventForm = ({ event }) => {
               value={eventVisibility}
               onChange={(e) => {
                 setEventVisibility(e.target.value)
-
+                console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
-              <option value="false">Public</option>
-              <option value="true">Private</option>
+              <option value="Public">Public</option>
+              <option value="Private">Private</option>
             </select>
             <p className="group-event-errors">
               {validationError.private && `${validationError.private}`}
@@ -140,7 +160,7 @@ const EventForm = ({ event }) => {
                 placeholder='0'
                 value={price}
                 onWheel={(e) => {
-           
+
                   e.target.blur()
                   e.stopPropagation();
 
@@ -215,9 +235,9 @@ const EventForm = ({ event }) => {
             onChange={(e) => setDescription(e.target.value)}
           >
           </textarea>
-            <p className="group-event-errors">
-              {validationError.description && `${validationError.description}`}
-            </p>
+          <p className="group-event-errors">
+            {validationError.description && `${validationError.description}`}
+          </p>
         </section>
         <button id="create-event-btn">Create Event</button>
       </form>

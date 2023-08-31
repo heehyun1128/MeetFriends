@@ -36,19 +36,25 @@ export const fetchGroups = () => async (dispatch) => {
     dispatch(loadGroups(groups))
     // console.log("fetch groups action creator", groups)
     return groups
+  }else{
+    const errors = await res.json()
+    return errors
   }
 }
 
 export const fetchGroupDetail = (groupId) => async (dispatch) => {
   const res = await csrfFetch(`/api/groups/${groupId}`)
+
   if (res.ok) {
     const groupDetails = await res.json()
-    
     dispatch(getGroup(groupDetails))
-    // console.log("res",groupDetails)
+    return groupDetails
   } else {
-    const errors = await res.json()
+    let errors = await res.json()
+    // console.log("fetchGroupDetail",errors)
     return errors
+    
+   
   }
 }
 

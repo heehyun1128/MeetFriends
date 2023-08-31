@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from 'react-router-dom'
-import { useEffect } from 'react';
+import { useEffect,useState } from 'react';
 import { fetchEventDetail, fetchEvents } from '../../../store/event';
 
 import DeleteEventModal from '../../DeleteModal/DeleteEventModal';
@@ -12,6 +12,7 @@ import './EventDetail.css'
 const EventDetail = () => {
   const dispatch = useDispatch();
   const { eventId } = useParams()
+  const history = useHistory()
   // get current user
   const sessionUser = useSelector(state => state.session.user)
   // console.log("sessionUserId", sessionUser.id)
@@ -22,15 +23,32 @@ const EventDetail = () => {
   const singleEventObj = useSelector((state) => (Object.values(state.events.singleEvent).length ? state.events.singleEvent : {}))
   const eventData = singleEventObj.eventData
   // console.log(eventData?.Group?.Organizer?.id === sessionUser.id)
+  const [validationError, setValidationError] = useState({})
+  useEffect(() => {
+    dispatch(fetchEvents())
+  }, [dispatch])
 
   useEffect(() => {
-    dispatch(fetchEvents());
-  }, [dispatch]);
+    dispatch(fetchEventDetail(eventId)).catch(
+      async (res) => {
+        const data = await res.json();
+     console.log(data)
+        if (data && data.message) {
+          setValidationError(data.message);
+        }
 
-  useEffect(() => {
-    dispatch(fetchEventDetail(eventId));
+      }
+    )
   }, [dispatch, eventId]);
+  console.log(validationError)
+  if (Object.values(validationError).length) {
+    history.push('/404')
 
+  }
+  if (!eventInfo && !eventData) {
+    // history.push('/404')
+    return null
+  }
 
   const startDate = eventInfo?.startDate.split('T')[0]
   const startTime = eventInfo?.startDate.split('T')[1].slice(0, 8)

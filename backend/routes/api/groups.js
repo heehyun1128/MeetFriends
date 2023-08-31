@@ -36,22 +36,26 @@ const validateEventInfoOnCreate = [
   check("type")
     .notEmpty()
     .withMessage("Event Type is required")
-  // .isIn(['Online', 'In Person'])
-  // .withMessage("Type must be Online or In person")
+  .isIn(['Online', 'In Person'])
+  .withMessage("Type must be Online or In person")
   ,
   check('private')
     .notEmpty()
-    .withMessage("Visibility is required"),
+    .withMessage("Visibility is required")
+    .isIn(['Public', 'Private'])
+    .withMessage("Visibility must be Public or Private"),
   // check("capacity")
   //   .isInt()
   //   .withMessage("Capacity must be an integer"),
   check("price")
-    .custom(value=>{
-      if (value === null || value === undefined || value === ""){
-        throw new Error("Price is required")
-      } else if (isNaN(parseFloat(value)) || parseFloat(value) <0){
+    .exists({ checkFalsy: true })
+    .withMessage("Price is required")
+    .custom(value => {
+      if (isNaN(parseFloat(value)) || parseFloat(value) < 0) {
         throw new Error("Price must be a number that is greater than or equal to 0")
       }
+      return true
+
     })
   ,
   check("description")

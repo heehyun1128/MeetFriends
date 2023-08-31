@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch,Redirect } from "react-router-dom";
 
 
 import * as sessionActions from "./store/session";
@@ -13,6 +13,7 @@ import CreateGroupForm from "./components/Group/GroupForm/CreateGroupForm";
 import EditGroupForm from "./components/Group/GroupForm/EditGroupForm";
 import EventDetail from "./components/Event/EventDetail/EventDetail";
 import CreateEventForm from './components/Event/EventForm/CreateEventForm'
+import PageNotFound from "./components/PageNotFound/PageNotFound";
 
 function App() {
   const dispatch = useDispatch();
@@ -33,6 +34,13 @@ function App() {
         <Route exact path="/events"><Event /></Route>
         <Route exact path="/groups/:groupId/events/new"><CreateEventForm /></Route>
         <Route exact path="/events/:eventId"><EventDetail /></Route>
+        <Route exact path='404'>
+          <PageNotFound />
+        </Route>
+        <Route>
+          <PageNotFound />
+        </Route>
+        
       </Switch>}
     </>
   );
