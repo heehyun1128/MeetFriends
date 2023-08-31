@@ -20,56 +20,29 @@ module.exports = {
         url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
         preview: true
       },
-      {
-        groupId: 1,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
-        preview: false
-      },
+   
       {
         groupId: 2,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
-        preview: true
-      },
-      {
-        groupId: 2,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
+        url: "https://v.fastcdn.co/u/f91f856b/63921554-0-paper-plane.png",
         preview: true
       },
       {
         groupId: 3,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
-        preview: true
-      },
-      {
-        groupId: 3,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
-        preview: true
-      },
-      {
-        groupId: 3,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
+        url: "https://v.fastcdn.co/u/f91f856b/63921559-0-Fist-bump.png",
         preview: true
       },
       {
         groupId: 4,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
+        url: "https://v.fastcdn.co/u/f91f856b/59389892-0-meetup.png",
         preview: true
       },
+     
       {
         groupId: 5,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
+        url: "https://v.fastcdn.co/u/f91f856b/59389892-0-meetup.png",
         preview: true
       },
-      {
-        groupId: 6,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
-        preview: true
-      },
-      {
-        groupId: 7,
-        url: "https://secure.meetupstatic.com/next/images/shared/handsUp.svg?w=384",
-        preview: true
-      },
+   
     ], { validate: true })
   },
 

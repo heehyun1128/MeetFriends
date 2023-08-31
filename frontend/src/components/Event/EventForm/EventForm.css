@@ -1,0 +1,83 @@
+#event-form-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+#create-event-btn {
+  background-color: rgb(231, 62, 62);
+  color: white;
+  width: 200px;
+  height: 50px;
+  font-size: 20px;
+  box-shadow: 3px 3px 3px black;
+}
+
+.event-form-section {
+  border-bottom: 2px solid gray;
+  margin: 10px 0;
+  /* padding: 0 0 5px; */
+  display: flex;
+  flex-direction: column;
+}
+
+.event-form-section>*{
+  margin-bottom: 5px;
+}
+
+.event-form-section div>*{
+  margin-bottom: 5px;
+
+}
+
+#event-form-container input {
+  width: 200px;
+  height: 36px;
+  border: 3px solid black;
+  background-color: rgb(210, 230, 239);
+  /* margin-top: 15px; */
+}
+
+#event-form-container textarea {
+  width: 400px;
+  height: 240px;
+  border: 3px solid black;
+  background-color: rgb(210, 230, 239);
+  /* margin-top: 15px; */
+}
+
+.flow-div{
+  display: flex;
+  align-items: center;
+}
+input#price-input{
+  border: none;
+}
+
+
+.flow-div-price{
+  width:200px;
+  border: 3px solid black;
+  background-color: rgb(210, 230, 239);
+}
+
+
+.flow-div-date input{
+  margin-right: 10px;
+}
+
+input#event-name{
+  width: 400px;
+}
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.group-event-errors {
+  color: red;
+}

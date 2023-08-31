@@ -11,9 +11,12 @@ export const loadEvents = events => ({
   events
 })
 
-export const getEvent = event => ({
+export const getEvent = (event,groupId) => ({
   type: GET_EVENT,
-  event
+  payload:{
+    event,
+    groupId
+  }
 })
 
 export const removeEvent = eventId => ({
@@ -47,8 +50,9 @@ export const fetchEventDetail = (eventId) => async (dispatch) => {
   }
 }
 
-export const createEvent = event => async (dispatch) => {
-  const res = await csrfFetch('/api/events', {
+
+export const createEvent = (event,groupId) => async (dispatch) => {
+  const res = await csrfFetch(`/api/groups/${groupId}/events`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(event)
@@ -127,9 +131,13 @@ const eventReducer = (state = initialState, action) => {
     case GET_EVENT:
       return {
         ...state,
+        allEvents:{
+          ...state.allEvents,
+          [action.payload.event.id]:action.payload.event
+        },
         singleEvent: {
           ...state.singleEvent,
-          eventData: action.event
+          eventData: action.payload.event
         }
       }
     case REMOVE_EVENT:

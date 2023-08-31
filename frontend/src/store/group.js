@@ -12,9 +12,9 @@ export const loadGroups = groups => ({
   groups
 })
 
-export const getGroup = group => ({
+export const getGroup = (group) => ({
   type: GET_GROUP,
-  group
+  group,
 })
 export const editGroup = group => ({
   type: EDIT_GROUP,
@@ -34,8 +34,11 @@ export const fetchGroups = () => async (dispatch) => {
   if (res.ok) {
     const groups = await res.json()
     dispatch(loadGroups(groups))
-    console.log("fetch groups action creator",groups)
+    // console.log("fetch groups action creator", groups)
     return groups
+  }else{
+    const errors = await res.json()
+    return errors
   }
 }
 
@@ -44,11 +47,14 @@ export const fetchGroupDetail = (groupId) => async (dispatch) => {
 
   if (res.ok) {
     const groupDetails = await res.json()
-  
     dispatch(getGroup(groupDetails))
+    return groupDetails
   } else {
-    const errors = await res.json()
+    let errors = await res.json()
+    // console.log("fetchGroupDetail",errors)
     return errors
+    
+   
   }
 }
 
@@ -58,17 +64,21 @@ export const createGroup = group => async (dispatch) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(group)
   })
+
   if (res.ok) {
     const newGroup = await res.json()
     dispatch(getGroup(newGroup))
     return newGroup
   } else {
+
     const errors = await res.json()
+
     return errors
   }
 }
 
 export const updateGroup = group => async (dispatch) => {
+  console.log("update group reducer passed in data",group)
   const res = await csrfFetch(`/api/groups/${group.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -76,6 +86,7 @@ export const updateGroup = group => async (dispatch) => {
   })
   if (res.ok) {
     const updatedGroup = await res.json()
+    console.log("update group reducer returned data",updatedGroup)
     dispatch(editGroup(updatedGroup))
     return updatedGroup
   } else {
@@ -106,7 +117,7 @@ const initialState = {
 }
 const groupReducer = (state = initialState, action) => {
   // let newState = {}
-// store shape:
+  // store shape:
   // groups: {
   //   allGroups: {
   //     [groupId]: {
@@ -114,43 +125,56 @@ const groupReducer = (state = initialState, action) => {
   //     },
   //     optionalOrderedList: [],
   //   },
-  //   singleGroup: {
-  //     groupData,
-  //       GroupImages: [imagesData],
-  //         Organizer: {
-  //       organizerData,
+  // singleGroup: {
+  //   groupData,
+  //     GroupImages: [imagesData],
+  //       Organizer: {
+  //     organizerData,
   //     },
-  //     Venues: [venuesData],
+  //   Venues: [venuesData],
   //   },
 
   switch (action.type) {
     case LOAD_GROUPS:
-      const updatedState = {...state,allGroups:{...state.allGroups}}
-      action.groups.Groups.forEach(group=>{
-        updatedState.allGroups[group.id]=group}
+      const updatedState = { 
+        ...state, 
+        allGroups: { ...state.allGroups }
+       }
+      action.groups.Groups.forEach(group => {
+        updatedState.allGroups[group.id] = group
+      }
       )
-  
+
       return updatedState
     case GET_GROUP:
-      return {
-        ...state,
-        singleGroup: {
-          ...state.singleGroup,
-          groupData: action.group
-        }
-      }
-    case EDIT_GROUP:
       return {
         ...state,
         allGroups: {
           ...state.allGroups,
           [action.group.id]: action.group
+        },
+        singleGroup: {
+          ...state.singleGroup,
+          groupData:action.group
+        }
+      }
+    case EDIT_GROUP:
+      // console.log("state.singleGroup",action.group)
+      return {
+        ...state,
+        allGroups:{
+          ...state.allGroups,
+          [action.group.id]:action.group
+        },
+        singleGroup: {
+          ...state.singleGroup,
+          groupData: action.group,
         }
       }
     case REMOVE_GROUP:
       const newState = { ...state, allGroups: { ...state.allGroups } }
       delete newState.allGroups[action.groupId]
-      console.log("Del",newState)
+      // console.log("Del", newState)
       return newState
 
     default:

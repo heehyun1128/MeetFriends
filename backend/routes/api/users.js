@@ -15,10 +15,30 @@ const router = express.Router();
 const validateSignup = [
   check('firstName')
     .exists({ checkFalsy: true })
-    .withMessage('First Name is required'),
+    .withMessage('First Name is required')
+    .custom((value)=>{
+      if (value[0].toUpperCase() !== value[0]) {
+        throw new Error("Firstname must be capitalized.")
+      }
+      if (/[0-9]/.test(value)){
+        throw new Error("Firstname cannot include number.")
+      }
+      return true
+    })
+    ,
   check('lastName')
     .exists({ checkFalsy: true })
-    .withMessage('Last Name is required'),
+    .withMessage('Last Name is required')
+    .custom((value) => {
+      if (value[0].toUpperCase() !== value[0]) {
+        throw new Error("Lastname must be capitalized.")
+      }
+      if (/[0-9]/.test(value)) {
+        throw new Error("Lastname cannot include number.")
+      }
+      return true
+    })
+    ,
   check('email')
     .exists({ checkFalsy: true })
     .isEmail()

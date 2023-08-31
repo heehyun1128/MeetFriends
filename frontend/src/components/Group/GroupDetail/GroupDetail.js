@@ -3,6 +3,7 @@ import './GroupDetail.css'
 import {useHistory} from 'react-router-dom'
 
 const GroupDetail = ({group}) => {
+  console.log(group)
 const history = useHistory()
   const handleViewGroupDetail = (e)=>{
     e.preventDefault()
@@ -10,7 +11,9 @@ const history = useHistory()
   }
   return (
     <div className="group-detail-div" onClick={handleViewGroupDetail}>
-      <img className='group-image' src={group.previewImage} alt="groupImage" />
+      <div className="group-image-div">
+        <img className='group-image' src={group.previewImage} alt="groupImage" />
+      </div>
       <div className="group-info">
         <h3 className='groupName'>{group.name}</h3>
         <p className="city">{group.city}</p>

@@ -8,11 +8,11 @@ import './GroupContent.css'
 
 const GroupContent = () => {
   const groupObj = useSelector((state) => (Object.values(state.groups.allGroups).length ? state.groups.allGroups : {}))
-useSelector(state=>console.log("state 123",state))
+
   const groups = Object.values(
     groupObj
   );
-  console.log("get all groups", groups)
+ 
   // sort group - recently created group at the top
   groups.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
 

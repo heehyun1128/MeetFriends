@@ -61,57 +61,73 @@ module.exports = (sequelize, DataTypes) => {
     type: {
       type: DataTypes.ENUM("Online", "In Person"),
       allowNull: false,
-      validate: {
+      // validate: {
         // isValidType(type){
         //   if (type !== "Online" && type !== "In Person" ){
         //     throw new Error("Type must be 'Online' or 'In person'")
         //   }
         // }
-        isIn: {
-          args: [['Online', 'In Person']],
-          msg: "Type must be 'Online' or 'In person'"
-        }
-      }
+      //   isIn: {
+      //     args: [['Online', 'In Person']],
+      //     msg: "Type must be 'Online' or 'In person'"
+      //   }
+      // }
+    },
+    private: {
+      type: DataTypes.ENUM("Public", "Private"),
+      allowNull: false,
+      // validate: {
+      //   isIn: {
+      //     args: [["Public", "Private"]],
+      //     msg: "Type must be 'Public' or 'Private'"
+      //   }
+      // }
     },
     capacity: {
       type: DataTypes.INTEGER,
-      validate: {
-        isInt: {
-          msg: "Capacity must be an integer"
-        }
-      }
+      allowNull:true
+      // validate: {
+      //   isInt: {
+      //     msg: "Capacity must be an integer"
+      //   }
+      // }
     },
     price: {
       type: DataTypes.DECIMAL,
-      
+      allowNull: false,
+      // validate: {
+      //   notNull: {
+      //     msg: "Price is required"
+      //   }
+      // }
     },
     startDate: {
       type: DataTypes.DATE,
-      validate: {
-        isDate: {
-          args:true,
-          msg: "Start date must be a valid datetime"
-      },  
-        // isFutureDate(value) {
-        //   if (new Date(value) <= new Date()) {
-        //     throw new Error('Start date must be in the future');
-        //   }
-        // }
-      }
+      // validate: {
+      //   isDate: {
+      //     args:true,
+      //     msg: "Start date must be a valid datetime"
+      // },  
+      //   // isFutureDate(value) {
+      //   //   if (new Date(value) <= new Date()) {
+      //   //     throw new Error('Start date must be in the future');
+      //   //   }
+      //   // }
+      // }
     },
     endDate: {
       type: DataTypes.DATE,
-      isDate: {
-        args: true,
-        msg: "End date must be a valid datetime"
-      },  
-      validate: {
-        isLessThanStartDate(value) {
-          if (new Date(value) <= new Date(this.startDate)) {
-            throw new Error('End date is less than start date');
-          }
-        }
-      }
+      // isDate: {
+      //   args: true,
+      //   msg: "End date must be a valid datetime"
+      // },  
+      // validate: {
+      //   isLessThanStartDate(value) {
+      //     if (new Date(value) <= new Date(this.startDate)) {
+      //       throw new Error('End date is less than start date');
+      //     }
+      //   }
+      // }
     }
   }, {
     sequelize,

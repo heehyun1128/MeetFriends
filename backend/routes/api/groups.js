@@ -31,21 +31,40 @@ const validateEventInfoOnCreate = [
       return true
     }),
   check("name")
-    .isLength({ min: 5 })
-    .withMessage("Name must be at least 5 characters"),
-  check("type")
-    .isIn(['Online', 'In Person'])
-    .withMessage("Type must be Online or In person"),
-  check("capacity")
-    .isInt()
-    .withMessage("Capacity must be an integer"),
-  check("price")
-    .isDecimal()
-    .withMessage("Price is invalid"),
-  check("description")
     .notEmpty()
-    .withMessage("Description is required"),
+    .withMessage("Name is required"),
+  check("type")
+    .notEmpty()
+    .withMessage("Event Type is required")
+  .isIn(['Online', 'In Person'])
+  .withMessage("Type must be Online or In person")
+  ,
+  check('private')
+    .notEmpty()
+    .withMessage("Visibility is required")
+    .isIn(['Public', 'Private'])
+    .withMessage("Visibility must be Public or Private"),
+  // check("capacity")
+  //   .isInt()
+  //   .withMessage("Capacity must be an integer"),
+  check("price")
+    .exists({ checkFalsy: true })
+    .withMessage("Price is required")
+    .custom(value => {
+      if (isNaN(parseFloat(value)) || parseFloat(value) < 0) {
+        throw new Error("Price must be a number that is greater than or equal to 0")
+      }
+      return true
+
+    })
+  ,
+  check("description")
+    .exists({ checkFalsy: true })
+    .isLength({ min: 30 })
+    .withMessage("Description must be at least 30 characters long"),
   check("startDate")
+    .notEmpty()
+    .withMessage("Event start date is required")
     .isAfter()
     .withMessage("Start date must be in the future")
     .isISO8601()
@@ -64,6 +83,8 @@ const validateEventInfoOnCreate = [
     .withMessage("Start date must be a valid datetime")
   ,
   check("endDate")
+    .notEmpty()
+    .withMessage("Event end date is required")
     .isISO8601()
     .custom((value, { req }) => {
       // use regex to check date format
@@ -82,7 +103,17 @@ const validateEventInfoOnCreate = [
       }
       return true
     })
-
+  ,
+  check('imageUrl')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("")
+    .custom(value => {
+      if (!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")) {
+        throw new Error("Image URL must end in .png, .jpg, or .jpeg")
+      }
+      return true
+    })
   ,
   handleValidationErrors
 ];
@@ -151,8 +182,48 @@ const checkMemberDelInput = [
   ,
   handleValidationErrors
 ]
-// handle 404 error on group id not found
 
+const checkCreateGroupInput = [
+  // const { memberId, status } = req.body
+  check('name')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Name is required"),
+  check('city')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("City is required"),
+  check('state')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("State is required"),
+  check('about')
+    .exists({ checkFalsy: true })
+    .isLength({ min: 30 })
+    .withMessage("Description must be at least 30 characters long"),
+  check('type')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("Group Type is required"),
+  check('private')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    // .isBoolean()
+    .withMessage("Visibility Type is required"),
+  check('imageUrl')
+    .exists({ checkFalsy: true })
+    .notEmpty()
+    .withMessage("")
+    .custom(value => {
+      if (!value.endsWith(".png") && !value.endsWith(".jpg") && !value.endsWith(".jpeg")) {
+        throw new Error("Image URL must end in .png, .jpg, or .jpeg")
+      }
+      return true
+    })
+  ,
+  handleValidationErrors
+]
+// handle 404 error on group id not found
 const handleError404 = async (req, res, next) => {
   const currGroup = await Group.findByPk(req.params.id)
 
@@ -289,14 +360,14 @@ const handleDelMembership403 = async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   const allGroups = await Group.findAll({
     attributes: ["id", "organizerId", "name", "about", "type", "private", "city", "state", "createdAt", "updatedAt"],
-  
+
 
   })
   let groups = []
   for (let i = 0; i < allGroups.length; i++) {
     let group = allGroups[i]
     const groupImages = await group.getGroupImages()
-    const groupEvents=await group.getEvents()
+    const groupEvents = await group.getEvents()
     const groupMemberships = await group.getMemberships({
       where: {
         status: {
@@ -305,7 +376,7 @@ router.get("/", async (req, res, next) => {
       }
     })
     group = group.toJSON()
-    group.numEvemts = groupEvents.length ? groupEvents.length : 0
+    group.numEvents = groupEvents.length ? groupEvents.length : 0
     group.numMembers = groupMemberships.length ? groupMemberships.length : 0
     group.organizer = await User.findByPk(group.organizerId)
 
@@ -315,7 +386,7 @@ router.get("/", async (req, res, next) => {
       if (groupImage.preview === true) {
 
         group.previewImage = groupImage.url
-        
+
 
       }
     }
@@ -615,7 +686,8 @@ router.get("/:id", async (req, res, next) => {
         },
         {
           model: GroupImage,
-          attributes: ["id", "url", "preview"]
+          attributes: ["id", "url", "preview"],
+
         },
         {
           model: User,
@@ -641,6 +713,17 @@ router.get("/:id", async (req, res, next) => {
 
     })
     if (findGroupsById) {
+      // const previewImage = findGroupsById.groupImage
+      // console.log(findGroupsById.toJSON().GroupImages)
+      const groupImageArr = findGroupsById.GroupImages
+      const previewImage = groupImageArr.filter(image => image.preview === true)
+      previewImage.sort((a, b) => b.id - a.id)
+      // console.log(previewImage[0].toJSON().url)
+      if (previewImage.length > 0) {
+
+        findGroupsById.previewImage = previewImage[0].url
+      }
+
       res.json(findGroupsById)
     } else {
       next(
@@ -660,9 +743,9 @@ router.get("/:id", async (req, res, next) => {
 // Create a Group
 // Creates and returns a new group.
 // Require Authentication: true
-router.post("/", requireAuth, async (req, res, next) => {
+router.post("/", requireAuth, checkCreateGroupInput, async (req, res, next) => {
 
-  const { name, about, type, private, city, state } = req.body
+  const { name, about, type, private, city, state, imageUrl } = req.body
   const newGroup = await Group.create({
     organizerId: req.user.id,
     name,
@@ -672,6 +755,8 @@ router.post("/", requireAuth, async (req, res, next) => {
     city,
     state,
   })
+  const groupImage = await newGroup.createGroupImage({ url: imageUrl })
+
 
   // add organizer membership to current user who's creating a group
   const currUser = await User.findByPk(req.user.id)
@@ -679,8 +764,20 @@ router.post("/", requireAuth, async (req, res, next) => {
     status: "organizer",
     groupId: newGroup.id
   })
+
   // console.log(currUserMemInGroup)
-  res.status(201).json(newGroup)
+  res.status(201).json({
+    id: newGroup.id,
+    organizerId: newGroup.organizerId,
+    name: newGroup.name,
+    about: newGroup.about,
+    type: newGroup.type,
+    private: newGroup.private,
+    city: newGroup.city,
+    state: newGroup.state,
+    imageUrl: groupImage.url,
+    imageId: groupImage.id
+  })
 })
 
 
@@ -761,21 +858,14 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
   try {
     const currGroup = await Group.findByPk(req.params.id)
 
-    const { venueId, name, type, capacity, price, description, startDate, endDate } = req.body
+    const { venueId, name, type, capacity, price, description, startDate, endDate, imageUrl, private } = req.body
     // console.log(typeof price)
     //create new group event
 
     const newGroupEvent = await currGroup.createEvent({
-      venueId, name, type, capacity, price, description, startDate, endDate
+      venueId, name, type, capacity, price, description, startDate, endDate, private
     })
-
-
-    // //group organizer of an event automatically create new Attendance
-    // const newAttendance = await Attendance.create({
-    //   eventId: newGroupEvent.id,
-    //   userId:req.user.id,
-    //   status:"attending"
-    // })
+    const eventImage = await newGroupEvent.createEventImage({ url: imageUrl })
     //check if current user has membership in the group
     //if in the group - check status
     const newGroupEventObj = {
@@ -788,7 +878,9 @@ router.post("/:id/events", requireAuth, handleError404, handleError403, validate
       price: Number(newGroupEvent.price),
       description: newGroupEvent.description,
       startDate: new Date(newGroupEvent.startDate),
-      endDate: new Date(newGroupEvent.endDate)
+      endDate: new Date(newGroupEvent.endDate),
+      private: newGroupEvent.private,
+      imageUrl: eventImage.url
     }
     // console.log(newGroupEventObj)
     res.status(200).json(newGroupEventObj)
@@ -922,10 +1014,22 @@ router.put("/:id/membership", requireAuth, handleError404, handleError403, check
 router.put("/:id", requireAuth, async (req, res, next) => {
   try {
     // check to see if id is provided and matched
-    const { name, about, type, private, city, state } = req.body
+    const { name, about, type, private, city, state, imageUrl } = req.body
     // console.log(private)
     // find group by Id after id is provided and matched
     const groupToUpdate = await Group.findByPk(req.params.id)
+    // find group images
+    const groupImages = await groupToUpdate.getGroupImages({
+      where: {
+        preview: true
+      },
+      order: [['id', 'DESC']]
+    })
+    console.log(groupImages[0].url)
+    groupImages[0].url = imageUrl
+    console.log(groupImages[0].url)
+    await groupImages[0].save()
+    // console.log(previewImageUrl)
     // find group memberships
     if (groupToUpdate) {
 
@@ -939,7 +1043,16 @@ router.put("/:id", requireAuth, async (req, res, next) => {
         groupToUpdate.state = state
 
         await groupToUpdate.save()
-        return res.json(groupToUpdate)
+        return res.json({
+          id: groupToUpdate.id,
+          name: groupToUpdate.name,
+          about: groupToUpdate.about,
+          type: groupToUpdate.type,
+          private: groupToUpdate.private,
+          city: groupToUpdate.city,
+          state: groupToUpdate.state,
+          imageUrl: imageUrl
+        })
       } else {
         next({
           status: 403,

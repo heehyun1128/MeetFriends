@@ -10,15 +10,36 @@
   cursor: pointer;
 }
 
+.group-image-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 180px;
+  width: 180px;
+  overflow: hidden;
+}
+
 .group-image {
-  height: 90%;
-  width: 20%
+  width: 180px;
 }
 
 .group-info {
   display: flex;
   flex-direction: column;
   justify-content: space-around;
+  max-width: 900px;
+  width: 600px;
+}
+
+.group-info .about {
+width:100%;
+  max-height: 80px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
 }
 
 .city {
@@ -29,22 +50,29 @@
   display: flex;
   justify-content: flex-start;
   color: gray;
-  
+
 }
 
 .numEvents {
   padding-left: 0;
 }
-.centered-dot{
+
+.centered-dot {
   position: relative;
   width: 20px;
-    height: 20px;
+  height: 20px;
 }
 
-.centered-dot p{
+.centered-dot p {
   position: absolute;
   bottom: 25%;
-  left:6px;
+  left: 6px;
   font-weight: 700;
-  /* border-radius: 50%; */
+  /* width:20px;
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0; */
+
 }

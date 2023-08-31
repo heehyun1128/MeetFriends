@@ -2,11 +2,11 @@ import React from "react";
 import { useHistory } from 'react-router-dom'
 import { useDispatch } from "react-redux";
 import { useModal } from "../../context/Modal";
-import { deleteGroup } from "../../store/group";
-import { fetchGroups } from '../../store/group'
+import { deleteEvent } from "../../store/event";
+import { fetchEvents } from '../../store/event'
 import './DeleteModal.css'
 
-const DeleteModal = ({ groupId }) => {
+const DeleteModal = ({ eventId }) => {
   const dispatch = useDispatch();
 
   const { closeModal } = useModal();
@@ -15,14 +15,14 @@ const DeleteModal = ({ groupId }) => {
   const handleDelete = (e) => {
 
     e.preventDefault();
-   dispatch(deleteGroup(groupId)).then(()=>{
+    dispatch(deleteEvent(eventId)).then(() => {
 
-     closeModal()
+      closeModal()
 
-     history.push('/groups')
-    //  dispatch(fetchGroups());
-   })
- 
+      history.push('/events')
+      //  dispatch(fetchEvents());
+    })
+
 
 
 
@@ -37,10 +37,10 @@ const DeleteModal = ({ groupId }) => {
     <div id="delete-modal-container">
       <h3 id='delete-modal-header'>Confirm Delete</h3>
       <p className="delete-modal-msg">
-        Are you sure you want to remove this group?
+        Are you sure you want to remove this event?
       </p>
-      <button onClick={handleDelete} className="delete-modal-btn yes">{`Yes (Delete Group)`}</button>
-      <button onClick={closeDeleteModal} className="delete-modal-btn no">{`No (Keep Group)`}</button>
+      <button onClick={handleDelete} className="delete-modal-btn yes">{`Yes (Delete Event)`}</button>
+      <button onClick={closeDeleteModal} className="delete-modal-btn no">{`No (Keep Event)`}</button>
     </div>
   )
 }

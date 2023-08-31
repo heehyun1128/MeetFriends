@@ -2,7 +2,7 @@ const express = require('express');
 // const cookieParser = require('cookie-parser');
 const { requireAuth } = require("../../utils/auth")
 
-const { Group, Venue, EventImage, User, Membership, Attendance, sequelize, Event } = require('../../db/models');
+const { Group, Venue, EventImage, GroupImage, User, Membership, Attendance, sequelize, Event } = require('../../db/models');
 
 const { Op } = require('sequelize');
 
@@ -36,9 +36,9 @@ const validateEventInfoOnCreate = [
   check("type")
     .isIn(['Online', 'In Person'])
     .withMessage("Type must be Online or In person"),
-  check("capacity")
-    .isInt()
-    .withMessage("Capacity must be an integer"),
+  // check("capacity")
+  //   .isInt()
+  //   .withMessage("Capacity must be an integer"),
   check("price")
     .isDecimal()
     .withMessage("Price is invalid"),
@@ -535,7 +535,16 @@ router.get("/:id", async (req, res, next) => {
       },
       include: [{
         model: Group,
-        attributes: ["id", "name", "private", "city", "state"]
+        attributes: ["id", "name", "private", "city", "state"],
+        include:[{
+          model: User,
+          as: "Organizer",
+          attributes:['firstName','lastName','id']
+        },{
+          model:GroupImage,
+          attributes:['url','id'],
+          order:[['id','DESC']]
+        }]
       }, {
         model: Venue,
         attributes: ["id", "address", "city", "state", "lat", "lng"]
