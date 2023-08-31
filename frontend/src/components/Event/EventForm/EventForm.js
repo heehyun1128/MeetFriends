@@ -42,28 +42,33 @@ const EventForm = ({ event }) => {
     setImageUrl("")
     setDescription("")
   }
-  
- // format start date and end date for backend validation
+
+  // format start date and end date for backend validation
   const formatDate = (date) => {
+    if (/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/\d{4} (0[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/.test(date)) {
 
-    const isMorning = date.split(" ")[2] === "AM" ? true : false
-    const isNight = date.split(" ")[2] === "PM" ? true : false
-    console.log(date.split(" "))
+      const isMorning = date.split(" ")[2] === "AM" ? true : false
+      const isNight = date.split(" ")[2] === "PM" ? true : false
+      console.log(date.split(" "))
 
-    let year = date.split(" ")[0].slice(6)
-    let month = date.split(" ")[0].slice(0, 2)
-    let day = date.split(" ")[0].slice(3, 5)
-    let hour
-    let minute = date.split(" ")[1].slice(3, 5)
+      let year = date.split(" ")[0].slice(6)
+      let month = date.split(" ")[0].slice(0, 2)
+      let day = date.split(" ")[0].slice(3, 5)
+      let hour
+      let minute = date.split(" ")[1].slice(3, 5)
 
-    if (isMorning) {
-      hour = date.split(" ")[1].slice(0, 2)
+      if (isMorning) {
+        hour = date.split(" ")[1].slice(0, 2)
+      }
+      if (isNight) {
+        hour = (Number(date.split(" ")[1].slice(0, 2)) + 12).toString()
+      }
+      const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:00`
+      return formattedDate
+    }else{
+      return
     }
-    if (isNight) {
-      hour = (Number(date.split(" ")[1].slice(0, 2)) + 12).toString()
-    }
-    const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:00`
-    return formattedDate
+
   }
   const handleEventFormSubmit = (e) => {
     e.preventDefault()
@@ -123,7 +128,7 @@ const EventForm = ({ event }) => {
               onChange={(e) => {
                 setEventType(e.target.value)
                 console.log(e.target.value)
-                }}
+              }}
             >
               <option value="" disabled selected>(select one)</option>
               <option value="In Person">In Person</option>
