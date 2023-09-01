@@ -33,7 +33,10 @@
   margin-top: 5px;
   border-radius: 5px;
 }
+input[type=text]:focus {
+  background-color: #fff !important;
 
+}
 .initial-login-input-label {
 
   width: 100%;
@@ -63,4 +66,22 @@
   text-align: center;
   margin-top:20px;
   cursor: pointer;
+}
+
+
+button#login-btn:hover {
+  background-color: rgb(228, 126, 126);
+  color: #fff !important;
+  font-weight: bold;
+}
+
+button#login-btn[disabled],
+button#login-btn:disabled {
+  background-color: #CCC;
+  cursor: not-allowed !important;
+  color: black !important;
+}
+
+button#login-btn:disabled:hover {
+  font-weight: 400;
 }

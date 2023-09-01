@@ -30,6 +30,12 @@ font-size:25px;
   /* margin-top:1%; */
   border-radius: 5px;
 }
+
+input[type=text]:focus {
+  background-color: #fff !important;
+
+}
+
 #initial-signup-form input:focus{
   background-color: #fff;
 }
@@ -54,4 +60,21 @@ cursor: pointer;
 .signup-error-msg{
   color:red;
   font-size: 14px;
+}
+
+button#sign-btn:hover{
+  background-color: rgb(228, 126, 126);
+  color: #fff !important;
+  font-weight: bold;
+}
+
+button#sign-btn[disabled],
+button#sign-btn:disabled {
+  background-color: #CCC;
+  cursor: not-allowed !important;
+  color: black !important;
+} 
+
+button#sign-btn:disabled:hover{
+font-weight: 400;
 }

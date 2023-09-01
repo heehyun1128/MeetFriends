@@ -190,6 +190,7 @@ const EventForm = ({ event }) => {
               <input
                 type="text"
                 placeholder='MM/DD/YYYY HH:mm AM'
+                title='Date format must be MM/DD/YYYY HH:mm AM/PM '
                 value={startDate}
                 onChange={(e) => {
                   setStartDate(e.target.value)
@@ -207,6 +208,7 @@ const EventForm = ({ event }) => {
               <input
                 type="text"
                 placeholder='MM/DD/YYYY HH:mm AM'
+                title='Date format must be MM/DD/YYYY HH:mm AM/PM '
                 value={endDate}
                 onChange={(e) => {
                   setEndDate(e.target.value)
@@ -236,6 +238,7 @@ const EventForm = ({ event }) => {
         <section className='event-form-section event-form-five'>
           <h4>Please describe your event:</h4>
           <textarea name="" id="" cols="30" rows="10"
+          placeholder='Please include at least 30 characters'
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           >

@@ -25,6 +25,10 @@
   font-weight: 700;
 }
 
+#navbar-right-create-group:hover{
+  text-decoration: underline;
+}
+
 #logo-style {
   color: #FF5A5F;
   font-weight: bold;
@@ -68,11 +72,23 @@
   background-color: #fff;
   text-wrap: nowrap;
 }
+
+.profile-dropdown a:hover{
+  text-decoration: underline !important;
+}
+
+.profile-dropdown a{
+  padding-left: 8px !important; 
+}
 #start-new-group-nav{
   color:#0f6767;
   text-decoration: none;
   font-weight: 700;
   margin:10px 10px;
+}
+#user-email-li{
+  border-bottom:2px solid black;
+
 }
 #logout-button {
   border: none;
@@ -84,6 +100,9 @@
  font-size: 18px;
  padding-top: 10px;
 
+}
+#logout-button:hover{
+  text-decoration: underline;
 }
 
 #logout-btn-li{
