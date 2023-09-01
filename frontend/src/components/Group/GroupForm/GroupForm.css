@@ -32,6 +32,12 @@ padding-bottom: 150px;
   background-color: rgb(210, 230, 239);
   /* margin-top: 15px; */
 }
+
+input[type=text]:focus,textarea:focus {
+  background-color: #fff !important;
+
+}
+
 #group-form-div textarea{
   width:400px;
   height: 240px;
@@ -60,6 +66,7 @@ height:36px;
   height:50px;
   font-size: 20px;
   box-shadow: 3px 3px 3px black;
+  cursor: pointer;
 }
 
 .group-form-errors{

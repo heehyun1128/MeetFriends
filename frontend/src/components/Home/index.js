@@ -54,7 +54,7 @@ const Home = () => {
           </p>
         </div>
         <div id="home-intro-section-right">
-          <img src={homeMainImage} alt="" />
+          <img src={homeMainImage} alt="HomeMainImage" />
         </div>
       </div>
       <div id="home-detail-section">
@@ -64,21 +64,21 @@ const Home = () => {
       <div id="home-detail-section">
         <div id="home-detail-items">
           <div className='home-detail-item-tab' >
-            <img src={homeTabImage1} alt="" />
+            <img src={homeTabImage1} alt="homeTabImage" />
             <button onClick={handleSeeAllGroups} className="home-detail-item-tab-btn">See All Groups</button>
             <p className="home-detail-item-tab-text">
               Meet people that love what you love and start your next journey.
             </p>
           </div>
           <div className='home-detail-item-tab'>
-            <img src={homeTabImage2} alt="" />
+            <img src={homeTabImage2} alt="homeTabImage" />
             <button onClick={handleFindEvent} className="home-detail-item-tab-btn">Find An Event</button>
             <p className="home-detail-item-tab-text">
               Join an event to meet your future friends!
             </p>
           </div>
           <div className='home-detail-item-tab'>
-            <img src={homeTabImage3} alt="" />
+            <img src={homeTabImage3} alt="homeTabImage" />
             <button onClick={handleStartGroup} disabled={startGroupDisabled} className={startGroupBtn}>Start A New Group</button>
             <p className="home-detail-item-tab-text">
               Create a group here to gather people with shared interests.

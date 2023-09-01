@@ -101,7 +101,7 @@ const GroupForm = ({ group, groupInfo,formType }) => {
     <div id="group-form-div">
       <form onSubmit={handleGroupFormSubmit}>
         <section className="group-form-section one">
-          {formType ==="createGroup" && <h4>BECOME AN ORGANIZER</h4>}
+          {formType ==="createGroup" && <h4>START A NEW GROUP</h4>}
           {formType ==="updateGroup" && <h4>UPDATE YOUR GROUP'S INFORMATION</h4>}
           <h2>We'll walk you through a few steps to build your local community</h2>
         </section>

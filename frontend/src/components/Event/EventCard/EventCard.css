@@ -14,6 +14,11 @@
   height:fit-content;
 }
 
+#event-card-container:hover{
+  transform: scale(1.02);
+
+  box-shadow: 3px 3px 4px gray;
+}
 .event-card-upper{
   width:100%;
   height: fit-content;

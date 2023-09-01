@@ -1,5 +1,5 @@
 .group-detail-div {
-  height: 200px;
+  height: 260px;
   display: flex;
   width: 100%;
   border-bottom: 2px solid rgb(209, 209, 209);
@@ -8,6 +8,9 @@
 
 .group-detail-div:hover {
   cursor: pointer;
+  transform: scale(1.02);
+  box-shadow: 3px 3px 4px gray;
+  border-radius: 10px;
 }
 
 .group-image-div {
@@ -15,8 +18,9 @@
   justify-content: center;
   align-items: center;
   height: 180px;
-  width: 180px;
+  width: 240px;
   overflow: hidden;
+  margin-right: 20px;
 }
 
 .group-image {

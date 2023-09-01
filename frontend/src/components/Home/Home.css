@@ -82,6 +82,7 @@ font-size: 18px;
   margin-top: 5px;
   cursor: pointer;
   font-size: 16px;
+  cursor: pointer;
 }
 
 .home-detail-item-tab-btn:hover{
@@ -119,3 +120,7 @@ font-size: 18px;
   margin:2px;
   text-align: center;
 }
+
+
+
+

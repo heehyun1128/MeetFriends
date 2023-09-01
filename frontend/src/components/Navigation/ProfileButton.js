@@ -70,7 +70,7 @@ function ProfileButton({ user }) {
           <>
             <li>Hello, {user.username}</li>
             {/* <li>{user.firstName} {user.lastName}</li> */}
-            <li>{user.email}</li>
+            <li id='user-email-li'>{user.email}</li>
             <NavLink onClick={handleViewGroup} id='start-new-group-nav' exact to='/groups'>View Groups</NavLink>
             <NavLink onClick={handleViewEvent} id='start-new-group-nav' exact to='/events'>View Events</NavLink>
             <li id="logout-btn-li">

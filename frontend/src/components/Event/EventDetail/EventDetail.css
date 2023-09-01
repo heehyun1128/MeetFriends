@@ -114,6 +114,12 @@ height:30px;
   cursor: pointer;
 }
 
+#delete-event-btn:hover {
+  background-color: rgb(228, 126, 126);
+  color: #fff !important;
+
+}
+
 .icon-div {
   width:22px;
   height:22px;

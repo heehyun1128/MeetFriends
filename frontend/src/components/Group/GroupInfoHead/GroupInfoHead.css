@@ -2,7 +2,7 @@
   display: flex;
   width: 80%;
   justify-content: center;
-  margin-top:20px;
+  margin-top: 20px;
 }
 
 .image-div {
@@ -13,11 +13,13 @@
   margin-right: 20px;
   overflow: hidden;
 }
-.group-head-right{
+
+.group-head-right {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
+
 .group-info-image {
   width: 100%;
 }
@@ -41,43 +43,53 @@
 
 .group-info-centered-dot {
   position: relative;
-  width:20px;
+  width: 20px;
   height: 20px;
 }
 
 .group-info-centered-dot p {
   position: absolute;
-  
+
   bottom: 25%;
   left: 6px;
   font-weight: 700;
 
 }
 
-#join-this-group-btn{
+#join-this-group-btn {
   background-color: rgb(230, 50, 50);
-  height:40px;
-  width:160px;
-  color:white;
+  height: 40px;
+  width: 160px;
+  color: white;
   font-weight: bold;
   box-shadow: 2px 2px 4px black;
-  margin-left:10px;
+  margin-left: 10px;
   cursor: pointer;
 }
-
-#gray-buttons{
-  display:flex;
-
-   
+#join-this-group-btn:hover{
+  background-color: rgb(67, 67, 67);
+  color: #fff;
 }
 
-.gray-btn{
-  width:fit-content;
+#gray-buttons {
+  display: flex;
+
+
+}
+
+.gray-btn {
+  width: fit-content;
   padding: 0 15px;
-  height:24px;
+  height: 24px;
   background-color: gray;
   box-shadow: 2px 2px 4px black;
-  color:white;
+  color: white;
   margin-right: 15px;
   cursor: pointer;
+}
+
+.gray-btn:hover {
+  background-color: rgb(228, 126, 126);
+  color: #fff !important;
+ 
 }

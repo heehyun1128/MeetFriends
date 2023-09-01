@@ -27,7 +27,7 @@
 .go-back-btn{
   width:80%;
   margin-left:10%;
- 
+ cursor: pointer;
 }
 .go-back-btn-link{
 
