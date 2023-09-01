@@ -54,7 +54,17 @@ const EventDetail = () => {
   const startTime = eventInfo?.startDate.split('T')[1].slice(0, 8)
   const endDate = eventInfo?.endDate.split('T')[0]
   const endTime = eventInfo?.endDate.split('T')[1].slice(0, 8)
-  const groupImageUrl = eventData?.Group?.GroupImages?.slice(0, 1)[0].url
+  console.log(endTime)
+ 
+  const startHour = startTime?.slice(0,2)-7
+  const endHour = endTime?.slice(0,2)-7
+  // format startTime/endTime to switch to local time
+  const localStartTime = startHour + startTime?.slice(2)
+  const localEndTime = endHour + endTime?.slice(2)
+
+  console.log(localEndTime) 
+  const groupImageUrl = eventData?.Group?.GroupImages?.slice(0, 1)[0]?.url
+  console.log("eventInfo",eventInfo)
   const isPrivate = eventData?.Group?.private ? "Private" : "Public"
   return (
     <div id="event-detail-page">
@@ -74,7 +84,7 @@ const EventDetail = () => {
           <div id="event-main-upper-right">
             <div id="event-main-group-info">
               <div id='group-info-image-div'>
-                <img id='group-info-image' src={groupImageUrl} alt="groupImage" />
+                <img id='group-info-image' src={groupImageUrl && groupImageUrl} alt="groupImage" />
               </div>
               <div>
                 <h4>{eventData?.Group?.name}</h4>
@@ -89,11 +99,11 @@ const EventDetail = () => {
                     <div id="start-end">
                       <div id='flow-box'>
                         <p id='start' style={{ color: 'gray' }}>START</p>
-                        <p style={{ color: '#0f6767' }}>{startDate}<p id='dot-dot'>.</p> {startTime}</p>
+                        <p style={{ color: '#0f6767' }}>{startDate}<p id='dot-dot'>.</p> {localStartTime}</p>
                       </div>
                       <div id='flow-box'>
                         <p id='end' style={{ color: 'gray' }}>END</p>
-                        <p style={{ color: '#0f6767' }}>{endDate} <p id='dot-dot'>.</p>{endTime}</p>
+                        <p style={{ color: '#0f6767' }}>{endDate} <p id='dot-dot'>.</p>{localEndTime}</p>
                       </div>
                     </div>
                   </div>
