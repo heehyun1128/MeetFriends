@@ -111,7 +111,7 @@ const EventDetail = () => {
                 </div>
                 <div id="div-two">
                   <div className='icon-div'><i id='dollar-icon' style={{ color: 'gray' }} class="fa-solid fa-dollar-sign"></i></div>
-                  <div id='price'><p style={{ color: 'gray' }}>{eventData?.price || "FREE"}</p></div>
+                  <div id='price'><p style={{ color: 'gray' }}>{eventData?.price > 0 ? eventData?.price : "FREE"}</p></div>
                 </div>
                 <div id="div-three">
                   <div className='icon-div'><i style={{ color: 'gray' }} class="fa-solid fa-map-pin fa-lg"></i></div>
