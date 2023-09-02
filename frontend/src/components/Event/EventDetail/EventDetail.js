@@ -118,7 +118,7 @@ const EventDetail = () => {
                   <div><p style={{ color: 'gray' }}>{eventData?.type}</p></div>
                 </div>
               </div>
-              <div><button onClick={()=>alert('Feature coming soon')} id='update-event-btn'>Update</button></div>
+              {/* <div><button onClick={()=>alert('Feature coming soon')} id='update-event-btn'>Update</button></div> */}
               <div id='delete-event-btn-div'>
                 {sessionUser && eventData?.Group?.Organizer?.id === sessionUser.id && <button id="delete-event-btn">
                   <OpenModalMenuItem
