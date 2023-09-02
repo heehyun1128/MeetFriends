@@ -82,12 +82,12 @@ const EventForm = ({ event }) => {
   const handleEventFormSubmit = (e) => {
     e.preventDefault()
     // console.log(formatDate(startDate))
-
+   
     event = {
       venueId: null,
       name,
       type: eventType,
-      price: Number(price),
+      price: parseFloat(price),
       description,
       startDate: startDate && formatDate(startDate),
       endDate: endDate && formatDate(endDate),
