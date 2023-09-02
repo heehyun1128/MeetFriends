@@ -1,7 +1,7 @@
 import EventForm from "./EventForm";
 import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router-dom'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 // import { fetchGroups } from "../../../store/group";
 import { fetchGroupDetail } from '../../../store/group';
 const CreateEventForm = () => {
@@ -11,6 +11,14 @@ const CreateEventForm = () => {
   const [validationError, setValidationError] = useState({})
 
 
+  // get single group
+  const singleGroupObj = useSelector((state) => (Object.values(state.groups.singleGroup).length ? state.groups.singleGroup : {}))
+  const groupData = singleGroupObj?.groupData
+
+  const sessionUser = useSelector(state => state.session.user)
+  if (!sessionUser || (groupData && sessionUser && sessionUser.id !== groupData?.Organizer?.id)) {
+    history.push('/')
+  }
 
   useEffect(() => {
     dispatch(fetchGroupDetail(groupId)).catch(
@@ -42,10 +50,12 @@ const CreateEventForm = () => {
     imageUrl: ''
   }
   return (
-    <EventForm
-      event={event}
-      formType="createEvent"
-    />
+    <>
+      {sessionUser && sessionUser.id === groupData?.Organizer?.id && <EventForm
+        event={event}
+        formType="createEvent"
+      />}
+    </>
   )
 }
 
