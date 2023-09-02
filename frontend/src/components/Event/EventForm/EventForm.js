@@ -69,7 +69,7 @@ const EventForm = ({ event }) => {
       }
       if (isMidNight) {
         hour = (Number(date.split(" ")[1].slice(0, 2)) - 12).toString() + 0
-        console.log(hour)
+        // console.log(hour)
       }
       const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:00`
       // console.log(formattedDate)
@@ -94,21 +94,22 @@ const EventForm = ({ event }) => {
       imageUrl,
       private: eventVisibility
     }
+    // console.log(imageUrl)
     const newEvent = dispatch(createEvent(event, groupId)).then(
       (newEventRes) => {
         history.push(`/events/${newEventRes.id}`)
         resetEventForm()
         event = newEventRes
-        // console.log(event.startDate)
+        // console.log(event)
       }
     ).catch(async (res) => {
       const data = await res.json();
       if (data && data.errors) {
         setValidationError(data.errors);
       }
-      console.log(data.errors)
+      // console.log(data.errors)
     });
-    console.log(validationError)
+    // console.log(validationError)
   }
 
   return (
@@ -136,7 +137,7 @@ const EventForm = ({ event }) => {
               value={eventType}
               onChange={(e) => {
                 setEventType(e.target.value)
-                console.log(e.target.value)
+                // console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
@@ -153,7 +154,7 @@ const EventForm = ({ event }) => {
               value={eventVisibility}
               onChange={(e) => {
                 setEventVisibility(e.target.value)
-                console.log(e.target.value)
+                // console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
@@ -239,7 +240,7 @@ const EventForm = ({ event }) => {
             onChange={(e) => {
 
               setImageUrl(e.target.value)
-              console.log('input image url', imageUrl)
+              // console.log('input image url', imageUrl)
             }}
           />
           <p className="group-event-errors">

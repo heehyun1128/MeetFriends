@@ -78,7 +78,7 @@ export const createGroup = group => async (dispatch) => {
 }
 
 export const updateGroup = group => async (dispatch) => {
-  console.log("update group reducer passed in data",group)
+  // console.log("update group reducer passed in data",group)
   const res = await csrfFetch(`/api/groups/${group.id}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -86,7 +86,7 @@ export const updateGroup = group => async (dispatch) => {
   })
   if (res.ok) {
     const updatedGroup = await res.json()
-    console.log("update group reducer returned data",updatedGroup)
+    // console.log("update group reducer returned data",updatedGroup)
     dispatch(editGroup(updatedGroup))
     return updatedGroup
   } else {

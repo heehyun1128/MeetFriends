@@ -32,7 +32,7 @@ const EventDetail = () => {
     dispatch(fetchEventDetail(eventId)).catch(
       async (res) => {
         const data = await res.json();
-     console.log(data)
+    //  console.log(data)
         if (data && data.message) {
           setValidationError(data.message);
         }
@@ -40,7 +40,7 @@ const EventDetail = () => {
       }
     )
   }, [dispatch, eventId]);
-  console.log(validationError)
+  // console.log(validationError)
   if (Object.values(validationError).length) {
     history.push('/404')
 
@@ -49,22 +49,23 @@ const EventDetail = () => {
     // history.push('/404')
     return null
   }
-
+  // console.log("eventInfo", eventInfo)
+ 
   const startDate = eventInfo?.startDate.split('T')[0]
   const startTime = eventInfo?.startDate.split('T')[1].slice(0, 8)
   const endDate = eventInfo?.endDate.split('T')[0]
   const endTime = eventInfo?.endDate.split('T')[1].slice(0, 8)
-  console.log(endTime)
+  // console.log(endTime)
  
-  const startHour = startTime?.slice(0,2)-7
-  const endHour = endTime?.slice(0,2)-7
+  // const startHour = startTime?.slice(0,2)-7
+  // const endHour = endTime?.slice(0,2)-7
   // format startTime/endTime to switch to local time
-  const localStartTime = startHour + startTime?.slice(2)
-  const localEndTime = endHour + endTime?.slice(2)
+  // const localStartTime = startHour + startTime?.slice(2)
+  // const localEndTime = endHour + endTime?.slice(2)
 
-  console.log(localEndTime) 
+  // console.log(localEndTime) 
   const groupImageUrl = eventData?.Group?.GroupImages?.slice(0, 1)[0]?.url
-  console.log("eventInfo",eventInfo)
+  // console.log("eventInfo",eventInfo)
   const isPrivate = eventData?.Group?.private ? "Private" : "Public"
   return (
     <div id="event-detail-page">
@@ -79,7 +80,7 @@ const EventDetail = () => {
       <div id="event-detail-main">
         <div id="event-detail-main-upper">
           <div id="event-info-image-div">
-            <img id='event-info-image' src={eventInfo && eventInfo.previewImage} alt="eventImage" />
+            <img id='event-info-image' src={eventInfo && eventInfo?.previewImage} alt="eventImage" />
           </div>
           <div id="event-main-upper-right">
             <div id="event-main-group-info">
@@ -99,11 +100,11 @@ const EventDetail = () => {
                     <div id="start-end">
                       <div id='flow-box'>
                         <p id='start' style={{ color: 'gray' }}>START</p>
-                        <p style={{ color: '#0f6767' }}>{startDate}<p id='dot-dot'>.</p> {localStartTime}</p>
+                        <p style={{ color: '#0f6767' }}>{startDate}<p id='dot-dot'>.</p> {startTime}</p>
                       </div>
                       <div id='flow-box'>
                         <p id='end' style={{ color: 'gray' }}>END</p>
-                        <p style={{ color: '#0f6767' }}>{endDate} <p id='dot-dot'>.</p>{localEndTime}</p>
+                        <p style={{ color: '#0f6767' }}>{endDate} <p id='dot-dot'>.</p>{endTime}</p>
                       </div>
                     </div>
                   </div>
@@ -117,6 +118,7 @@ const EventDetail = () => {
                   <div><p style={{ color: 'gray' }}>{eventData?.type}</p></div>
                 </div>
               </div>
+              <div><button onClick={()=>alert('Feature coming soon')} id='update-event-btn'>Update</button></div>
               <div id='delete-event-btn-div'>
                 {sessionUser && eventData?.Group?.Organizer?.id === sessionUser.id && <button id="delete-event-btn">
                   <OpenModalMenuItem
@@ -129,7 +131,7 @@ const EventDetail = () => {
           </div>
         </div>
         <div id="event-detail-main-lower">
-          <h2>Details</h2>
+          <h2>Description</h2>
           <p>{eventData?.description}</p>
         </div>
       </div>

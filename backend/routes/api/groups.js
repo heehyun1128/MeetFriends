@@ -48,7 +48,8 @@ const validateEventInfoOnCreate = [
   //   .isInt()
   //   .withMessage("Capacity must be an integer"),
   check("price")
-    .exists({ checkFalsy: true })
+    // .exists({ checkFalsy: true })
+    .notEmpty()
     .withMessage("Price is required")
     .custom(value => {
       if (isNaN(parseFloat(value)) || parseFloat(value) < 0) {
@@ -1025,9 +1026,9 @@ router.put("/:id", requireAuth, async (req, res, next) => {
       },
       order: [['id', 'DESC']]
     })
-    console.log(groupImages[0].url)
+    // console.log(groupImages[0].url)
     groupImages[0].url = imageUrl
-    console.log(groupImages[0].url)
+    // console.log(groupImages[0].url)
     await groupImages[0].save()
     // console.log(previewImageUrl)
     // find group memberships
