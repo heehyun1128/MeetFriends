@@ -45,13 +45,13 @@ const EventForm = ({ event }) => {
 
   // format start date and end date for backend validation
   const formatDate = (date) => {
-    if (/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/\d{4} (0[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/.test(date)) {
+    if (/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/\d{4} (0[0-9]|1[0-2]):([0-5]\d) (AM|PM)$/.test(date)) {
 
-      const isMorning = (date.split(" ")[2] === "AM" && Number(date.split(" ")[1].slice(0, 2)) !== 12) || (Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "PM") ? true : false
+      const isMorning = (date.split(" ")[2] === "AM" && Number(date.split(" ")[1].slice(0, 2)) !== 12) || (Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "PM") || (date.split(" ")[1].slice(0, 2) === '00' && date.split(" ")[2] === "AM") ? true : false
       const isNight = date.split(" ")[2] === "PM" && Number(date.split(" ")[1].slice(0, 2)) < 12 ? true : false
       const isMidNight = Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "AM" ? true : false
       // console.log(Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "AM")
-      // console.log('isMorning', isMorning)
+      console.log(date.split(" ")[1].slice(0, 2))
       // console.log('isNight', isNight)
       // console.log('isMidNight', isMidNight)
 
