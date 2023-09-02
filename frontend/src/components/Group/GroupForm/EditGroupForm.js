@@ -16,7 +16,7 @@ const EditGroupForm = () => {
   const groupInfo = groupObj[groupId]
   // get single group
   const singleGroupObj = useSelector((state) => (Object.values(state.groups.singleGroup).length ? state.groups.singleGroup : {}))
-  const groupData=singleGroupObj.groupData
+  const groupData=singleGroupObj?.groupData
 // console.log(groupData?.Organizer.id)
 // check if user is logged in
 const sessionUser = useSelector(state => state.session.user)
