@@ -54,7 +54,7 @@ function SignupFormModal() {
           if (data && data.errors) {
             setErrors(data.errors);
           }
-          console.log(data.errors)
+          // console.log(data.errors)
         });
     }
     return setErrors({

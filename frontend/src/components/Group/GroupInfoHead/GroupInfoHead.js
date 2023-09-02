@@ -40,7 +40,7 @@ const GroupInfoHead = ({ groupData, groupInfo }) => {
           <div className="group-info-sub-head">
             <p className='group-info-city'>{groupData && groupData.city}</p>
             <div className='event-privacy-div'>
-              <p className='group-info-numEvents'>{groupData && groupData.numEvents} events</p>
+              <p className='group-info-numEvents'>{groupInfo && groupInfo?.numEvents} events</p>
               <div className="group-info-centered-dot"><p>.</p></div>
               <p className='group-info-private'>{groupData && groupData.private ? "Private" : "Public"}</p>
             </div>

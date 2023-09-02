@@ -8,14 +8,14 @@ import './GroupForm.css'
 
 const GroupForm = ({ group, groupInfo,formType }) => {
   const history = useHistory()
-  console.log("group.GroupImages", group.GroupImages)
+  // console.log("group.GroupImages", group.GroupImages)
 
-  const [city, setCity] = useState(group.city || "")
-  const [state, setState] = useState(group.state || "")
-  const [groupName, setGroupName] = useState(group.name || "")
-  const [description, setDescription] = useState(group.about || "")
-  const [groupType, setGroupType] = useState(group.type || "")
-  const [groupVisibility, setGroupVisibility] = useState(group.private.toString() || "")
+  const [city, setCity] = useState(group?.city || "")
+  const [state, setState] = useState(group?.state || "")
+  const [groupName, setGroupName] = useState(group?.name || "")
+  const [description, setDescription] = useState(group?.about || "")
+  const [groupType, setGroupType] = useState(group?.type || "")
+  const [groupVisibility, setGroupVisibility] = useState(group?.private.toString() || "")
  
   const [groupImageUrl, setgroupImageUrl] = useState(groupInfo?.previewImage  || "")
   const [validationError, setValidationError] = useState({})
@@ -61,6 +61,10 @@ const GroupForm = ({ group, groupInfo,formType }) => {
         }
     
       });
+      // if (Object.values(validationError).length) {
+      //   history.push('/404')
+
+      // }
     } else if (formType === "updateGroup") {
       // console.log(group)
       group = {
@@ -91,6 +95,10 @@ const GroupForm = ({ group, groupInfo,formType }) => {
           }
    
         });
+      // if (Object.values(validationError).length) {
+      //   history.push('/404')
+
+      // }
     }
 
 
@@ -114,6 +122,10 @@ const GroupForm = ({ group, groupInfo,formType }) => {
             value={city}
             onChange={(e) => setCity(e.target.value)}
           />
+          <p className="group-form-errors">
+            {validationError.city && `${validationError.city}`}
+            {/* {validationError.state && `${validationError.state}`} */}
+          </p>
           <input
             type="text"
             placeholder='STATE  e.g.CA'
@@ -121,7 +133,7 @@ const GroupForm = ({ group, groupInfo,formType }) => {
             onChange={(e) => setState(e.target.value)}
           />
           <p className="group-form-errors">
-            {validationError.city && `${validationError.city}`}
+            {/* {validationError.city && `${validationError.city}`} */}
             {validationError.state && `${validationError.state}`}
           </p>
         </section>
@@ -139,7 +151,7 @@ const GroupForm = ({ group, groupInfo,formType }) => {
           </p>
         </section>
         <section className="group-form-section four">
-          <h2>Now describe what your group will be about</h2>
+          <h2>Describe the purpose of your group</h2>
           <p>People will see this when we promote your group, but you'll be able to add to it later, too.</p>
           <ol>
             <li>1. What's the purpose of the group?</li>

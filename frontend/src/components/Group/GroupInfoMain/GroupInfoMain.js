@@ -34,7 +34,7 @@ const GroupInfoMain = ({ groupData }) => {
   useEffect(() => {
     dispatch(fetchEvents());
   }, [dispatch]);
-console.log(groupData?.Organizer)
+// console.log(groupData?.Organizer)
   return (
     <div id='group-info-main-div'>
       <div className="group-info-main-organizer">

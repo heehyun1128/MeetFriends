@@ -47,9 +47,13 @@ const EventForm = ({ event }) => {
   const formatDate = (date) => {
     if (/^(0[1-9]|1[0-2])\/(0[1-9]|1\d|2\d|3[01])\/\d{4} (0[1-9]|1[0-2]):([0-5]\d) (AM|PM)$/.test(date)) {
 
-      const isMorning = date.split(" ")[2] === "AM" ? true : false
-      const isNight = date.split(" ")[2] === "PM" ? true : false
-      console.log(date.split(" "))
+      const isMorning = (date.split(" ")[2] === "AM" && Number(date.split(" ")[1].slice(0, 2)) !== 12) || (Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "PM") ? true : false
+      const isNight = date.split(" ")[2] === "PM" && Number(date.split(" ")[1].slice(0, 2)) < 12 ? true : false
+      const isMidNight = Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "AM" ? true : false
+      // console.log(Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "AM")
+      // console.log('isMorning', isMorning)
+      // console.log('isNight', isNight)
+      // console.log('isMidNight', isMidNight)
 
       let year = date.split(" ")[0].slice(6)
       let month = date.split(" ")[0].slice(0, 2)
@@ -63,9 +67,14 @@ const EventForm = ({ event }) => {
       if (isNight) {
         hour = (Number(date.split(" ")[1].slice(0, 2)) + 12).toString()
       }
+      if (isMidNight) {
+        hour = (Number(date.split(" ")[1].slice(0, 2)) - 12).toString() + 0
+        // console.log(hour)
+      }
       const formattedDate = `${year}-${month}-${day} ${hour}:${minute}:00`
+      // console.log(formattedDate)
       return formattedDate
-    }else{
+    } else {
       return
     }
 
@@ -85,21 +94,22 @@ const EventForm = ({ event }) => {
       imageUrl,
       private: eventVisibility
     }
+    // console.log(imageUrl)
     const newEvent = dispatch(createEvent(event, groupId)).then(
       (newEventRes) => {
         history.push(`/events/${newEventRes.id}`)
         resetEventForm()
         event = newEventRes
-        console.log(event)
+        // console.log(event)
       }
     ).catch(async (res) => {
       const data = await res.json();
       if (data && data.errors) {
         setValidationError(data.errors);
       }
-      console.log(data.errors)
+      // console.log(data.errors)
     });
-    console.log(validationError)
+    // console.log(validationError)
   }
 
   return (
@@ -127,7 +137,7 @@ const EventForm = ({ event }) => {
               value={eventType}
               onChange={(e) => {
                 setEventType(e.target.value)
-                console.log(e.target.value)
+                // console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
@@ -144,7 +154,7 @@ const EventForm = ({ event }) => {
               value={eventVisibility}
               onChange={(e) => {
                 setEventVisibility(e.target.value)
-                console.log(e.target.value)
+                // console.log(e.target.value)
               }}
             >
               <option value="" disabled selected>(select one)</option>
@@ -228,7 +238,9 @@ const EventForm = ({ event }) => {
             placeholder='Image URL'
             value={imageUrl}
             onChange={(e) => {
+
               setImageUrl(e.target.value)
+              // console.log('input image url', imageUrl)
             }}
           />
           <p className="group-event-errors">
@@ -238,7 +250,7 @@ const EventForm = ({ event }) => {
         <section className='event-form-section event-form-five'>
           <h4>Please describe your event:</h4>
           <textarea name="" id="" cols="30" rows="10"
-          placeholder='Please include at least 30 characters'
+            placeholder='Please include at least 30 characters'
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           >

@@ -36,7 +36,7 @@ const GroupInfoPage = () => {
       async (res) => {
      
         const data = await res.json();
-        console.log(data)
+        // console.log(data)
         if (data && data.message) {
           setValidationError(data.message);
         }
@@ -46,9 +46,9 @@ const GroupInfoPage = () => {
       // history.push('/404')
   
   }, [dispatch, groupId])
-  console.log(groupInfo)
-  console.log(groupData)
-  console.log(Object.values(validationError).length)
+  // console.log(groupInfo)
+  // console.log(groupData)
+  // console.log(Object.values(validationError).length)
   if (Object.values(validationError).length){
     history.push('/404')
     

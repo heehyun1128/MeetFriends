@@ -14,7 +14,7 @@ const DeleteModal = ({ eventId }) => {
  // get single event
   const singleEventObj = useSelector((state) => (Object.values(state.events.singleEvent).length ? state.events.singleEvent : {}))
   const eventData = singleEventObj.eventData
-console.log(eventData)
+// console.log(eventData)
 
   const handleDelete = (e) => {
 
@@ -28,7 +28,7 @@ console.log(eventData)
     })
 
 
-    console.log(deletedEvent)
+    // console.log(deletedEvent)
 
   }
 
