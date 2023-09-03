@@ -5,7 +5,7 @@ import './EventCard.css'
 
 const EventCard = ({ event }) => {
 
-
+console.log(event)
   const date = event.startDate.split('T')[0]
   const time = event.startDate.split('T')[1].slice(0, 8)
 
@@ -25,7 +25,8 @@ const EventCard = ({ event }) => {
             {event && <h4 id='date-time'>{time}</h4>}
          </div>
           <h3>{event && event.name}</h3>
-          <p id='event-city'>{event && event.Venue ? event.Venue.city : "Online"}</p>
+          {/* <p id='event-city'>{event && event.Venue ? event.Venue.city : "Online"}</p> */}
+          <p id='event-city'>{event && event.Venue ? event.Venue.city : event.Group.city}</p>
         </div>
       </div>
       <div className="event-card-lower">

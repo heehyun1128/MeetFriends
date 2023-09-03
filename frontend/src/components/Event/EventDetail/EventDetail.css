@@ -87,14 +87,14 @@
  align-items: flex-end;
 background-color: white;
 border-radius: 15px;
-padding:20px 20px 0;
+padding:20px 20px 5px;
 height:160px;
 
 }
 
-/* #event-main-group-detail-left{
-  width: 90%;
-} */
+#div-one{
+  width: 100%;
+}
 #delete-event-btn-div{
   display: flex;
   flex-direction: column;
@@ -111,7 +111,7 @@ height:30px;
   background-color: gray;
   box-shadow: 2px 2px 4px black;
   color: white;
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
   cursor: pointer;
 }
 
@@ -126,6 +126,9 @@ height:30px;
   height:22px;
   margin-right: 15px;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 
@@ -136,6 +139,11 @@ height:30px;
   display: flex;
   margin-bottom: 15px;
   align-items: center;
+
+}
+
+#div-three i.icon-div{
+  width:22px !important;
 }
 
 
@@ -154,7 +162,7 @@ height:30px;
 
 #start-end>*{
   display: flex;
-
+width:100%;
 
 }
 
@@ -174,7 +182,8 @@ align-items: center;
 }
 
 #start, #end{
-  width:60px;
+  width:120px;
+  
 }
 
 #flow-box p{
@@ -186,4 +195,13 @@ align-items: center;
   height:15px;
   align-items: center;
   justify-content: center;
+}
+
+#event-main-group-detail-left{
+  width:100%;
+}
+
+#update-delete-btn-div{
+  display: flex;
+  margin-left:80px;
 }
