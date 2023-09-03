@@ -36,7 +36,7 @@ const GroupInfoHead = ({ groupData, groupInfo }) => {
       </div>
       <div className="group-head-right">
         <div>
-          <h1>{groupData && groupData.name}</h1>
+          <h2>{groupData && groupData.name}</h2>
           <div className="group-info-sub-head">
             <p className='group-info-city'>{groupData && groupData.city}</p>
             <div className='event-privacy-div'>

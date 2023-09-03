@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from 'react-router-dom'
-import { useEffect,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchEventDetail, fetchEvents } from '../../../store/event';
 
 import DeleteEventModal from '../../DeleteModal/DeleteEventModal';
@@ -32,7 +32,7 @@ const EventDetail = () => {
     dispatch(fetchEventDetail(eventId)).catch(
       async (res) => {
         const data = await res.json();
-    //  console.log(data)
+        //  console.log(data)
         if (data && data.message) {
           setValidationError(data.message);
         }
@@ -50,13 +50,13 @@ const EventDetail = () => {
     return null
   }
   // console.log("eventInfo", eventInfo)
- 
+
   const startDate = eventInfo?.startDate.split('T')[0]
   const startTime = eventInfo?.startDate.split('T')[1].slice(0, 8)
   const endDate = eventInfo?.endDate.split('T')[0]
   const endTime = eventInfo?.endDate.split('T')[1].slice(0, 8)
   // console.log(endTime)
- 
+
   // const startHour = startTime?.slice(0,2)-7
   // const endHour = endTime?.slice(0,2)-7
   // format startTime/endTime to switch to local time
@@ -111,22 +111,25 @@ const EventDetail = () => {
                 </div>
                 <div id="div-two">
                   <div className='icon-div'><i id='dollar-icon' style={{ color: 'gray' }} class="fa-solid fa-dollar-sign"></i></div>
-                  <div id='price'><p style={{ color: 'gray' }}>{eventData?.price > 0 ? eventData?.price : "FREE"}</p></div>
+                  <div id='price'><p style={{ color: 'gray' }}>{eventData?.price > 0 ? `$${eventData?.price}` : "FREE"}</p></div>
                 </div>
                 <div id="div-three">
                   <div className='icon-div'><i style={{ color: 'gray' }} class="fa-solid fa-map-pin fa-lg"></i></div>
                   <div><p style={{ color: 'gray' }}>{eventData?.type}</p></div>
+                  <div id='update-delete-btn-div'>
+                    <div>{sessionUser && eventData?.Group?.Organizer?.id === sessionUser.id && <button onClick={() => alert('Feature coming soon')} id='update-event-btn'>Update</button>}</div>
+                    <div id='delete-event-btn-div'>
+                      {sessionUser && eventData?.Group?.Organizer?.id === sessionUser.id && <button id="delete-event-btn">
+                        <OpenModalMenuItem
+                          itemText="Delete"
+                          modalComponent={<DeleteEventModal eventId={eventId} />}
+
+                        /></button>}
+                    </div>
+                  </div>
                 </div>
               </div>
-              {/* <div><button onClick={()=>alert('Feature coming soon')} id='update-event-btn'>Update</button></div> */}
-              <div id='delete-event-btn-div'>
-                {sessionUser && eventData?.Group?.Organizer?.id === sessionUser.id && <button id="delete-event-btn">
-                  <OpenModalMenuItem
-                    itemText="Delete"
-                    modalComponent={<DeleteEventModal eventId={eventId} />}
 
-                  /></button>}
-              </div>
             </div>
           </div>
         </div>
