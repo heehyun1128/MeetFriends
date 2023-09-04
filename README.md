@@ -262,6 +262,7 @@ A user who is the geoup organizer can delete an event from the group.
 
 ## Upcoming Features
 
+* Enable Dark Mode/ Language Selection
 * Update Event
 * Venue
   - Create a Venue for a Group

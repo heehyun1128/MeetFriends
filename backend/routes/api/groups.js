@@ -73,15 +73,17 @@ const validateEventInfoOnCreate = [
       // use regex to check date format
       const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
       if (!dateFormat.test(value)) {
-        throw new Error("Start date must be a valid datetime")
+        throw new Error("Start date must be a valid datetime and in format: MM:DD:YYYY HH:mm AM")
       }
       const date = new Date(value)
-      if (isNaN(date.getTime())) {
-        throw new Error("Start date must be a valid datetime")
+      const [year, month, day] = value.split(' ')[0].split('-')
+      
+      if (isNaN(date.getTime()) || parseInt(month) !== date.getMonth() +1 || parseInt(day) !==date.getDate() ) {
+        throw new Error("Start date must be a valid datetime and in format: MM:DD:YYYY HH:mm AM")
       }
       return true
     })
-    .withMessage("Start date must be a valid datetime")
+    .withMessage("Start date must be a valid datetime and in format: MM:DD:YYYY HH:mm AM")
   ,
   check("endDate")
     .notEmpty()
@@ -91,11 +93,14 @@ const validateEventInfoOnCreate = [
       // use regex to check date format
       const dateFormat = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/
       if (!dateFormat.test(value)) {
-        throw new Error("End date must be a valid datetime")
+        throw new Error("End date must be a valid datetime and in format: MM:DD:YYYY HH:mm AM")
       }
       const date = new Date(value)
-      if (isNaN(date.getTime())) {
-        throw new Error("End date must be a valid datetime")
+      const [year, month, day] = value.split(' ')[0].split('-')
+
+      
+      if (isNaN(date.getTime()) || parseInt(month) !== date.getMonth() + 1 || parseInt(day) !== date.getDate()) {
+        throw new Error("End date must be a valid datetime and in format: MM:DD:YYYY HH:mm AM")
       }
       const startDate = new Date(req.body.startDate)
       const endDate = new Date(value)
