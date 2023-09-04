@@ -263,7 +263,11 @@ A user who is the geoup organizer can delete an event from the group.
 ## Upcoming Features
 
 * Enable Dark Mode/ Language Selection
-* Update Event
+* Event
+  - Update Event
+* Group
+  - Search by location and group info (name, description)
+  - Calendar on group page and for all groups in search results
 * Venue
   - Create a Venue for a Group
   - Enable Selection of Venue for Group Events
@@ -280,6 +284,8 @@ A user who is the geoup organizer can delete an event from the group.
   - View Current Attendee List
   - Update Attendance Status
   - Remove attendees
+* AWS/S3 Image Upload
+* Google Maps
 
 
 ## Frontend Redux Store Shape
