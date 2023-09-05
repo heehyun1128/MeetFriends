@@ -51,7 +51,7 @@ const EventForm = ({ event }) => {
       const isNight = date.split(" ")[2] === "PM" && Number(date.split(" ")[1].slice(0, 2)) < 12 ? true : false
       const isMidNight = Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "AM" ? true : false
       // console.log(Number(date.split(" ")[1].slice(0, 2)) === 12 && date.split(" ")[2] === "AM")
-      console.log(date.split(" ")[1].slice(0, 2))
+      // console.log(date.split(" ")[1].slice(0, 2))
       // console.log('isNight', isNight)
       // console.log('isMidNight', isMidNight)
 

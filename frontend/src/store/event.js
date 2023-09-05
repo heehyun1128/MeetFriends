@@ -1,5 +1,5 @@
 import { csrfFetch } from "./csrf"
-
+import { REMOVE_GROUP } from "./group"
 /** Action Type Constants: */
 export const LOAD_EVENTS = '/events/LOAD_EVENTS'
 export const GET_EVENT = '/events/GET_EVENT'
@@ -19,8 +19,9 @@ export const getEvent = (event,groupId) => ({
   }
 })
 
-export const removeEvent = eventId => ({
+export const removeEvent = (groupId,eventId) => ({
   type: REMOVE_EVENT,
+  groupId,
   eventId
 })
 
@@ -67,13 +68,13 @@ export const createEvent = (event,groupId) => async (dispatch) => {
   }
 }
 
-export const deleteEvent= (eventId) => async (dispatch) => {
+export const deleteEvent= (groupId,eventId) => async (dispatch) => {
   const res = await csrfFetch(`/api/events/${eventId}`, {
     method: 'DELETE'
   })
   if (res.ok) {
 
-    dispatch(removeEvent(eventId))
+    dispatch(removeEvent(groupId, eventId))
 
   } else {
     const errors = await res.json()
@@ -123,7 +124,7 @@ const eventReducer = (state = initialState, action) => {
       const updatedState = { ...state, allEvents: { ...state.allEvents } }
       action.events.Events.forEach(event => {
 
-        // console.log(event)
+        console.log(event)
         // newState.allEvents={...newState.allEvents, [event.id] : event}
         updatedState.allEvents[event.id] = event
       })
@@ -146,6 +147,25 @@ const eventReducer = (state = initialState, action) => {
       delete newState.allEvents[action.eventId]
       return newState
 
+    case REMOVE_GROUP:
+      const removedGroupId = action.groupId
+      console.log(action.groupId)
+      const filterEvent = { ...state.allEvents }
+      console.log(filterEvent)
+      Object.keys(filterEvent).forEach((eventId)=>{
+        const eventEle = filterEvent[eventId]
+        console.log(eventEle)
+        console.log(Number(eventEle.groupId) === Number(removedGroupId))
+        if (Number(eventEle.groupId) === Number(removedGroupId)){
+          delete filterEvent[eventId]
+        }
+        
+      })
+      console.log(filterEvent)
+      return {
+        ...state,
+        allEvents: filterEvent
+      }
     default:
       return state;
   }

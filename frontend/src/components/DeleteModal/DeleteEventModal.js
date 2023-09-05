@@ -19,7 +19,7 @@ const DeleteModal = ({ eventId }) => {
   const handleDelete = (e) => {
 
     e.preventDefault();
-    const deletedEvent=dispatch(deleteEvent(eventId)).then(() => {
+    const deletedEvent = dispatch(deleteEvent(eventData?.groupId,eventId)).then(() => {
 
       closeModal()
 

@@ -24,8 +24,8 @@ const CreateEventForm = () => {
     dispatch(fetchGroupDetail(groupId)).catch(
       async (res) => {
         const data = await res.json();
-         console.log(data)
-        console.log(data.message)
+        //  console.log(data)
+        // console.log(data.message)
         if (data && data.message) {
           setValidationError(data);
         }
