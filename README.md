@@ -8,7 +8,7 @@ This project is a clone of Meetup.com. Currently, the application allows users t
 
 ## Link to Live Site
 
-https://meetup-backend-witc.onrender.com
+[https://meetup-backend-witc.onrender.com](https://meetup-clone-40bc08cdb811.herokuapp.com/)
 
 
 ## Contact the Project Owner
