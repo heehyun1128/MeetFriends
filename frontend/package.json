@@ -17,7 +17,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm install && npm run render-postbuild && npm run build",
+    "postbuild": "npm run sequelize --prefix backend db:migrate && npm run sequelize --prefix backend db:seed:all",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
